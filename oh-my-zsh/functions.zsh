@@ -25,6 +25,11 @@ function add_remote() {
     git push -uf origin main
 }
 
+# Add location to PYTHONPATH
+function addpp() {
+    export PYTHONPATH=${PYTHONPATH}:${HOME}/$1
+}
+
 # Use rich to print out the current readme
 function readme() {
     if [ "$1" != "" ]
