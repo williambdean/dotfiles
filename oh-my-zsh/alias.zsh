@@ -13,7 +13,7 @@ alias chrome="/Applications/Google\\ \\Chrome.app/Contents/MacOS/Google\\ \\Chro
 
 alias confluence="chrome 'https://hyperionpath.atlassian.net/wiki/spaces/ANALYTICS/overview?homepageId=163842'"
 
-# Github Helpers
+# Git Helpers
 alias gs='git status'
 alias ga='git add'
 alias gc='git commit -m'

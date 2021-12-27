@@ -1,3 +1,4 @@
+# Open Github of the local
 function gh() {
     local url_root="$(git config --get remote.origin.url)"
     if [ -z  "$url_root" ]
@@ -16,13 +17,15 @@ function gh() {
     fi
 }
 
+# Add a remote and push up to main
 function add_remote() {
     local git_url=$1
 
     git remote add origin $git_url
-    git push -uf origin master
+    git push -uf origin main
 }
 
+# Use rich to print out the current readme
 function readme() {
     if [ "$1" != "" ]
     then
@@ -32,6 +35,7 @@ function readme() {
     fi
 }
 
+# Adding and removing jupyter kernels
 function new_kernel() {
     ipython kernel install --name "$1" --user
 }
