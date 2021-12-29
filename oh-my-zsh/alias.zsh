@@ -5,7 +5,9 @@ alias back="cd -"
 
 alias llpy="ll *.py"
 
-alias reload="source ~/.zshrc"
+alias reload="c && source ~/.zshrc"
+
+alias rc="vim ~/.zshrc"
 
 alias atom="atom ."
 
