@@ -29,3 +29,5 @@ alias gdelete="git branch --merged | grep -v \* | xargs git branch -D "
 ## Pipenv helpers
 alias pes="pipenv shell"
 alias jnb="pipenv run jupyter lab"
+
+alias unused_imports="flake8 --select=F401, F841"
