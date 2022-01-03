@@ -17,6 +17,11 @@ function gh() {
     fi
 }
 
+function finder() {
+    local dir="$PWD"
+    open $dir
+}
+
 # Add a remote and push up to main
 function add_remote() {
     local git_url=$1
