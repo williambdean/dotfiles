@@ -13,8 +13,6 @@ alias atom="atom ."
 
 alias chrome="/Applications/Google\\ \\Chrome.app/Contents/MacOS/Google\\ \\Chrome"
 
-alias confluence="chrome 'https://hyperionpath.atlassian.net/wiki/spaces/ANALYTICS/overview?homepageId=163842'"
-
 # Git Helpers
 alias gs='git status'
 alias ga='git add'
