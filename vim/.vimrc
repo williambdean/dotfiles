@@ -20,6 +20,8 @@ set encoding=utf-8
 set colorcolumn=80
 highlight ColorColumn ctermbg=0 guibg=grey
 
+autocmd BufNewFile,BufFilePre,BufRead *.md set filetype=markdown.pandoc
+
 call plug#begin('~/.vim/plugged')
 
 Plug 'morhetz/gruvbox'

@@ -39,9 +39,9 @@ function addpp() {
 function readme() {
     if [ "$1" != "" ]
     then
-        python3 -m rich.markdown $1 --hyperlinks -p
+        python3 -m rich.markdown $1 --hyperlinks 
     else
-        python3 -m rich.markdown README.md --hyperlinks -p
+        python3 -m rich.markdown README.md --hyperlinks
     fi
 }
 
