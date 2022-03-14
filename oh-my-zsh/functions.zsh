@@ -39,7 +39,7 @@ function addpp() {
 function readme() {
     if [ "$1" != "" ]
     then
-        python3 -m rich.markdown $1 --hyperlinks 
+        python3 -m rich.markdown $1 --hyperlinks
     else
         python3 -m rich.markdown README.md --hyperlinks
     fi
@@ -52,4 +52,9 @@ function new_kernel() {
 
 function remove_kernel() {
     jupyter kernelspec remove "$1"
+}
+
+# Link file to ZSH_CUSTOM
+function zsh-link() {
+    ln -s $(pwd)/$1 $ZSH_CUSTOM
 }
