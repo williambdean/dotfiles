@@ -58,3 +58,9 @@ function remove_kernel() {
 function zsh-link() {
     ln -s $(pwd)/$1 $ZSH_CUSTOM
 }
+
+# From https://blog.mattclemente.com/2020/06/26/oh-my-zsh-slow-to-load/#how-to-test-your-shell-load-time
+timezsh() {
+  shell=${1-$SHELL}
+  for i in $(seq 1 10); do /usr/bin/time $shell -i -c exit; done
+}
