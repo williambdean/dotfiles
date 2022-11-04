@@ -24,7 +24,7 @@ alias gls='git ls-tree --full-tree --name-only -r HEAD'
 alias gg="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)'"
 alias gdelete="git branch --merged | grep -v \* | xargs git branch -D "
 
-alias gblack="gd --name-only | grep .py | xargs python -m black"
+alias gdblack="gdext .py | xargs python -m black"
 
 ## Pipenv helpers
 alias pes="pipenv shell"

@@ -17,6 +17,10 @@ function gh() {
     fi
 }
 
+function gdext() {
+    git diff --name-only | grep "$1"
+}
+
 function finder() {
     local dir="$PWD"
     open $dir
