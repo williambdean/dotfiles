@@ -1,4 +1,6 @@
 alias c=clear
+# Since I've been on windows recently...
+alias cls=clear
 
 alias ..="cd .."
 alias back="cd -"
@@ -10,8 +12,6 @@ alias reload="c && exec zsh"
 alias rc="vim ~/.zshrc"
 
 alias atom="atom ."
-
-alias chrome="/Applications/Google\\ \\Chrome.app/Contents/MacOS/Google\\ \\Chrome"
 
 # Git Helpers
 alias gs='git status'

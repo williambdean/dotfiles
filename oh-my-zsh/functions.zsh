@@ -1,20 +1,44 @@
+# Open page in Google Chrome
+function chrome() {
+    open -a "Google Chrome" http://$1
+}
+
 # Open Github of the local
 function gh() {
     local url_root="$(git config --get remote.origin.url)"
     if [ -z  "$url_root" ]
     then
         echo "There is no remote!"
-    else
-        url_root=${url_root%.git}
-        if [ -z "$1" ]
-        then
-            local current_branch="$(git branch --show-current)"
-        else
-            local current_branch="$1"
-        fi
-        local url_name="$url_root/tree/$current_branch"
-        chrome $url_name
+        return;
     fi
+
+    local python_code="import sys
+x = sys.argv[1]
+for prefix in ('git@', 'https://', 'http://'): 
+    x = x.replace(prefix, '')
+
+x = x.replace(':', '/')
+print(x)
+    "
+    url_root=$(python3 -c $python_code $url_root)
+    url_root=${url_root%.git}
+    # Optional branch selection
+    if [ -z "$1" ]
+    then
+        local current_branch="$(git branch --show-current)"
+    else
+        local current_branch="$1"
+    fi
+
+    if [[ $url_root == gitlab* ]]
+    then 
+        separator="/-/tree/"
+    else
+        separator="/tree/"
+    fi 
+
+    local url_name="$url_root$separator$current_branch"
+    chrome $url_name
 }
 
 function gdext() {

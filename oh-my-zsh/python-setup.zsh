@@ -8,3 +8,6 @@ export PATH="$PYENV_ROOT/bin:$PATH"
 if which pyenv > /dev/null; then eval "$(pyenv init --path)" && eval "$(pyenv init -)"; fi
 export PATH=$PATH:${HOME}/Driver/
 export PIPENV_VENV_IN_PROJECT=1
+
+# Poetry
+export PATH=$HOME/.local/bin:$PATH
