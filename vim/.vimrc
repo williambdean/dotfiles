@@ -29,8 +29,11 @@ Plug 'itchyny/lightline.vim'
 Plug 'mbbill/undotree'
 Plug 'preservim/nerdtree'
 Plug 'mhinz/vim-startify'
+Plug 'davidhalter/jedi-vim'
 
 call plug#end()
+
+let NERDTreeIgnore = ['\.pyc$']
 
 colorscheme gruvbox
 set background=dark
