@@ -1,5 +1,6 @@
 syntax on
 
+set spell
 set noerrorbells
 set tabstop=4 softtabstop=4
 set shiftwidth=4
@@ -24,12 +25,15 @@ autocmd BufNewFile,BufFilePre,BufRead *.md set filetype=markdown.pandoc
 
 call plug#begin('~/.vim/plugged')
 
+Plug 'tpope/vim-fugitive'
 Plug 'morhetz/gruvbox'
 Plug 'itchyny/lightline.vim'
 Plug 'mbbill/undotree'
 Plug 'preservim/nerdtree'
 Plug 'mhinz/vim-startify'
 Plug 'davidhalter/jedi-vim'
+Plug 'nvie/vim-flake8'
+Plug 'justinmk/vim-sneak'
 
 call plug#end()
 
@@ -51,3 +55,5 @@ nnoremap <C-t> :NERDTreeToggle<CR>
 nnoremap <C-f> :NERDTreeFind<CR>
 
 nnoremap <leader>o o<esc>k
+
+let g:sneak#label = 1
