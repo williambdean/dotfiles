@@ -18,6 +18,8 @@ set scrolloff=15
 set relativenumber
 set encoding=utf-8
 
+set backspace=indent,eol,start
+
 set colorcolumn=80
 highlight ColorColumn ctermbg=0 guibg=grey
 
