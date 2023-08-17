@@ -43,7 +43,6 @@ print(x)
 
 function wrap-pr() {
     local branch_name="${1:-main}"
-    echo $branch_name
     git checkout $branch_name && git pull origin $branch_name && gdelete
 }
 
