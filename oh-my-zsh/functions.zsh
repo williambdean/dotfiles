@@ -41,6 +41,12 @@ print(x)
     chrome $url_name
 }
 
+function wrap-pr() {
+    local branch_name="${1:-main}"
+    echo $branch_name
+    git checkout $branch_name && git pull origin $branch_name && gdelete
+}
+
 function gdext() {
     git diff --name-only | grep "$1"
 }
