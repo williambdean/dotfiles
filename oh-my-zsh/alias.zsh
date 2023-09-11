@@ -26,8 +26,8 @@ alias gdelete="git branch --merged | grep -v \* | xargs git branch -D "
 
 alias gdblack="gdext .py | xargs python -m black"
 
-## Pipenv helpers
-alias pes="pipenv shell"
-alias jnb="pipenv run jupyter lab"
-
+# Python files
 alias unused_imports="flake8 --select=F401, F841"
+
+# Docker 
+alias enter-docker="docker run --rm -it --entrypoint bash"

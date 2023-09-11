@@ -92,9 +92,6 @@ function zsh-link() {
     ln -s $(pwd)/$1 $ZSH_CUSTOM
 }
 
-function enter-docker() {
-    docker run --rm -it --entrypoint bash $1
-}
 
 # From https://blog.mattclemente.com/2020/06/26/oh-my-zsh-slow-to-load/#how-to-test-your-shell-load-time
 timezsh() {
