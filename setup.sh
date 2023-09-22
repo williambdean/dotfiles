@@ -4,6 +4,6 @@ ln -s $PWD/vim/.vimrc $HOME/.vimrc
 
 cd oh-my-zsh
 for file in *.zsh
-do ln -s $file $ZSH_CUSTOM/$file
+do ln -s $(readlink -f $file) $ZSH_CUSTOM/$file
 done
 cd ..
