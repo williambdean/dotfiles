@@ -4,7 +4,7 @@ function chrome() {
 }
 
 # Open Github of the local
-function gh() {
+function open-gh() {
     local url_root="$(git config --get remote.origin.url)"
     if [ -z  "$url_root" ]
     then
