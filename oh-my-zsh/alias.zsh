@@ -31,4 +31,4 @@ alias unused_imports="flake8 --select=F401, F841"
 
 # Docker 
 alias enter-docker="docker run --rm -it --entrypoint bash"
-alias local-docker="enter-docker -v $(pwd):/app -w /app"
+
