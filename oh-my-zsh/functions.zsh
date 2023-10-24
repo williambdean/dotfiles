@@ -3,8 +3,7 @@ function chrome() {
     open -a "Google Chrome" http://$1
 }
 
-# Open Github of the local
-function gh() {
+function git-url() {
     local url_root="$(git config --get remote.origin.url)"
     if [ -z  "$url_root" ]
     then
@@ -37,8 +36,12 @@ print(x)
         separator="/tree/"
     fi 
 
-    local url_name="$url_root$separator$current_branch"
-    chrome $url_name
+    echo "https://$url_root$separator$current_branch"
+}
+
+# Open Github of the local
+function open-gh() {
+    chrome $(git-url)
 }
 
 function wrap-pr() {
