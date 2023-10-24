@@ -3,6 +3,12 @@ function chrome() {
     open -a "Google Chrome" http://$1
 }
 
+
+function local-docker() {
+    enter-docker -v $(pwd):/app -w /app $1
+}
+
+# Open Github of the local
 function git-url() {
     local url_root="$(git config --get remote.origin.url)"
     if [ -z  "$url_root" ]
