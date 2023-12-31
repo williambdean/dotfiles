@@ -8,7 +8,7 @@ function local-docker() {
 }
 
 # Open Github of the local
-function open-gh() {
+function open-remote() {
     local url_root="$(git config --get remote.origin.url)"
     if [ -z  "$url_root" ]
     then

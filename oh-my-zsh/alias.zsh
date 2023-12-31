@@ -9,6 +9,8 @@ alias llpy="ll *.py"
 
 alias reload="c && exec zsh"
 
+alias vim=nvim
+
 alias rc="vim ~/.zshrc"
 
 alias atom="atom ."
