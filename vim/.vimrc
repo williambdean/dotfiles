@@ -36,6 +36,9 @@ Plug 'mhinz/vim-startify'
 Plug 'davidhalter/jedi-vim'
 Plug 'nvie/vim-flake8'
 Plug 'justinmk/vim-sneak'
+Plug 'nvim-lua/plenary.nvim'
+" Plug 'ThePrimeagen/harpoon'
+Plug 'nvim-telescope/telescope.nvim'
 
 call plug#end()
 
@@ -59,3 +62,10 @@ nnoremap <C-f> :NERDTreeFind<CR>
 nnoremap <leader>o o<esc>k
 
 let g:sneak#label = 1
+
+" Find files using Telescope command-line sugar.
+nnoremap <leader>ff <cmd>Telescope find_files<cr>
+" vim.api.nvim_set_keymap('n', '<Leader>ff', ':lua require"telescope.builtin".find_files({ hidden = true })
+nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+nnoremap <leader>fb <cmd>Telescope buffers<cr>
+nnoremap <leader>fh <cmd>Telescope help_tags<cr>
