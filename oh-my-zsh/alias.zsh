@@ -13,8 +13,6 @@ alias vim=nvim
 
 alias rc="vim ~/.zshrc"
 
-alias atom="atom ."
-
 # Git Helpers
 alias gs='git status'
 alias ga='git add'
