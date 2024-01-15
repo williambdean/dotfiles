@@ -45,8 +45,14 @@ print(x)
     chrome $url_name
 }
 
+function default-branch() {
+    local branch_name=$(git remote show origin | sed -n '/HEAD branch/s/.*: //p')
+    echo $branch_name
+}
+
 function wrap-pr() {
-    local branch_name="${1:-main}"
+    default_branch=$(default-branch)
+    local branch_name="${1:-$default_branch}"
     git checkout $branch_name && git pull origin $branch_name && gdelete
 }
 
