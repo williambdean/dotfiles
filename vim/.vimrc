@@ -44,6 +44,7 @@ Plug 'nvim-lua/plenary.nvim'
 Plug 'dense-analysis/ale'
 " Plug 'ThePrimeagen/harpoon'
 Plug 'nvim-telescope/telescope.nvim'
+Plug 'stevearc/oil.nvim'
 
 call plug#end()
 
