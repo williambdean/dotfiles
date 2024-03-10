@@ -42,12 +42,18 @@ Plug 'nvie/vim-flake8'
 Plug 'justinmk/vim-sneak'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'dense-analysis/ale'
+Plug 'junegunn/limelight.vim'
 " Plug 'ThePrimeagen/harpoon'
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'stevearc/oil.nvim'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'rcarriga/nvim-notify'
+Plug 'folke/noice.nvim'
+Plug 'MunifTanjim/nui.nvim'
 
 call plug#end()
+
+lua require("noice").setup()
 
 let NERDTreeIgnore = ['\.pyc$']
 
@@ -76,6 +82,11 @@ nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+
+" Limelight 
+let g:limelight_conceal_ctermfg = 'Gray'
+let g:limelight_concel_guibg = 'DarkGray'
+let g:limelight_default_coefficient = 0.7
 
 " SLIME configuration
 " for all buffers
