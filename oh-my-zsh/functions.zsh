@@ -50,6 +50,11 @@ function default-branch() {
     echo $branch_name
 }
 
+function gpom() {
+    default_branch=$(default-branch)
+    git pull origin $default_branch
+}
+
 function wrap-pr() {
     default_branch=$(default-branch)
     local branch_name="${1:-$default_branch}"
