@@ -20,7 +20,7 @@ set encoding=utf-8
 
 set backspace=indent,eol,start
 
-set colorcolumn=80
+set colorcolumn=88
 highlight ColorColumn ctermbg=0 guibg=grey
 
 autocmd BufNewFile,BufFilePre,BufRead *.md set filetype=markdown.pandoc
@@ -55,7 +55,7 @@ call plug#end()
 
 lua require("noice").setup()
 
-let NERDTreeIgnore = ['\.pyc$']
+let NERDTreeIgnore = ['\.pyc$', '__pycache__']
 
 colorscheme gruvbox
 set background=dark
