@@ -29,6 +29,7 @@ call plug#begin('~/.vim/plugged')
 
 Plug 'jpalardy/vim-slime', { 'for': 'python' }
 Plug 'hanschen/vim-ipython-cell', { 'for': 'python' }
+Plug 'nanotee/zoxide.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'morhetz/gruvbox'
 Plug 'edluffy/hologram.nvim'
