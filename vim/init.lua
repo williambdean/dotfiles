@@ -1,4 +1,3 @@
-
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   vim.fn.system({
@@ -20,24 +19,27 @@ vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
 require("lazy").setup({
-    {
-      "christoomey/vim-tmux-navigator",
-      cmd = {
-        "TmuxNavigateLeft",
-        "TmuxNavigateDown",
-        "TmuxNavigateUp",
-        "TmuxNavigateRight",
-        "TmuxNavigatePrevious",
-      },
-      keys = {
-        { "<c-h>", "<cmd><C-U>TmuxNavigateLeft<cr>" },
-        { "<c-j>", "<cmd><C-U>TmuxNavigateDown<cr>" },
-        { "<c-k>", "<cmd><C-U>TmuxNavigateUp<cr>" },
-        { "<c-l>", "<cmd><C-U>TmuxNavigateRight<cr>" },
-        { "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
-      },
-    },
+    -- {
+    --   "christoomey/vim-tmux-navigator",
+    --   cmd = {
+    --     "TmuxNavigateLeft",
+    --     "TmuxNavigateDown",
+    --     "TmuxNavigateUp",
+    --     "TmuxNavigateRight",
+    --     "TmuxNavigatePrevious",
+    --   },
+    --   keys = {
+    --     { "<c-h>", "<cmd><C-U>TmuxNavigateLeft<cr>" },
+    --     { "<c-j>", "<cmd><C-U>TmuxNavigateDown<cr>" },
+    --     { "<c-k>", "<cmd><C-U>TmuxNavigateUp<cr>" },
+    --     { "<c-l>", "<cmd><C-U>TmuxNavigateRight<cr>" },
+    --     { "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
+    --   },
+    -- },
+    { "tpope/vim-commentary" }, 
+    { "tpope/vim-fugitive" },
     -- Python development
+    { "davidhalter/jedi-vim" },
     { "jpalardy/vim-slime" }, 
     { "hanschen/vim-ipython-cell" },
     -- Colors
@@ -62,7 +64,7 @@ require("lazy").setup({
 		},
         config = function()
             require("CopilotChat").setup({
-                debug = true, 
+                debug = false, 
                 show_help = "yes", 
                 language = "English", 
                 prompts = {
@@ -158,6 +160,13 @@ vim.keymap.set("n", "<C-S-P>", function() harpoon:list():prev() end)
 
 -- Using the vimtree plugin
 vim.api.nvim_set_keymap("n", "<leader>t", ":NvimTreeToggle<CR>", { noremap = true, silent = true })
+
+function notify_toggle_tree()
+  vim.notify("Please use <leader>t to toggle the tree", "error", { title = "NvimTree" })
+end
+
+-- Use the function in vim.api.nvim_set_keymap
+vim.api.nvim_set_keymap("n", "<C-t>", "<cmd>lua notify_toggle_tree()<CR>", { noremap = true, silent = true })
 
 -- CopilotChatToggle
 vim.api.nvim_set_keymap("n", "<leader>cc", ":CopilotChatToggle<CR>", { noremap = true, silent = true })
