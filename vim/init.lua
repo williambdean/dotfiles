@@ -161,13 +161,6 @@ vim.keymap.set("n", "<C-S-P>", function() harpoon:list():prev() end)
 -- Using the vimtree plugin
 vim.api.nvim_set_keymap("n", "<leader>t", ":NvimTreeToggle<CR>", { noremap = true, silent = true })
 
-function notify_toggle_tree()
-  vim.notify("Please use <leader>t to toggle the tree", "error", { title = "NvimTree" })
-end
-
--- Use the function in vim.api.nvim_set_keymap
-vim.api.nvim_set_keymap("n", "<C-t>", "<cmd>lua notify_toggle_tree()<CR>", { noremap = true, silent = true })
-
 -- CopilotChatToggle
 vim.api.nvim_set_keymap("n", "<leader>cc", ":CopilotChatToggle<CR>", { noremap = true, silent = true })
 
