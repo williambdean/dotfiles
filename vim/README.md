@@ -1,14 +1,12 @@
 ## Plugin installation
 
-https://github.com/junegunn/vim-plug
 
-### Cheatsheet 
+Using Lazy.nvim
 
-:PlugInstall
-:PlugUpdate
 
-## TODO: 
+```bash 
+ln -s /path/to/this/repo ~/.config/nvim/
+```
 
-- Learn more about other plugins
-- Start up script for nvim / using Lua
+
 
