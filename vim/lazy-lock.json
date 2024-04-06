@@ -3,7 +3,7 @@
   "ale": { "branch": "master", "commit": "6c10a519f1460179cf8f8e329d8eb3186247be2b" },
   "copilot.vim": { "branch": "release", "commit": "9484e35cf222e9360e05450622a884f95c662c4c" },
   "gruvbox.nvim": { "branch": "main", "commit": "6e4027ae957cddf7b193adfaec4a8f9e03b4555f" },
-  "harpoon": { "branch": "harpoon2", "commit": "4ad05be8fe98092f0dec3bc3b47abebb59c3814a" },
+  "harpoon": { "branch": "harpoon2", "commit": "2e25a13fa4c0ada39ce3ecfd5f75d61b896d3306" },
   "jedi-vim": { "branch": "master", "commit": "9bd79ee41ac59a33f5890fa50b6d6a446fcc38c7" },
   "lazy.nvim": { "branch": "main", "commit": "31ddbea7c10b6920c9077b66c97951ca8682d5c8" },
   "noice.nvim": { "branch": "main", "commit": "0cbe3f88d038320bdbda3c4c5c95f43a13c3aa12" },

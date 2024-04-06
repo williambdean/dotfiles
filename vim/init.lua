@@ -1,12 +1,12 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  vim.fn.system({
-    "git",
-    "clone",
-    "--filter=blob:none",
-    "https://github.com/folke/lazy.nvim.git",
-    -- latest stable release lazypath
-    "--branch=stable", 
+    vim.fn.system({
+        "git",
+        "clone",
+        "--filter=blob:none",
+        "https://github.com/folke/lazy.nvim.git",
+        -- latest stable release lazypath
+        "--branch=stable", 
     })
 end
 vim.opt.rtp:prepend(lazypath)
@@ -45,7 +45,8 @@ require("lazy").setup({
     -- Colors
     { "ellisonleao/gruvbox.nvim", priority = 1000 },
     { "nvim-treesitter/nvim-treesitter" },
-    { "folke/noice.nvim", dependencies = { "folke/nvim-notify" }}, 
+    { "folke/noice.nvim", dependencies = { "folke/nvim-notify" }},
+    -- Autocomplete
 	{ "github/copilot.vim" }, 
 	{ 
 		"nvim-tree/nvim-tree.lua", 
@@ -53,7 +54,12 @@ require("lazy").setup({
 		lazy = false, 
 		dependencies = { "nvim-tree/nvim-web-devicons" }, 
 		config = function()
-			require("nvim-tree").setup({})
+			require("nvim-tree").setup({
+                view = {
+                    width = 35, 
+                    side = "left", 
+                },
+            })
 		end, 
 	},
 	{ "CopilotC-Nvim/CopilotChat.nvim", 
