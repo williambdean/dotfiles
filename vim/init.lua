@@ -237,6 +237,10 @@ vim.keymap.set("x", "<leader>cci", ":CopilotChatInline<CR>", { noremap = true, s
 vim.o.background = "dark" -- or "light" for light mode
 vim.cmd([[colorscheme gruvbox]])
 
+
+-- Zoom in and make the "o"nly window
+vim.keymap.set("n", "<leader>o", ":tab split<CR>", { noremap = true, silent = true })
+
 -- Python and Slime
 vim.g.slime_target = "tmux"
 vim.g.slime_python_ipython = 1
