@@ -67,6 +67,7 @@ require("lazy").setup({
 		dependencies = { 
 			{ "github/copilot.vim" }, 
 			{ "nvim-lua/plenary.nvim" },
+            { "nvim-telescope/telescope.nvim" },
 		},
         config = function()
             require("CopilotChat").setup({
@@ -83,16 +84,48 @@ require("lazy").setup({
                     vim.notify("Please update the remote plugins by running :UpdateRemotePlugins, the")
                 end,
                 event = "VeryLazy", 
-                mappings = {
-                    submit_prompt = {
-                        normal = "<CR>",
-                        insert = "<C-CR>",
-                    },
-                }, 
             })
         end,
+        keys = {
+            {
+                "<leader>cct",
+                function ()
+                    require("CopilotChat").toggle()
+                end,
+                desc = "CopilotChat - Toggle",
+            },
+            { 
+                "<leader>cch", 
+                function ()
+                    local actions = require("CopilotChat.actions")
+                    require("CopilotChat.integrations.telescope").pick(
+                        actions.help_actions()
+                    )
+                end,
+                desc = "CopilotChat - Help actions",
+            },
+            {
+                "<leader>ccp",
+                function ()
+                    local actions = require("CopilotChat.actions")
+                    require("CopilotChat.integrations.telescope").pick(
+                    actions.prompt_actions()
+                    )
+                end,
+                desc = "CopilotChat - Prompt actions",
+            },
+        },
 	},
-	{ "nvim-telescope/telescope.nvim", dependencies = { 'nvim-lua/plenary.nvim' } },
+    { 
+        "nvim-telescope/telescope.nvim", 
+        dependencies = { 'nvim-lua/plenary.nvim' }, 
+        keys = {
+            { "<leader>ff", function() require('telescope.builtin').find_files() end, },
+            { "<leader>fg", function() require('telescope.builtin').live_grep() end, },
+            { "<leader>fb", function() require('telescope.builtin').buffers() end, },
+            { "<leader>fh", function() require('telescope.builtin').help_tags() end, },
+        },
+    },
 	{ "dense-analysis/ale" },
 	{ 
         "folke/noice.nvim", 
@@ -128,12 +161,6 @@ require("lazy").setup({
     },
 })
 
-local builtin = require('telescope.builtin')
-vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
-vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
-vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
-vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
-
 -- Move around windows with vim keys 
 vim.api.nvim_set_keymap("n", "<leader>h", ":wincmd h<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<leader>j", ":wincmd j<CR>", { noremap = true, silent = true })
@@ -168,19 +195,18 @@ vim.keymap.set("n", "<C-e>", function() harpoon.ui:toggle_quick_menu(harpoon:lis
 
 vim.keymap.set("n", "<C-h>", function() harpoon:list():select(1) end)
 vim.keymap.set("n", "<C-t>", function() harpoon:list():select(2) end)
-vim.keymap.set("n", "<C-n>", function() harpoon:list():select(3) end)
+vim.keymap.set("n", "<C-w>", function() harpoon:list():select(3) end)
 vim.keymap.set("n", "<C-s>", function() harpoon:list():select(4) end)
 
-vim.keymap.set("n", "<C-S-P>", function() harpoon:list():prev() end)
+vim.keymap.set("n", "<C-n>", function() harpoon:list():next() end)
+vim.keymap.set("n", "<C-p>", function() harpoon:list():prev() end)
 
 -- Using the vimtree plugin
 vim.api.nvim_set_keymap("n", "<leader>t", ":NvimTreeFindFileToggle<CR>", { noremap = true, silent = true })
 
 -- CopilotChatToggle
-vim.api.nvim_set_keymap("n", "<leader>cct", ":CopilotChatToggle<CR>", { noremap = true, silent = true })
 
 local function quick_chat(with_buffer) 
-    
     prompt = "Quick Chat: "
     if with_buffer then
         prompt = "Quick Chat (Buffer): "
