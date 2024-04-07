@@ -179,16 +179,28 @@ vim.api.nvim_set_keymap("n", "<leader>t", ":NvimTreeFindFileToggle<CR>", { norem
 -- CopilotChatToggle
 vim.api.nvim_set_keymap("n", "<leader>cct", ":CopilotChatToggle<CR>", { noremap = true, silent = true })
 
-local function chat_with_buffer() 
-    local input = vim.fn.input("Quick Chat: ")
-    if input ~= "" then
-        require("CopilotChat").ask(input, {
+local function quick_chat(with_buffer) 
+    
+    prompt = "Quick Chat: "
+    if with_buffer then
+        prompt = "Quick Chat (Buffer): "
+    end
+    local input = vim.fn.input(prompt)
+    if input == "" then
+        return
+    end
+
+    ask = require("CopilotChat").ask
+    if with_buffer then
+        ask(input, {
             selection = require("CopilotChat.select").buffer
         })
+    else
+        ask(input)
     end
 end
-vim.keymap.set("n", "<leader>ccq", function() chat_with_buffer() end, { noremap = true, silent = true })
-vim.keymap.set("n", "<leader>ccb", function() chat_with_buffer() end, { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>ccq", function() quick_chat(false) end, { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>ccb", function() quick_chat(true) end, { noremap = true, silent = true })
 
 vim.api.nvim_create_user_command(
     "CopilotChatVisual", 
