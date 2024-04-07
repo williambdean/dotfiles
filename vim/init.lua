@@ -72,15 +72,23 @@ require("lazy").setup({
             require("CopilotChat").setup({
                 debug = false, 
                 show_help = "yes", 
+                context = "buffers",
                 language = "English", 
                 prompts = {
                     Explain = "Explain how it works in the English language.",
                     Review = "Review the following code and provide concise suggestions.",
+                    Tests = "Write tests for the following code.",
                 },
                 build = function()
                     vim.notify("Please update the remote plugins by running :UpdateRemotePlugins, the")
                 end,
                 event = "VeryLazy", 
+                mappings = {
+                    submit_prompt = {
+                        normal = "<CR>",
+                        insert = "<C-CR>",
+                    },
+                }, 
             })
         end,
 	},
@@ -166,10 +174,52 @@ vim.keymap.set("n", "<C-s>", function() harpoon:list():select(4) end)
 vim.keymap.set("n", "<C-S-P>", function() harpoon:list():prev() end)
 
 -- Using the vimtree plugin
-vim.api.nvim_set_keymap("n", "<leader>t", ":NvimTreeToggle<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>t", ":NvimTreeFindFileToggle<CR>", { noremap = true, silent = true })
 
 -- CopilotChatToggle
-vim.api.nvim_set_keymap("n", "<leader>cc", ":CopilotChatToggle<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>cct", ":CopilotChatToggle<CR>", { noremap = true, silent = true })
+
+local function chat_with_buffer() 
+    local input = vim.fn.input("Quick Chat: ")
+    if input ~= "" then
+        require("CopilotChat").ask(input, {
+            selection = require("CopilotChat.select").buffer
+        })
+    end
+end
+vim.keymap.set("n", "<leader>ccq", function() chat_with_buffer() end, { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>ccb", function() chat_with_buffer() end, { noremap = true, silent = true })
+
+vim.api.nvim_create_user_command(
+    "CopilotChatVisual", 
+    function(args)
+        local chat = require("CopilotChat")
+        local select = require("CopilotChat.select")
+        chat.ask(args.args, { selection = select.visual })
+    end, 
+    { nargs = "*", range = true }
+)
+vim.keymap.set("x", "<leader>ccv", ":CopilotChatVisual<CR>", { noremap = true, silent = true })
+
+vim.api.nvim_create_user_command(
+    "CopilotChatInline", 
+    function(args)
+        local chat = require("CopilotChat")
+        local select = require("CopilotChat.select")
+        chat.ask(args.args, { 
+            selection = select.visual,
+            window = {
+                layout = "float", 
+                relative = "cursor", 
+                width = 1, 
+                height = 0.4, 
+                row = 1, 
+            },
+        })
+    end, 
+    { nargs = "*", range = true }
+)
+vim.keymap.set("x", "<leader>cci", ":CopilotChatInline<CR>", { noremap = true, silent = true })
 
 -- Colorscheme
 vim.o.background = "dark" -- or "light" for light mode
