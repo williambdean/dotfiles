@@ -28,6 +28,7 @@ require("lazy").setup({
     --     "TmuxNavigateRight",
     --     "TmuxNavigatePrevious",
     --   },
+    --   These override with some of the harpoon commands
     --   keys = {
     --     { "<c-h>", "<cmd><C-U>TmuxNavigateLeft<cr>" },
     --     { "<c-j>", "<cmd><C-U>TmuxNavigateDown<cr>" },
@@ -42,6 +43,18 @@ require("lazy").setup({
     { "davidhalter/jedi-vim" },
     { "jpalardy/vim-slime" }, 
     { "hanschen/vim-ipython-cell" },
+    { 
+        "williamboman/mason.nvim", 
+        opts = {
+            ensure_installed = {
+                "ruff", 
+                "pyright",
+            },
+        },
+        config = function() 
+            require("mason").setup()
+        end,
+    },
     -- Colors
     { "ellisonleao/gruvbox.nvim", priority = 1000 },
     { "nvim-treesitter/nvim-treesitter" },
@@ -70,7 +83,59 @@ require("lazy").setup({
             { "nvim-telescope/telescope.nvim" },
 		},
         config = function()
-            require("CopilotChat").setup({
+            local chat = require("CopilotChat")
+            local select = require("CopilotChat.select")
+
+            local function quick_chat(with_buffer) 
+                prompt = "Quick Chat: "
+                if with_buffer then
+                    prompt = "Quick Chat (Buffer): "
+                end
+                local input = vim.fn.input(prompt)
+                if input == "" then
+                    return
+                end
+
+                ask = chat.ask
+                if with_buffer then
+                    ask(input, {
+                        selection = select.buffer
+                    })
+                else
+                    ask(input)
+                end
+            end
+            vim.keymap.set("n", "<leader>ccq", function() quick_chat(false) end, { noremap = true, silent = true })
+            vim.keymap.set("n", "<leader>ccb", function() quick_chat(true) end, { noremap = true, silent = true })
+
+            vim.api.nvim_create_user_command(
+            "CopilotChatVisual", 
+            function(args)
+                chat.ask(args.args, { selection = select.visual })
+            end, 
+            { nargs = "*", range = true }
+            )
+            vim.keymap.set("x", "<leader>ccv", ":CopilotChatVisual<CR>", { noremap = true, silent = true })
+
+            vim.api.nvim_create_user_command(
+            "CopilotChatInline", 
+            function(args)
+                chat.ask(args.args, { 
+                    selection = select.visual,
+                    window = {
+                        layout = "float", 
+                        relative = "cursor", 
+                        width = 1, 
+                        height = 0.4, 
+                        row = 1, 
+                    },
+                })
+            end, 
+            { nargs = "*", range = true }
+            )
+            vim.keymap.set("x", "<leader>cci", ":CopilotChatInline<CR>", { noremap = true, silent = true })
+
+            chat.setup({
                 debug = false, 
                 show_help = "yes", 
                 context = "buffers",
@@ -99,7 +164,7 @@ require("lazy").setup({
                 function ()
                     local actions = require("CopilotChat.actions")
                     require("CopilotChat.integrations.telescope").pick(
-                        actions.help_actions()
+                    actions.help_actions()
                     )
                 end,
                 desc = "CopilotChat - Help actions",
@@ -190,7 +255,7 @@ harpoon:setup({})
 -- end
 -- vim.keymap.set("n", "<C-e>", function() toggle_telescope(harpoon:list()) end)
 
-vim.keymap.set("n", "<leader>a", function() harpoon:list():append() end)
+vim.keymap.set("n", "<leader>a", function() harpoon:list():add() end)
 vim.keymap.set("n", "<C-e>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
 
 vim.keymap.set("n", "<C-h>", function() harpoon:list():select(1) end)
@@ -206,58 +271,6 @@ vim.api.nvim_set_keymap("n", "<leader>t", ":NvimTreeFindFileToggle<CR>", { norem
 
 -- CopilotChatToggle
 
-local function quick_chat(with_buffer) 
-    prompt = "Quick Chat: "
-    if with_buffer then
-        prompt = "Quick Chat (Buffer): "
-    end
-    local input = vim.fn.input(prompt)
-    if input == "" then
-        return
-    end
-
-    ask = require("CopilotChat").ask
-    if with_buffer then
-        ask(input, {
-            selection = require("CopilotChat.select").buffer
-        })
-    else
-        ask(input)
-    end
-end
-vim.keymap.set("n", "<leader>ccq", function() quick_chat(false) end, { noremap = true, silent = true })
-vim.keymap.set("n", "<leader>ccb", function() quick_chat(true) end, { noremap = true, silent = true })
-
-vim.api.nvim_create_user_command(
-    "CopilotChatVisual", 
-    function(args)
-        local chat = require("CopilotChat")
-        local select = require("CopilotChat.select")
-        chat.ask(args.args, { selection = select.visual })
-    end, 
-    { nargs = "*", range = true }
-)
-vim.keymap.set("x", "<leader>ccv", ":CopilotChatVisual<CR>", { noremap = true, silent = true })
-
-vim.api.nvim_create_user_command(
-    "CopilotChatInline", 
-    function(args)
-        local chat = require("CopilotChat")
-        local select = require("CopilotChat.select")
-        chat.ask(args.args, { 
-            selection = select.visual,
-            window = {
-                layout = "float", 
-                relative = "cursor", 
-                width = 1, 
-                height = 0.4, 
-                row = 1, 
-            },
-        })
-    end, 
-    { nargs = "*", range = true }
-)
-vim.keymap.set("x", "<leader>cci", ":CopilotChatInline<CR>", { noremap = true, silent = true })
 
 -- Colorscheme
 vim.o.background = "dark" -- or "light" for light mode
