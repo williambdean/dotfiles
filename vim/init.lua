@@ -39,6 +39,12 @@ require("lazy").setup({
     -- },
     { "tpope/vim-commentary" }, 
     { "tpope/vim-fugitive" },
+    {
+        "ggandor/leap.nvim",
+        config = function()
+            require('leap').create_default_mappings()
+        end,
+    },
     -- Python development
     { "davidhalter/jedi-vim" },
     { "jpalardy/vim-slime" }, 
