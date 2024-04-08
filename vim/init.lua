@@ -14,11 +14,31 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
--- Disable netrw
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
+vim.opt.termguicolors = true
 
 require("lazy").setup({
+    {
+        "nvim-lualine/lualine.nvim",
+        dependencies = { "nvim-tree/nvim-web-devicons" },
+        config = function()
+            require("lualine").setup({
+                options = {
+                    theme = "gruvbox",
+                    section_separators = { "", "" },
+                    component_separators = { "", "" },
+                },
+            })
+        end,
+    },
+    {
+        "iamcco/markdown-preview.nvim",
+        cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+        build = "cd app && npm install",
+        config = function() 
+            vim.g.mkdp_filetypes = { "markdown" }
+        end,
+        ft = { "markdown" }, 
+    },
     -- {
     --   "christoomey/vim-tmux-navigator",
     --   cmd = {
@@ -47,7 +67,15 @@ require("lazy").setup({
     },
     -- Python development
     { "davidhalter/jedi-vim" },
-    { "jpalardy/vim-slime" }, 
+    { 
+        "jpalardy/vim-slime", 
+        config = function() 
+            vim.g.slime_target = "tmux"
+            vim.g.slime_python_ipython = 1
+            vim.g.slime_default_config = { socket_name = "default", target_pane = "{last}", python_ipython = 0, dispatch_ipython_pause = 100 }
+            vim.g.slime_bracketed_paste = 1
+        end,
+    }, 
     { "hanschen/vim-ipython-cell" },
     { 
         "williamboman/mason.nvim", 
@@ -64,15 +92,44 @@ require("lazy").setup({
     -- Colors
     { "ellisonleao/gruvbox.nvim", priority = 1000 },
     { "nvim-treesitter/nvim-treesitter" },
-    { "folke/noice.nvim", dependencies = { "folke/nvim-notify" }},
+    { 
+        "rcarriga/nvim-notify",
+        config = function() 
+            vim.api.nvim_set_keymap("n", "<leader>nd", ":lua require('notify').dismiss()<CR>", { noremap = true, silent = true })
+
+            require("notify").setup({
+                background_colour = "Normal",
+                fps = 30,
+                icons = {
+                    DEBUG = "",
+                    ERROR = "",
+                    INFO = "",
+                    TRACE = "✎",
+                    WARN = ""
+                },
+                level = 2,
+                minimum_width = 50,
+                maximum_width = 300,
+                render = "compact",
+                stages = "fade_in_slide_out",
+                timeout = 5000,
+                top_down = true
+            })
+        end,
+    },
+    { "folke/noice.nvim", dependencies = { "rcarriga/nvim-notify" }},
     -- Autocomplete
-	{ "github/copilot.vim" }, 
-	{ 
-		"nvim-tree/nvim-tree.lua", 
-		version = "*", 
-		lazy = false, 
-		dependencies = { "nvim-tree/nvim-web-devicons" }, 
+    { "github/copilot.vim" }, 
+    { 
+        "nvim-tree/nvim-tree.lua", 
+        version = "*", 
+        lazy = false, 
+        dependencies = { "nvim-tree/nvim-web-devicons" }, 
         config = function()
+            -- Disable netrw
+            vim.g.loaded_netrw = 1
+            vim.g.loaded_netrwPlugin = 1
+
             -- Using the vimtree plugin
             vim.api.nvim_set_keymap("n", "<leader>t", ":NvimTreeFindFileToggle<CR>", { noremap = true, silent = true })
 
@@ -83,14 +140,15 @@ require("lazy").setup({
                 },
             })
         end, 
-	},
-	{ "CopilotC-Nvim/CopilotChat.nvim", 
-		branch = "canary", 
-		dependencies = { 
-			{ "github/copilot.vim" }, 
-			{ "nvim-lua/plenary.nvim" },
+    },
+    { 
+        "CopilotC-Nvim/CopilotChat.nvim", 
+        branch = "canary", 
+        dependencies = { 
+            { "github/copilot.vim" }, 
+            { "nvim-lua/plenary.nvim" },
             { "nvim-telescope/telescope.nvim" },
-		},
+        },
         config = function()
             local chat = require("CopilotChat")
             local select = require("CopilotChat.select")
@@ -189,7 +247,7 @@ require("lazy").setup({
                 desc = "CopilotChat - Prompt actions",
             },
         },
-	},
+    },
     { 
         "nvim-telescope/telescope.nvim", 
         dependencies = { 'nvim-lua/plenary.nvim' }, 
@@ -200,31 +258,31 @@ require("lazy").setup({
             { "<leader>fh", function() require('telescope.builtin').help_tags() end, },
         },
     },
-	{ "dense-analysis/ale" },
-	{ 
+    { "dense-analysis/ale" },
+    { 
         "folke/noice.nvim", 
         event = "VeryLazy", 
         dependencies = {
             "MunifTanjim/nui.nvim",
-            "folke/nvim-notify",
+            "rcarriga/nvim-notify",
         },
         config = function() 
-		require("noice").setup({
-			lsp = {
-                override = {
-                    ["vim.lsp.util.convert_input_to_markdown_lines"] = true, 
-                    ["vim.lsp.util.stylize_markdown"] = true, 
-                    ["cmp.entry.get_documentation"] = true, 
-                },
-            }, 
-			presets = {
-				bottom_search = true, 
-				command_palette = true, 
-				long_message_to_split = true, 
-				inc_rename = false, 
-				lsp_doc_border = false, 
-			}, 
-		})
+            require("noice").setup({
+                lsp = {
+                    override = {
+                        ["vim.lsp.util.convert_input_to_markdown_lines"] = true, 
+                        ["vim.lsp.util.stylize_markdown"] = true, 
+                        ["cmp.entry.get_documentation"] = true, 
+                    },
+                }, 
+                presets = {
+                    bottom_search = true, 
+                    command_palette = true, 
+                    long_message_to_split = true, 
+                    inc_rename = false, 
+                    lsp_doc_border = false, 
+                }, 
+            })
         end,
     }, 
     { "stevearc/oil.nvim" },
@@ -258,12 +316,6 @@ vim.api.nvim_set_keymap("n", "<leader>k", ":wincmd k<CR>", { noremap = true, sil
 vim.api.nvim_set_keymap("n", "<leader>l", ":wincmd l<CR>", { noremap = true, silent = true })
 
 
--- Using the vimtree plugin
---vim.api.nvim_set_keymap("n", "<leader>t", ":NvimTreeFindFileToggle<CR>", { noremap = true, silent = true })
-
--- CopilotChatToggle
-
-
 -- Colorscheme
 vim.o.background = "dark" -- or "light" for light mode
 vim.cmd([[colorscheme gruvbox]])
@@ -271,12 +323,6 @@ vim.cmd([[colorscheme gruvbox]])
 
 -- Zoom in and make the "o"nly window
 vim.keymap.set("n", "<leader>o", ":tab split<CR>", { noremap = true, silent = true })
-
--- Python and Slime
-vim.g.slime_target = "tmux"
-vim.g.slime_python_ipython = 1
-vim.g.slime_default_config = { socket_name = "default", target_pane = "{last}", python_ipython = 0, dispatch_ipython_pause = 100 }
-vim.g.slime_bracketed_paste = 1
 
 -- Enable syntax highlighting
 -- vim.cmd('syntax on')
