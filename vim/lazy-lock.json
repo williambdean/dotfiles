@@ -22,5 +22,6 @@
   "vim-commentary": { "branch": "master", "commit": "f67e3e67ea516755005e6cccb178bc8439c6d402" },
   "vim-fugitive": { "branch": "master", "commit": "dac8e5c2d85926df92672bf2afb4fc48656d96c7" },
   "vim-ipython-cell": { "branch": "master", "commit": "35e25f63c0de4fa3d9f9b1d8922905cd309795ce" },
-  "vim-slime": { "branch": "main", "commit": "87988b173b7642e6a5124f9e5559148c4159d076" }
+  "vim-slime": { "branch": "main", "commit": "87988b173b7642e6a5124f9e5559148c4159d076" },
+  "zoxide.vim": { "branch": "master", "commit": "b1e70b6fc1682a83929aee63680d2b43456fe9a5" }
 }

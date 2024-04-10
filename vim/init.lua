@@ -18,6 +18,9 @@ vim.opt.termguicolors = true
 
 require("lazy").setup({
     {
+        "nanotee/zoxide.vim",
+    },
+    {
         "nvim-lualine/lualine.nvim",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
@@ -285,7 +288,14 @@ require("lazy").setup({
             })
         end,
     }, 
-    { "stevearc/oil.nvim" },
+    { 
+        "stevearc/oil.nvim",
+        config = function()
+            vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+
+            require("oil").setup({})
+        end,
+    },
     { 
         "ThePrimeagen/harpoon", 
         branch = "harpoon2", 
