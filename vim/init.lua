@@ -18,7 +18,9 @@ vim.opt.termguicolors = true
 
 require("lazy").setup({
     {
-        "nanotee/zoxide.vim",
+        "chrisgrieser/nvim-recorder",
+        -- dependencies = "rcarriga/nvim-notify",
+        opts = {},
     },
     {
         "nvim-lualine/lualine.nvim",
@@ -30,9 +32,19 @@ require("lazy").setup({
                     section_separators = { "", "" },
                     component_separators = { "", "" },
                 },
+                sections = {
+                    lualine_c = { { "filename", path = 1 } },
+                    lualine_y = {
+                        { require("recorder").displaySlots },
+                    },
+                    lualine_z = {
+                        { require("recorder").recordingStatus },
+                    },
+                },
             })
         end,
     },
+    { "nanotee/zoxide.vim" },
     {
         "iamcco/markdown-preview.nvim",
         cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
@@ -384,6 +396,9 @@ vim.opt.encoding = 'utf-8'
 -- Configure backspace behavior
 vim.opt.backspace:remove('indent')
 vim.opt.backspace:append({'indent', 'eol', 'start'})
+
+-- Copy and paste to system clipboard
+vim.api.nvim_set_keymap('v', '<leader>y', '"*y', { noremap = true })
 
 -- Set color column
 -- vim.opt.colorcolumn = '88'
