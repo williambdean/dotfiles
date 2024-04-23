@@ -423,6 +423,7 @@ vim.opt.backspace:append({'indent', 'eol', 'start'})
 
 -- Copy and paste to system clipboard
 vim.api.nvim_set_keymap('v', '<leader>y', '"*y', { noremap = true })
+vim.opt.clipboard = 'unnamedplus'
 
 -- Set color column
 -- vim.opt.colorcolumn = '88'
