@@ -22,28 +22,28 @@ require("lazy").setup({
         -- dependencies = "rcarriga/nvim-notify",
         opts = {},
     },
-    {
-        "nvim-lualine/lualine.nvim",
-        dependencies = { "nvim-tree/nvim-web-devicons" },
-        config = function()
-            require("lualine").setup({
-                options = {
-                    theme = "gruvbox",
-                    section_separators = { "", "" },
-                    component_separators = { "", "" },
-                },
-                sections = {
-                    lualine_c = { { "filename", path = 1 } },
-                    lualine_y = {
-                        { require("recorder").displaySlots },
-                    },
-                    lualine_z = {
-                        { require("recorder").recordingStatus },
-                    },
-                },
-            })
-        end,
-    },
+    -- {
+    --     "nvim-lualine/lualine.nvim",
+    --     dependencies = { "nvim-tree/nvim-web-devicons" },
+    --     config = function()
+    --         require("lualine").setup({
+    --             options = {
+    --                 theme = "gruvbox",
+    --                 section_separators = { "", "" },
+    --                 component_separators = { "", "" },
+    --             },
+    --             sections = {
+    --                 lualine_c = { { "filename", path = 1 } },
+    --                 lualine_y = {
+    --                     { require("recorder").displaySlots },
+    --                 },
+    --                 lualine_z = {
+    --                     { require("recorder").recordingStatus },
+    --                 },
+    --             },
+    --         })
+    --     end,
+    -- },
     { "nanotee/zoxide.vim" },
     {
         "iamcco/markdown-preview.nvim",
@@ -72,12 +72,13 @@ require("lazy").setup({
     --     { "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
     --   },
     -- },
-    { "tpope/vim-commentary" }, 
+    -- { "tpope/vim-commentary" }, 
     { "tpope/vim-fugitive" },
     {
         "ggandor/leap.nvim",
         config = function()
             require('leap').create_default_mappings()
+            vim.api.nvim_set_hl(0, "LeapBackdrop", { link = "Comment" })
         end,
     },
     -- Python development
@@ -109,7 +110,7 @@ require("lazy").setup({
             require("mason").setup()
             require("mason-lspconfig").setup()
 
-            require("lspconfig").pyright.setup({})
+            -- require("lspconfig").pyright.setup({})
 
             vim.api.nvim_create_autocmd("LspAttach", {
                 group = vim.api.nvim_create_augroup("UserLspConfig", {}), 
@@ -212,7 +213,11 @@ require("lazy").setup({
                 end
             end
             vim.keymap.set("n", "<leader>ccq", function() quick_chat(false) end, { noremap = true, silent = true })
-            vim.keymap.set("n", "<leader>ccb", function() quick_chat(true) end, { noremap = true, silent = true })
+            vim.keymap.set("n", "<leader>ccb", 
+                function() 
+                    quick_chat(true) 
+                    vim.notify("Chatting with a buffer.")
+                end, { noremap = true, silent = true })
 
             vim.api.nvim_create_user_command(
             "CopilotChatVisual", 
@@ -254,7 +259,7 @@ require("lazy").setup({
                 build = function()
                     vim.notify("Please update the remote plugins by running :UpdateRemotePlugins, the")
                 end,
-                event = "VeryLazy", 
+                -- event = "VeryLazy", 
             })
         end,
         keys = {
@@ -428,3 +433,7 @@ vim.opt.clipboard = 'unnamedplus'
 -- Set color column
 -- vim.opt.colorcolumn = '88'
 -- vim.cmd('highlight ColorColumn ctermbg=0 guibg=grey')
+--
+
+-- Terminal mode escape key
+vim.api.nvim_set_keymap("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true })
