@@ -22,28 +22,28 @@ require("lazy").setup({
         -- dependencies = "rcarriga/nvim-notify",
         opts = {},
     },
-    -- {
-    --     "nvim-lualine/lualine.nvim",
-    --     dependencies = { "nvim-tree/nvim-web-devicons" },
-    --     config = function()
-    --         require("lualine").setup({
-    --             options = {
-    --                 theme = "gruvbox",
-    --                 section_separators = { "", "" },
-    --                 component_separators = { "", "" },
-    --             },
-    --             sections = {
-    --                 lualine_c = { { "filename", path = 1 } },
-    --                 lualine_y = {
-    --                     { require("recorder").displaySlots },
-    --                 },
-    --                 lualine_z = {
-    --                     { require("recorder").recordingStatus },
-    --                 },
-    --             },
-    --         })
-    --     end,
-    -- },
+    {
+        "nvim-lualine/lualine.nvim",
+        dependencies = { "nvim-tree/nvim-web-devicons" },
+        config = function()
+            require("lualine").setup({
+                options = {
+                    theme = "gruvbox",
+                    section_separators = { "", "" },
+                    component_separators = { "", "" },
+                },
+                sections = {
+                    lualine_c = { { "filename", path = 1 } },
+                    lualine_y = {
+                        { require("recorder").displaySlots },
+                    },
+                    lualine_z = {
+                        { require("recorder").recordingStatus },
+                    },
+                },
+            })
+        end,
+    },
     { "nanotee/zoxide.vim" },
     {
         "iamcco/markdown-preview.nvim",
@@ -437,3 +437,7 @@ vim.opt.clipboard = 'unnamedplus'
 
 -- Terminal mode escape key
 vim.api.nvim_set_keymap("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true })
+
+vim.g.markdown_fenced_languages = { "python", "bash=sh", "yaml", "json", "vim", "lua" }
+
+ 
