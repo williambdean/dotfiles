@@ -259,7 +259,7 @@ require("lazy").setup({
                 build = function()
                     vim.notify("Please update the remote plugins by running :UpdateRemotePlugins, the")
                 end,
-                -- event = "VeryLazy", 
+                event = "VeryLazy", 
             })
         end,
         keys = {
