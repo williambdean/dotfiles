@@ -48,9 +48,8 @@ require("lazy").setup({
     {
         "iamcco/markdown-preview.nvim",
         cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-        build = "cd app && npm install",
-        config = function() 
-            vim.g.mkdp_filetypes = { "markdown" }
+        build = function() 
+            vim.fn["mkdp#util#install"]()
         end,
         ft = { "markdown" }, 
     },
@@ -72,16 +71,17 @@ require("lazy").setup({
     --     { "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
     --   },
     -- },
-    { "tpope/vim-commentary" }, 
+    -- { "tpope/vim-commentary" }, 
     { "tpope/vim-fugitive" },
     {
         "ggandor/leap.nvim",
         config = function()
             require('leap').create_default_mappings()
+            vim.api.nvim_set_hl(0, "LeapBackdrop", { link = "Comment" })
         end,
     },
     -- Python development
-    { "davidhalter/jedi-vim" },
+    -- { "davidhalter/jedi-vim" },
     { 
         "jpalardy/vim-slime", 
         config = function() 
@@ -96,7 +96,6 @@ require("lazy").setup({
         "williamboman/mason.nvim", 
         opts = {
             ensure_installed = {
-                "ruff", 
                 "pyright",
             },
         },
@@ -104,6 +103,31 @@ require("lazy").setup({
             require("mason").setup()
         end,
     },
+    {
+        "williamboman/mason-lspconfig.nvim",
+        config = function() 
+            require("mason").setup()
+            require("mason-lspconfig").setup()
+
+            -- require("lspconfig").pyright.setup({})
+
+            vim.api.nvim_create_autocmd("LspAttach", {
+                group = vim.api.nvim_create_augroup("UserLspConfig", {}), 
+                callback = function(ev)
+                    vim.bo[ev.buf].omnifunc = "v:lua.vim.lsp.omnifunc"
+
+                    local opts = { buffer = ev.buf }
+                    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+                    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+                    vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+                end, 
+            })
+
+        end,
+    },
+    {
+        "neovim/nvim-lspconfig",
+    }, 
     -- Colors
     { "ellisonleao/gruvbox.nvim", priority = 1000 },
     { "nvim-treesitter/nvim-treesitter" },
@@ -188,7 +212,11 @@ require("lazy").setup({
                 end
             end
             vim.keymap.set("n", "<leader>ccq", function() quick_chat(false) end, { noremap = true, silent = true })
-            vim.keymap.set("n", "<leader>ccb", function() quick_chat(true) end, { noremap = true, silent = true })
+            vim.keymap.set("n", "<leader>ccb", 
+                function() 
+                    quick_chat(true) 
+                    vim.notify("Chatting with a buffer.")
+                end, { noremap = true, silent = true })
 
             vim.api.nvim_create_user_command(
             "CopilotChatVisual", 
@@ -268,6 +296,7 @@ require("lazy").setup({
         dependencies = { 'nvim-lua/plenary.nvim' }, 
         keys = {
             { "<leader>ff", function() require('telescope.builtin').find_files() end, },
+            { "<leader>fd", function() require('telescope.builtin').find_files({ hidden = true }) end, },
             { "<leader>fg", function() require('telescope.builtin').live_grep() end, },
             { "<leader>fb", function() require('telescope.builtin').buffers() end, },
             { "<leader>fh", function() require('telescope.builtin').help_tags() end, },
@@ -399,7 +428,16 @@ vim.opt.backspace:append({'indent', 'eol', 'start'})
 
 -- Copy and paste to system clipboard
 vim.api.nvim_set_keymap('v', '<leader>y', '"*y', { noremap = true })
+vim.opt.clipboard = 'unnamedplus'
 
 -- Set color column
 -- vim.opt.colorcolumn = '88'
 -- vim.cmd('highlight ColorColumn ctermbg=0 guibg=grey')
+--
+
+-- Terminal mode escape key
+vim.api.nvim_set_keymap("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true })
+
+vim.g.markdown_fenced_languages = { "python", "bash=sh", "yaml", "json", "vim", "lua" }
+
+ 

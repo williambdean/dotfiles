@@ -25,4 +25,3 @@ alias gdelete="git branch --merged | grep -v \* | xargs git branch -D "
 
 # Docker 
 alias enter-docker="docker run --rm -it --entrypoint bash"
-

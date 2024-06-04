@@ -3,6 +3,10 @@ function chrome() {
     open -a "Google Chrome" http://$1
 }
 
+function localhost() {
+    open http://localhost:$1
+}
+
 function local-docker() {
     enter-docker -v $(pwd):/app -w /app $1
 }
@@ -102,6 +106,11 @@ function zsh-link() {
     ln -s $(pwd)/$1 $ZSH_CUSTOM
 }
 
+# New tmux session with the name of current directory
+# Video from Josh Medeski
+function tn() {
+    tmux new -s $(pwd | sed 's/.*\///g')
+}
 
 # From https://blog.mattclemente.com/2020/06/26/oh-my-zsh-slow-to-load/#how-to-test-your-shell-load-time
 timezsh() {
