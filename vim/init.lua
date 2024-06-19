@@ -18,6 +18,21 @@ vim.opt.termguicolors = true
 
 require("lazy").setup({
     {
+        "pwntester/octo.nvim",
+        config = function()
+            vim.keymap.set("n", "<leader>oo", "<CMD>Octo<CR>", { silent = true })
+            vim.keymap.set("i", "@", "@<C-x><C-o>", { buffer = true, silent = true })
+            vim.keymap.set("i", "#", "#<C-x><C-o>", { silent = true, buffer = true })
+            require("octo").setup({ enable_builtin = true })
+        end,
+        dependencies = { 
+            "nvim-lua/plenary.nvim",
+            "nvim-telescope/telescope.nvim",
+            "nvim-tree/nvim-web-devicons",
+            
+        },
+    },
+    {
         "chrisgrieser/nvim-recorder",
         -- dependencies = "rcarriga/nvim-notify",
         opts = {},
