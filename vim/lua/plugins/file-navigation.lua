@@ -1,0 +1,73 @@
+return {
+	{ "nanotee/zoxide.vim" },
+	{
+		"stevearc/oil.nvim",
+		config = function()
+			vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+
+			require("oil").setup({
+				view_options = {
+					show_hidden = true,
+				},
+			})
+		end,
+	},
+	{
+		"ThePrimeagen/harpoon",
+		branch = "harpoon2",
+		dependencies = { "nvim-lua/plenary.nvim", "nvim-telescope/telescope.nvim" },
+		config = function()
+			local harpoon = require("harpoon")
+
+			vim.keymap.set("n", "<leader>a", function()
+				harpoon:list():add()
+			end)
+			vim.keymap.set("n", "<C-e>", function()
+				harpoon.ui:toggle_quick_menu(harpoon:list())
+			end)
+
+			vim.keymap.set("n", "<C-h>", function()
+				harpoon:list():select(1)
+			end)
+			vim.keymap.set("n", "<C-t>", function()
+				harpoon:list():select(2)
+			end)
+			vim.keymap.set("n", "<C-w>", function()
+				harpoon:list():select(3)
+			end)
+			vim.keymap.set("n", "<C-s>", function()
+				harpoon:list():select(4)
+			end)
+
+			vim.keymap.set("n", "<C-n>", function()
+				harpoon:list():next()
+			end)
+			vim.keymap.set("n", "<C-p>", function()
+				harpoon:list():prev()
+			end)
+
+			harpoon:setup({})
+		end,
+	},
+	{
+		"nvim-tree/nvim-tree.lua",
+		version = "*",
+		lazy = false,
+		dependencies = { "nvim-tree/nvim-web-devicons" },
+		config = function()
+			-- Disable netrw
+			vim.g.loaded_netrw = 1
+			vim.g.loaded_netrwPlugin = 1
+
+			-- Using the vimtree plugin
+			vim.api.nvim_set_keymap("n", "<leader>t", ":NvimTreeFindFileToggle<CR>", { noremap = true, silent = true })
+
+			require("nvim-tree").setup({
+				view = {
+					width = 35,
+					side = "left",
+				},
+			})
+		end,
+	},
+}

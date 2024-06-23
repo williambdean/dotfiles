@@ -1,8 +1,39 @@
-local builtin = require('telescope.builtin')
-vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
-vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
-vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
-vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
-
-return { "nvim-telescope/telescope.nvim", dependencies = { 'nvim-lua/plenary.nvim' } }
-
+return {
+	{ "nvim-telescope/telescope-symbols.nvim" },
+	{
+		"nvim-telescope/telescope.nvim",
+		dependencies = { "nvim-lua/plenary.nvim" },
+		keys = {
+			{
+				"<leader>ff",
+				function()
+					require("telescope.builtin").find_files()
+				end,
+			},
+			{
+				"<leader>fd",
+				function()
+					require("telescope.builtin").find_files({ hidden = true })
+				end,
+			},
+			{
+				"<leader>fg",
+				function()
+					require("telescope.builtin").live_grep()
+				end,
+			},
+			{
+				"<leader>fb",
+				function()
+					require("telescope.builtin").buffers()
+				end,
+			},
+			{
+				"<leader>fh",
+				function()
+					require("telescope.builtin").help_tags()
+				end,
+			},
+		},
+	},
+}
