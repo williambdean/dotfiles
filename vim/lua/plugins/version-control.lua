@@ -10,10 +10,13 @@ return {
 	{
 		"pwntester/octo.nvim",
 		config = function()
+			require("octo").setup({ enable_builtin = true })
+
 			vim.keymap.set("n", "<leader>oo", "<CMD>Octo<CR>", { silent = true })
 			vim.keymap.set("i", "@", "@<C-x><C-o>", { buffer = true, silent = true })
 			vim.keymap.set("i", "#", "#<C-x><C-o>", { silent = true, buffer = true })
-			require("octo").setup({ enable_builtin = true })
+			vim.keymap.set("n", "<leader>op", "<CMD>Octo pr list<CR>", { silent = true })
+			vim.keymap.set("n", "<leader>oi", "<CMD>Octo issue list<CR>", { silent = true })
 		end,
 		dependencies = {
 			"nvim-lua/plenary.nvim",

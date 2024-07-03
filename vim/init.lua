@@ -87,11 +87,18 @@ vim.api.nvim_set_keymap("v", "<leader>y", '"*y', { noremap = true })
 vim.opt.clipboard = "unnamedplus"
 
 -- Set color column
--- vim.opt.colorcolumn = '88'
--- vim.cmd('highlight ColorColumn ctermbg=0 guibg=grey')
---
+vim.opt.colorcolumn = "88"
+vim.cmd("highlight ColorColumn ctermbg=0 guibg=grey")
 
 -- Terminal mode escape key
 vim.api.nvim_set_keymap("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true })
 
 vim.g.markdown_fenced_languages = { "python", "bash=sh", "yaml", "json", "vim", "lua" }
+
+-- Go up and down with center screen
+vim.api.nvim_set_keymap("n", "<C-d>", "<C-d>zz", { noremap = true })
+vim.api.nvim_set_keymap("n", "<C-u>", "<C-u>zz", { noremap = true })
+
+-- Search is in the center of the screen
+vim.api.nvim_set_keymap("n", "n", "nzz", { noremap = true })
+vim.api.nvim_set_keymap("n", "N", "Nzz", { noremap = true })
