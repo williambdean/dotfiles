@@ -11,6 +11,12 @@ return {
 				end,
 			},
 			{
+				"<leader>fp",
+				function()
+					require("telescope.builtin").oldfiles({ only_cwd = true })
+				end,
+			},
+			{
 				"<leader>ff",
 				function()
 					require("telescope.builtin").find_files()

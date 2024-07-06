@@ -24,6 +24,12 @@ return {
 			)
 			vim.api.nvim_set_keymap(
 				"n",
+				"S",
+				"<cmd>lua require'hop'.hint_char2()<cr>",
+				{ noremap = true, silent = true }
+			)
+			vim.api.nvim_set_keymap(
+				"n",
 				"f",
 				"<cmd>lua require'hop'.hint_char1({ current_line_only = true })<cr>",
 				{ noremap = true, silent = true }
