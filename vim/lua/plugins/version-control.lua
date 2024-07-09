@@ -10,7 +10,9 @@ return {
 	{
 		"pwntester/octo.nvim",
 		config = function()
-			require("octo").setup({ enable_builtin = true })
+			require("octo").setup({
+				enable_builtin = true,
+			})
 
 			vim.keymap.set("n", "<leader>oo", "<CMD>Octo<CR>", { silent = true })
 			vim.keymap.set("i", "@", "@<C-x><C-o>", { buffer = true, silent = true })

@@ -9,7 +9,11 @@ return {
 			},
 		},
 		config = function()
-			require("mason").setup()
+			require("mason").setup({
+				pip = {
+					upgrade_pip = true,
+				},
+			})
 		end,
 	},
 	{
@@ -26,6 +30,7 @@ return {
 			lspconfig.ruff_lsp.setup({})
 			lspconfig.pyright.setup({})
 			lspconfig.lua_ls.setup({ ft = "lua" })
+			lspconfig.harper_ls.setup({})
 
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("UserLspConfig", {}),
