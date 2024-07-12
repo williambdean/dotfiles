@@ -16,7 +16,14 @@ vim.g.maplocalleader = "\\"
 
 vim.opt.termguicolors = true
 
-require("lazy").setup("plugins")
+require("lazy").setup({
+	spec = {
+		{ import = "plugins" },
+	},
+	ui = {
+		backdrop = 80,
+	},
+})
 
 -- Move around windows with vim keys
 vim.api.nvim_set_keymap("n", "<leader>h", ":wincmd h<CR>", { noremap = true, silent = true })
@@ -85,6 +92,9 @@ vim.opt.backspace:append({ "indent", "eol", "start" })
 -- Copy and paste to system clipboard
 vim.api.nvim_set_keymap("v", "<leader>y", '"*y', { noremap = true })
 vim.opt.clipboard = "unnamedplus"
+
+vim.cmd("highlight Normal guibg=#00000070 ctermbg=NONE")
+vim.cmd("highlight NonText guibg=#00000070 ctermbg=NONE")
 
 -- Set color column
 vim.opt.colorcolumn = "88"
