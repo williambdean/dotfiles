@@ -29,7 +29,12 @@ return {
 			local lspconfig = require("lspconfig")
 			lspconfig.ruff_lsp.setup({})
 			lspconfig.pyright.setup({})
-			lspconfig.lua_ls.setup({ ft = "lua" })
+			lspconfig.lua_ls.setup({
+				settings = {
+					globals = { "vim" },
+				},
+				ft = "lua",
+			})
 			lspconfig.harper_ls.setup({})
 
 			vim.api.nvim_create_autocmd("LspAttach", {
