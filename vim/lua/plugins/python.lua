@@ -1,3 +1,19 @@
+function python_main_block()
+	-- Go to the end of the file
+	vim.api.nvim_command("normal! G")
+	-- Insert Python main block
+	vim.api.nvim_buf_set_lines(0, -1, -1, false, {
+		"",
+		"",
+		'if __name__ == "__main__":',
+		"    # TODO: write your code here",
+	})
+	vim.api.nvim_command("normal! G")
+end
+
+-- Map <leader>mb to call the function
+vim.api.nvim_set_keymap("n", "<leader>mb", ":lua python_main_block()<CR>", { noremap = true, silent = true })
+
 return {
 	{
 		"jpalardy/vim-slime",
