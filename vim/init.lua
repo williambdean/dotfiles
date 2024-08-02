@@ -1,13 +1,13 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
-	vim.fn.system({
-		"git",
-		"clone",
-		"--filter=blob:none",
-		"https://github.com/folke/lazy.nvim.git",
-		-- latest stable release lazypath
-		"--branch=stable",
-	})
+    vim.fn.system({
+        "git",
+        "clone",
+        "--filter=blob:none",
+        "https://github.com/folke/lazy.nvim.git",
+        -- latest stable release lazypath
+        "--branch=stable",
+    })
 end
 vim.opt.rtp:prepend(lazypath)
 
@@ -17,26 +17,51 @@ vim.g.maplocalleader = "\\"
 vim.opt.termguicolors = true
 
 require("lazy").setup({
-	spec = {
-		{ import = "plugins" },
-	},
-	ui = {
-		backdrop = 80,
-	},
+    spec = {
+        { import = "plugins" },
+    },
+    ui = {
+        backdrop = 80,
+    },
 })
 
 -- Move around windows with vim keys
-vim.api.nvim_set_keymap("n", "<leader>h", ":wincmd h<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>j", ":wincmd j<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>k", ":wincmd k<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>l", ":wincmd l<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap(
+    "n",
+    "<leader>h",
+    ":wincmd h<CR>",
+    { noremap = true, silent = true }
+)
+vim.api.nvim_set_keymap(
+    "n",
+    "<leader>j",
+    ":wincmd j<CR>",
+    { noremap = true, silent = true }
+)
+vim.api.nvim_set_keymap(
+    "n",
+    "<leader>k",
+    ":wincmd k<CR>",
+    { noremap = true, silent = true }
+)
+vim.api.nvim_set_keymap(
+    "n",
+    "<leader>l",
+    ":wincmd l<CR>",
+    { noremap = true, silent = true }
+)
 
 -- Colorscheme
 vim.o.background = "dark" -- or "light" for light mode
 vim.cmd([[colorscheme gruvbox]])
 
 -- Zoom in and make the "o"nly window
-vim.keymap.set("n", "<leader>O", ":tab split<CR>", { noremap = true, silent = true })
+vim.keymap.set(
+    "n",
+    "<leader>O",
+    ":tab split<CR>",
+    { noremap = true, silent = true }
+)
 
 -- Enable syntax highlighting
 -- vim.cmd('syntax on')
@@ -94,16 +119,16 @@ vim.opt.backspace:append({ "indent", "eol", "start" })
 -- vim.api.nvim_set_keymap("v", "<leader>y", '"*y', { noremap = true })
 
 vim.g.clipboard = {
-	name = "WslClipboard",
-	copy = {
-		["+"] = "clip.exe",
-		["*"] = "clip.exe",
-	},
-	paste = {
-		["+"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
-		["*"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
-	},
-	cache_enabled = 0,
+    name = "WslClipboard",
+    copy = {
+        ["+"] = "clip.exe",
+        ["*"] = "clip.exe",
+    },
+    paste = {
+        ["+"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+        ["*"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+    },
+    cache_enabled = 0,
 }
 
 vim.api.nvim_set_keymap("v", "<leader>y", '"*y', { noremap = true })
@@ -114,11 +139,23 @@ vim.cmd("highlight NonText guibg=#00000070 ctermbg=NONE")
 -- Set color column
 vim.opt.colorcolumn = "88"
 vim.cmd("highlight ColorColumn ctermbg=0 guibg=grey")
+vim.cmd([[
+    autocmd FileType octo setlocal colorcolumn=0
+]])
+vim.cmd([[
+    autocmd FileType copilot-chat setlocal colorcolumn=0
+]])
 
 -- Terminal mode escape key
-vim.api.nvim_set_keymap("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap(
+    "t",
+    "<Esc>",
+    "<C-\\><C-n>",
+    { noremap = true, silent = true }
+)
 
-vim.g.markdown_fenced_languages = { "python", "bash=sh", "yaml", "json", "vim", "lua" }
+vim.g.markdown_fenced_languages =
+    { "python", "bash=sh", "yaml", "json", "vim", "lua" }
 
 -- Go up and down with center screen
 vim.api.nvim_set_keymap("n", "<C-d>", "<C-d>zz", { noremap = true })
@@ -127,3 +164,5 @@ vim.api.nvim_set_keymap("n", "<C-u>", "<C-u>zz", { noremap = true })
 -- Search is in the center of the screen
 vim.api.nvim_set_keymap("n", "n", "nzz", { noremap = true })
 vim.api.nvim_set_keymap("n", "N", "Nzz", { noremap = true })
+
+vim.cmd("command! JsonPrettify %!jq .")
