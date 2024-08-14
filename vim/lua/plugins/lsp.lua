@@ -7,6 +7,7 @@ return {
                 "pyright",
                 "lua-language-server",
                 "yaml-language-server",
+                "shfmt",
             },
         },
         config = function()
@@ -75,6 +76,14 @@ return {
             vim.api.nvim_command(
                 "command! LspFormat lua vim.lsp.buf.format({ async = false })"
             )
+
+            -- For shell scripts
+            vim.api.nvim_create_autocmd("BufWritePre", {
+                pattern = "*.sh",
+                callback = function()
+                    vim.cmd("!shfmt -w %")
+                end,
+            })
         end,
     },
     {

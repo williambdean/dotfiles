@@ -68,6 +68,7 @@ vim.keymap.set(
 
 -- Set spell checking
 vim.opt.spell = true
+vim.opt.spelllang = "en_us"
 
 -- Disable error bells
 vim.opt.errorbells = false
@@ -106,6 +107,12 @@ vim.opt.scrolloff = 15
 
 -- Set relative line numbers
 vim.opt.relativenumber = true
+-- Highlight line numbers
+-- vim.cmd("highlight LineNr guifg=#5eacd3")       -- Change the color code as per your preference
+vim.cmd("highlight CursorLineNr guifg=#fabd2f") -- Change the color code as per your preference
+vim.opt.cursorline = true
+-- Turn off the line across the screen
+vim.opt.cursorlineopt = "number"
 
 -- Set encoding
 vim.opt.encoding = "utf-8"

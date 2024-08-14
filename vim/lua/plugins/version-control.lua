@@ -50,6 +50,18 @@ return {
                 "<CMD>Octo issue list<CR>",
                 { silent = true }
             )
+            -- Add the key mapping only for octo filetype
+            vim.api.nvim_create_autocmd("FileType", {
+                pattern = "octo",
+                callback = function()
+                    vim.keymap.set(
+                        "n",
+                        "la",
+                        "<CMD>Octo label add<CR>",
+                        { silent = true, buffer = true }
+                    )
+                end,
+            })
         end,
         dependencies = {
             "nvim-lua/plenary.nvim",
