@@ -45,7 +45,7 @@ Plug 'justinmk/vim-sneak'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'dense-analysis/ale'
 Plug 'junegunn/limelight.vim'
-" Plug 'ThePrimeagen/harpoon'
+Plug 'ThePrimeagen/harpoon'
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'stevearc/oil.nvim'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
@@ -55,29 +55,29 @@ Plug 'MunifTanjim/nui.nvim'
 
 call plug#end()
 
-lua << EOF
-local copilot_chat = require("CopilotChat")
-copilot_chat.setup({
-  debug = true,
-  show_help = "yes",
-  language = "English", 
-  prompts = {
-    Explain = "Explain how it works in the English language.",
-    Review = "Review the following code and provide concise suggestions.",
-    Tests = "Briefly explain how the selected code works, then generate unit tests.",
-    Refactor = "Refactor the code to improve clarity and readability.",
-  },
-  build = function()
-    vim.notify("Please update the remote plugins by running ':UpdateRemotePlugins', then restart Neovim.")
-  end,
-  event = "VeryLazy",
-})
-EOF
-
-nnoremap <leader>cct <cmd>CopilotChatToggle<CR>
-
-
-lua require("noice").setup()
+"lua << EOF
+"local copilot_chat = require("CopilotChat")
+"copilot_chat.setup({
+"  debug = true,
+"  show_help = "yes",
+"  language = "English", 
+"  prompts = {
+"    Explain = "Explain how it works in the English language.",
+"    Review = "Review the following code and provide concise suggestions.",
+"    Tests = "Briefly explain how the selected code works, then generate unit tests.",
+"    Refactor = "Refactor the code to improve clarity and readability.",
+"  },
+"  build = function()
+"    vim.notify("Please update the remote plugins by running ':UpdateRemotePlugins', then restart Neovim.")
+"  end,
+"  event = "VeryLazy",
+"})
+"EOF
+"
+"nnoremap <leader>cct <cmd>CopilotChatToggle<CR>
+"
+"
+"lua require("noice").setup()
 
 let NERDTreeIgnore = ['\.pyc$', '__pycache__']
 
