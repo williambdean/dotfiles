@@ -3,3 +3,7 @@ repos:
     rev: v0.20.0
     hooks:
       - id: stylua
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: v3.8.0-1
+    hooks:
+      - id: shfmt         # prebuilt upstream executable
