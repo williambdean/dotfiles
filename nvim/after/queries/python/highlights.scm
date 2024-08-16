@@ -3,6 +3,12 @@
 ; Module docstring
 (module . (expression_statement (string) @comment))
 
+; Module docstring
+(module
+  (expression_statement (string) @comment)
+  (#match? @comment "^\"\"\"")
+  (#match? @comment "\"\"\"$"))
+
 ; Class docstring
 (class_definition
   body: (block . (expression_statement (string) @comment)))

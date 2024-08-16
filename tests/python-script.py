@@ -1,3 +1,6 @@
+# These are some comments at the top of the code
+# Another comment
+# Yet another comment
 """This is a the module docstring.
 
 This is some text that describes the module.
