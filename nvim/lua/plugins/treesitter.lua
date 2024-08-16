@@ -41,6 +41,7 @@ end
 return {
     {
         "nvim-treesitter/nvim-treesitter",
+        build = ":TSUpdate",
         config = function()
             -- Create Neovim commands to fold/unfold docstrings
             vim.api.nvim_create_user_command(
@@ -53,6 +54,19 @@ return {
                 unfold_docstrings,
                 {}
             )
+
+            -- Autocmd to run FoldDocstrings when entering a Python file
+            local fold_docstrings_group = vim.api.nvim_create_augroup(
+                "FoldDocstringGroup",
+                { clear = true }
+            )
+            vim.api.nvim_create_autocmd("FileType", {
+                pattern = "python",
+                callback = function()
+                    vim.cmd("FoldDocstrings")
+                end,
+                group = fold_docstrings_group,
+            })
 
             require("nvim-treesitter.configs").setup({
                 ensure_installed = {
