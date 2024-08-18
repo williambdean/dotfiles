@@ -1,3 +1,16 @@
+local is_git_repo = function()
+    local git_dir = vim.fn.system("git rev-parse --is-inside-work-tree")
+    return vim.v.shell_error == 0
+end
+
+local find_site_packages = function()
+    return vim.trim(
+        vim.fn.system(
+            "python -c 'import site; print(site.getsitepackages()[0])'"
+        )
+    )
+end
+
 -- Move around windows with vim keys
 vim.api.nvim_set_keymap(
     "n",
@@ -28,6 +41,9 @@ return {
     { "nanotee/zoxide.vim" },
     {
         "stevearc/oil.nvim",
+        dependencies = {
+            "nvim-telescope/telescope.nvim",
+        },
         config = function()
             vim.keymap.set(
                 "n",
@@ -82,5 +98,102 @@ return {
 
             harpoon:setup({})
         end,
+    },
+    { "nvim-telescope/telescope-symbols.nvim" },
+    {
+        "nvim-telescope/telescope.nvim",
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+        },
+        keys = {
+            {
+                "<leader>pf",
+                function()
+                    require("telescope.builtin").find_files({
+                        cwd = find_site_packages(),
+                        glob_pattern = "*.py",
+                    })
+                end,
+            },
+            {
+                "<leader>pg",
+                function()
+                    require("telescope.builtin").live_grep({
+                        cwd = find_site_packages(),
+                        glob_pattern = "*.py",
+                    })
+                end,
+            },
+            {
+                "<leader>fc",
+                function()
+                    require("telescope.builtin").resume()
+                end,
+            },
+            {
+                "<leader>fp",
+                function()
+                    require("telescope.builtin").oldfiles({ only_cwd = true })
+                end,
+            },
+            {
+                "<leader>ff",
+                function()
+                    local cwd
+                    if vim.bo.filetype == "oil" then
+                        cwd = require("oil").get_current_dir()
+                    else
+                        cwd = vim.fn.expand("%:p:h")
+                    end
+
+                    params = {
+                        cwd = cwd,
+                        search_dirs = { cwd },
+                    }
+
+                    -- TODO: Bug where in a git repo but in a non-git directory
+
+                    local search
+                    if is_git_repo() then
+                        search = require("telescope.builtin").git_files
+                        params.use_git_root = false
+                    else
+                        search = require("telescope.builtin").find_files
+                    end
+
+                    search(params)
+                end,
+            },
+            {
+                "<leader>fd",
+                function()
+                    require("telescope.builtin").find_files({ hidden = true })
+                end,
+            },
+            {
+                "<leader>fg",
+                function()
+                    cwd = require("oil").get_current_dir()
+                    require("telescope.builtin").live_grep({
+                        cwd = cwd,
+                        search_dirs = {
+                            cwd,
+                        },
+                    })
+                end,
+            },
+            {
+                "<leader>fb",
+                function()
+                    require("telescope.builtin").buffers()
+                end,
+            },
+            {
+                "<leader>fh",
+                function()
+                    require("telescope.builtin").help_tags()
+                end,
+            },
+        },
     },
 }
