@@ -23,6 +23,11 @@ This is an example of how to use the module.
 from dataclasses import dataclass
 
 import pandas as pd
+import numpy as np
+
+
+seed = sum(map(ord, "Some random seed"))
+rng = np.random.default_rng(seed)
 
 
 @dataclass
