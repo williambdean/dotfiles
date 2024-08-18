@@ -33,8 +33,9 @@ return {
             lspconfig.pyright.setup({})
             lspconfig.harper_ls.setup({})
 
+            local group = vim.api.nvim_create_augroup("UserLspConfig", {})
             vim.api.nvim_create_autocmd("LspAttach", {
-                group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+                group = group,
                 callback = function(ev)
                     vim.bo[ev.buf].omnifunc = "v:lua.vim.lsp.omnifunc"
 
@@ -59,6 +60,7 @@ return {
             -- Modify the autocmd to check the global variable before formatting
             vim.api.nvim_create_autocmd("BufWritePre", {
                 buffer = buffer,
+                group = group,
                 callback = function()
                     if vim.g.lsp_format_enabled then
                         vim.lsp.buf.format({ async = false })
@@ -80,9 +82,16 @@ return {
             -- For shell scripts
             vim.api.nvim_create_autocmd("BufWritePre", {
                 pattern = "*.sh",
+                group = group,
                 callback = function()
                     vim.cmd("!shfmt -w %")
                 end,
+            })
+
+            -- Add the diagnostics to the right of the screen
+            -- instead of the left side which pushes it out
+            vim.diagnostic.config({
+                virtual_text = true,
             })
         end,
     },

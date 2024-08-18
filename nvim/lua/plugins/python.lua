@@ -11,11 +11,30 @@ function python_main_block()
     vim.api.nvim_command("normal! G")
 end
 
+function random_seed()
+    local function add_rng_to_script(seed)
+        local row, _ = unpack(vim.api.nvim_win_get_cursor(0))
+        vim.api.nvim_buf_set_lines(0, row, row, false, {
+            "seed = sum(map(ord, '" .. seed .. "'))",
+            "rng = np.random.default_rng(seed)",
+        })
+    end
+
+    vim.ui.input({ prompt = "Seed: " }, add_rng_to_script)
+end
+
 -- Map <leader>mb to call the function
 vim.api.nvim_set_keymap(
     "n",
     "<leader>mb",
     ":lua python_main_block()<CR>",
+    { noremap = true, silent = true }
+)
+
+vim.api.nvim_set_keymap(
+    "n",
+    "<leader>rs",
+    ":lua random_seed()<CR>",
     { noremap = true, silent = true }
 )
 

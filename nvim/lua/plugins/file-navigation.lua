@@ -83,30 +83,4 @@ return {
             harpoon:setup({})
         end,
     },
-    {
-        "nvim-tree/nvim-tree.lua",
-        version = "*",
-        lazy = false,
-        dependencies = { "nvim-tree/nvim-web-devicons" },
-        config = function()
-            -- Disable netrw
-            vim.g.loaded_netrw = 1
-            vim.g.loaded_netrwPlugin = 1
-
-            -- Using the vimtree plugin
-            vim.api.nvim_set_keymap(
-                "n",
-                "<leader>t",
-                ":NvimTreeFindFileToggle<CR>",
-                { noremap = true, silent = true }
-            )
-
-            require("nvim-tree").setup({
-                view = {
-                    width = 35,
-                    side = "left",
-                },
-            })
-        end,
-    },
 }

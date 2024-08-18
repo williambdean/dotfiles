@@ -8,19 +8,21 @@ local function quick_chat(with_buffer)
         prompt = "Quick Chat (Buffer): "
     end
 
-    local input = vim.fn.input(prompt)
-    if input == "" then
-        return
+    local handle_input = function(input)
+        if input == "" then
+            return
+        end
+
+        if with_buffer then
+            chat.ask(input, {
+                selection = select.buffer,
+            })
+        else
+            chat.ask(input)
+        end
     end
 
-    local ask = chat.ask
-    if with_buffer then
-        ask(input, {
-            selection = select.buffer,
-        })
-    else
-        ask(input)
-    end
+    vim.ui.input({ prompt = prompt }, handle_input)
 end
 
 return {
@@ -35,7 +37,7 @@ return {
         },
         keys = {
             {
-                "<leader>cct",
+                "<leader>t",
                 function()
                     require("CopilotChat").toggle()
                 end,

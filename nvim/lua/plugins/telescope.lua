@@ -1,3 +1,8 @@
+local is_git_repo = function()
+    local git_dir = vim.fn.system("git rev-parse --is-inside-work-tree")
+    return vim.v.shell_error == 0
+end
+
 local find_site_packages = function()
     local site_packages = vim.trim(
         vim.fn.system(
@@ -47,7 +52,11 @@ return {
             {
                 "<leader>ff",
                 function()
-                    require("telescope.builtin").find_files()
+                    if is_git_repo() then
+                        require("telescope.builtin").git_files()
+                    else
+                        require("telescope.builtin").find_files()
+                    end
                 end,
             },
             {
