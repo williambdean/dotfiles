@@ -27,7 +27,7 @@ config.window_close_confirmation = "NeverPrompt"
 config.harfbuzz_features = { "calt=0", "clig=0", "liga=0" }
 
 -- Remove window border
-config.window_decorations = "NONE"
+-- config.window_decorations = "NONE"
 
 -- Set custom font
 config.font = wezterm.font_with_fallback({
