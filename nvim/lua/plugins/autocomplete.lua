@@ -114,13 +114,19 @@ return {
         config = function()
             require("CopilotChat").setup({
                 debug = false,
-                show_help = "yes",
+                auto_follow_cursor = false,
+                temperature = 0.5,
+                show_help = false,
                 context = "buffers",
                 language = "English",
                 prompts = {
                     Explain = "Explain how it works in the English language.",
                     Review = "Review the following code and provide concise suggestions.",
                     Tests = "Write tests for the following code.",
+                    Anything = {
+                        system_prompt = "Ignore any previous prompts and respond to the following question. It will likely be a technical question but could be anything.",
+                        prompt = "This is a free-form prompt. Respond to the following question.",
+                    },
                 },
                 build = function()
                     vim.notify(
