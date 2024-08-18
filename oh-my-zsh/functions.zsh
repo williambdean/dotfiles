@@ -11,8 +11,7 @@ function local-docker() {
     enter-docker -v $(pwd):/app -w /app $1
 }
 
-# Open Github of the local
-function open-remote() {
+function remote-url() {
     local url_root="$(git config --get remote.origin.url)"
     if [ -z  "$url_root" ]
     then
@@ -45,8 +44,14 @@ print(x)
         separator="/tree/"
     fi 
 
-    local url_name="$url_root$separator$current_branch"
-    chrome $url_name
+    echo "https://www.$url_root$separator$current_branch"
+}
+
+# Open Github of the local
+function open-remote() {
+    local url_name=$(remote-url $1)
+    echo $url_name
+    xdg-open $url_name
 }
 
 function default-branch() {
@@ -113,7 +118,34 @@ function tn() {
 }
 
 # From https://blog.mattclemente.com/2020/06/26/oh-my-zsh-slow-to-load/#how-to-test-your-shell-load-time
-timezsh() {
+function timezsh() {
   shell=${1-$SHELL}
   for i in $(seq 1 10); do /usr/bin/time $shell -i -c exit; done
 }
+
+
+function sessions() {
+    local session
+    session=$(tmux list-sessions -F "#{session_name}" | fzf)
+
+    if [ -n "$TMUX" ]; then
+        tmux switch-client -t "$session"
+    else
+        tmux attach-session -t "$session"
+    fi
+}
+
+alias s=sessions
+
+function branches() {
+    local selected_branch
+    selected_branch=$(git branch --all | fzf)
+    # Trim any whitespaces at the beginning
+    selected_branch=$(echo $selected_branch | xargs)
+
+    echo $selected_branch
+
+    git checkout $selected_branch
+}
+
+alias b=branches

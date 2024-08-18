@@ -29,3 +29,4 @@ alias ic="gh issue create -e"
 
 # Docker 
 alias enter-docker="docker run --rm -it --entrypoint bash"
+
