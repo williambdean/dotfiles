@@ -76,6 +76,19 @@ return {
                 harpoon.ui:toggle_quick_menu(harpoon:list())
             end)
 
+            vim.keymap.set("n", "<leader>1", function()
+                harpoon:list():select(1)
+            end)
+            vim.keymap.set("n", "<leader>2", function()
+                harpoon:list():select(2)
+            end)
+            vim.keymap.set("n", "<leader>3", function()
+                harpoon:list():select(3)
+            end)
+            vim.keymap.set("n", "<leader>4", function()
+                harpoon:list():select(4)
+            end)
+
             vim.keymap.set("n", "<C-h>", function()
                 harpoon:list():select(1)
             end)
@@ -146,17 +159,18 @@ return {
                         cwd = vim.fn.expand("%:p:h")
                     end
 
-                    params = {
-                        cwd = cwd,
-                        search_dirs = { cwd },
-                    }
+                    -- params = {
+                    --     cwd = cwd,
+                    --     search_dirs = { cwd },
+                    -- }
+                    params = {}
 
                     -- TODO: Bug where in a git repo but in a non-git directory
 
                     local search
                     if is_git_repo() then
                         search = require("telescope.builtin").git_files
-                        params.use_git_root = false
+                        -- params.use_git_root = false
                     else
                         search = require("telescope.builtin").find_files
                     end
@@ -174,12 +188,12 @@ return {
                 "<leader>fg",
                 function()
                     cwd = require("oil").get_current_dir()
-                    require("telescope.builtin").live_grep({
-                        cwd = cwd,
-                        search_dirs = {
-                            cwd,
-                        },
-                    })
+                    -- params = {
+                    --     cwd = cwd,
+                    --     search_dirs = { cwd },
+                    -- }
+                    params = {}
+                    require("telescope.builtin").live_grep(params)
                 end,
             },
             {
