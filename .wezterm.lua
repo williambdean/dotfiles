@@ -16,7 +16,7 @@ config.font_size = 12.5
 config.color_scheme = "Gruvbox Dark"
 
 -- Set the transparency of the background
-config.window_background_opacity = 0.85
+config.window_background_opacity = 0.825
 
 -- No tabs at the top
 config.hide_tab_bar_if_only_one_tab = true

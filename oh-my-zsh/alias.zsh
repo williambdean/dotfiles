@@ -26,7 +26,7 @@ alias gdelete="git branch --merged | grep -v \* | xargs git branch -D "
 
 # GitHub CLI
 alias ic="gh issue create -e"
+alias issues="nvim -c ':Octo issue list'"
 
 # Docker 
 alias enter-docker="docker run --rm -it --entrypoint bash"
-
