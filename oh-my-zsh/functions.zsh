@@ -113,8 +113,15 @@ function zsh-link() {
 
 # New tmux session with the name of current directory
 # Video from Josh Medeski
+# Modified
 function tn() {
-    tmux new -s $(pwd | sed 's/.*\///g')
+    local session_name=$(pwd | sed 's/.*\///g')
+    if [ -n "$TMUX" ]; then
+        tmux new-session -d -s "$session_name"
+        tmux switch-client -t "$session_name"
+    else
+        tmux new -s "$session_name"
+    fi
 }
 
 # From https://blog.mattclemente.com/2020/06/26/oh-my-zsh-slow-to-load/#how-to-test-your-shell-load-time
@@ -143,13 +150,35 @@ function sessions() {
 
 alias s=sessions
 
+function windows() {
+    local window
+    window=$(tmux list-windows -F "#{window_id}: #{window_name}")
+
+    if [ -z "$window" ]; then
+        return 1
+    fi
+
+    selected_window=$(echo "$window" | fzf)
+
+    if [ -n "$TMUX" ]; then
+        tmux select-window -t "${selected_window%%:*}"
+    else
+        echo "Not in a tmux session."
+    fi
+}
+
+alias w=windows
+
 function branches() {
     local selected_branch
     selected_branch=$(git branch --all | fzf)
     # Trim any whitespaces at the beginning
     selected_branch=$(echo $selected_branch | xargs)
 
-    echo $selected_branch
+    for remote in $(git remote)
+    do
+        selected_branch=${selected_branch#remotes/$remote/}
+    done
 
     git checkout $selected_branch
 }
