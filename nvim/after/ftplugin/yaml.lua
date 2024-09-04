@@ -8,6 +8,7 @@ vim.opt_local.expandtab = true
 require("lspconfig").yamlls.setup({
     settings = {
         yaml = {
+            validate = true,
             schemas = {
                 ["https://json.schemastore.org/github-workflow"] = ".github/workflows/*",
                 ["https://json.schemastore.org/github-action"] = ".github/actions.{yml,yaml}",

@@ -5,7 +5,6 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
         "clone",
         "--filter=blob:none",
         "https://github.com/folke/lazy.nvim.git",
-        -- latest stable release lazypath
         "--branch=stable",
     })
 end
@@ -19,6 +18,24 @@ vim.opt.termguicolors = true
 require("lazy").setup({
     spec = {
         { import = "plugins" },
+        {
+            "folke/which-key.nvim",
+            event = "VeryLazy",
+            opts = {
+                -- Your configuration comes here
+                -- or leave it empty to use the default settings
+                -- refer to the configuration section below
+            },
+            keys = {
+                {
+                    "<leader>?",
+                    function()
+                        require("which-key").show({ global = false })
+                    end,
+                    desc = "Buffer Local Keymaps (which-key)",
+                },
+            },
+        },
     },
     ui = {
         backdrop = 80,
@@ -51,8 +68,8 @@ vim.api.nvim_set_keymap(
     { noremap = true, silent = true }
 )
 
--- Colorscheme
-vim.o.background = "dark" -- or "light" for light mode
+-- Color scheme
+vim.o.background = "dark"
 vim.cmd([[colorscheme gruvbox]])
 
 -- Zoom in and make the "o"nly window
@@ -64,7 +81,7 @@ vim.keymap.set(
 )
 
 -- Enable syntax highlighting
--- vim.cmd('syntax on')
+vim.cmd("syntax on")
 
 -- Set spell checking
 vim.opt.spell = true
@@ -124,19 +141,35 @@ vim.opt.backspace:append({ "indent", "eol", "start" })
 -- Copy and paste to system clipboard
 -- vim.cmd("set clipboard+=unnamedplus")
 -- vim.api.nvim_set_keymap("v", "<leader>y", '"*y', { noremap = true })
+--
 
-vim.g.clipboard = {
-    name = "WslClipboard",
-    copy = {
-        ["+"] = "clip.exe",
-        ["*"] = "clip.exe",
-    },
-    paste = {
-        ["+"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
-        ["*"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
-    },
-    cache_enabled = 0,
-}
+-- vim.opt.clipboard = 'unnamedplus'
+--
+-- vim.g.clipboard = {
+--     name = 'WslClipboard',
+--     copy = {
+--         ['+'] = 'clip.exe',
+--         ['*'] = 'clip.exe',
+--     },
+--     paste = {
+--         ['+'] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+--         ['*'] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+--     },
+--     cache_enabled = 0,
+-- }
+
+-- vim.g.clipboard = {
+--     name = "WslClipboard",
+--     copy = {
+--         ["+"] = "clip.exe",
+--         ["*"] = "clip.exe",
+--     },
+--     paste = {
+--         ["+"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+--         ["*"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+--     },
+--     cache_enabled = 0,
+-- }
 
 vim.api.nvim_set_keymap("v", "<leader>y", '"*y', { noremap = true })
 
@@ -184,3 +217,7 @@ vim.api.nvim_create_autocmd("TextYankPost", {
         vim.highlight.on_yank({ timeout = 200 })
     end,
 })
+
+vim.cmd([[
+    command! Note execute 'edit ' .. expand('%:p:h') .. '/note.md'
+]])

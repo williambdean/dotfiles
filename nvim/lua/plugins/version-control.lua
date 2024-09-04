@@ -9,9 +9,15 @@ return {
     },
     {
         "pwntester/octo.nvim",
+        -- dir = "~/GitHub/octo.nvim",
         config = function()
             require("octo").setup({
+                default_to_projects_v2 = true,
                 enable_builtin = true,
+                picker = "fzf-lua",
+                picker_config = {
+                    use_emojis = true,
+                },
             })
 
             vim.keymap.set(
@@ -65,8 +71,9 @@ return {
         end,
         dependencies = {
             "nvim-lua/plenary.nvim",
-            "nvim-telescope/telescope.nvim",
+            -- "nvim-telescope/telescope.nvim",
             "nvim-tree/nvim-web-devicons",
+            "ibhagwan/fzf-lua",
         },
     },
 }

@@ -3,5 +3,5 @@ lspconfig.lua_ls.setup({
     settings = {
         globals = { "vim" },
     },
-    ft = "lua",
+    ft = ".lua",
 })

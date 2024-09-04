@@ -32,6 +32,24 @@ return {
             lspconfig.ruff_lsp.setup({})
             lspconfig.pyright.setup({})
             lspconfig.harper_ls.setup({})
+            lspconfig.lua_ls.setup({
+                settings = {
+                    globals = { "vim" },
+                    Lua = {
+                        format = {
+                            enable = true,
+                            defaultConfig = {
+                                indent_type = "Spaces",
+                                indent_width = "4",
+                                column_width = "80",
+                                line_endings = "Unix",
+                            },
+                        },
+                    },
+                },
+
+                ft = ".lua",
+            })
 
             local group = vim.api.nvim_create_augroup("UserLspConfig", {})
             vim.api.nvim_create_autocmd("LspAttach", {
@@ -57,9 +75,23 @@ return {
             -- Define a global variable to control formatting
             vim.g.lsp_format_enabled = true
 
+            vim.diagnostic.config({
+                virtual_text = {
+                    prefix = "●", -- Could be '●', '▎', 'x'
+                    source = "if_many", -- Or "always"
+                    spacing = 5,
+                    severity_limit = "Warning",
+                    right_align = false, -- Align to the right
+                },
+                signs = true,
+                underline = true,
+                update_in_insert = false,
+                severity_sort = true,
+            })
+
             -- Modify the autocmd to check the global variable before formatting
             vim.api.nvim_create_autocmd("BufWritePre", {
-                buffer = buffer,
+                -- buffer = buffer,
                 group = group,
                 callback = function()
                     if vim.g.lsp_format_enabled then

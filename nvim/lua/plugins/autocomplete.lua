@@ -35,11 +35,65 @@ return {
             { "nvim-lua/plenary.nvim" },
             { "nvim-telescope/telescope.nvim" },
         },
+        config = function()
+            -- Custom buffer for CopilotChat
+            vim.api.nvim_create_autocmd("BufEnter", {
+                pattern = "copilot-*",
+                callback = function()
+                    vim.opt_local.relativenumber = true
+                    vim.opt_local.number = true
+
+                    -- Get current filetype and set it to markdown if the current filetype is copilot-chat
+                    local ft = vim.bo.filetype
+                    if ft == "copilot-chat" then
+                        vim.bo.filetype = "markdown"
+                    end
+                end,
+            })
+            require("CopilotChat").setup({
+                debug = false,
+                auto_follow_cursor = true,
+                temperature = 0.1,
+                show_help = false,
+                context = "buffers",
+                language = "English",
+                prompts = {
+                    Explain = "Explain how it works in the English language.",
+                    Review = "Review the following code and provide concise suggestions.",
+                    Tests = "Write tests for the following code.",
+                    Anything = {
+                        system_prompt = "Ignore any previous prompts and respond to the following question. It will likely be a technical question but could be anything.",
+                        prompt = "This is a free-form prompt. Respond to the following question.",
+                    },
+                },
+                build = function()
+                    vim.notify(
+                        "Please update the remote plugins by running :UpdateRemotePlugins, the"
+                    )
+                end,
+                event = "VeryLazy",
+            })
+        end,
         keys = {
             {
                 "<leader>t",
                 function()
                     require("CopilotChat").toggle()
+                end,
+                desc = "CopilotChat - Toggle",
+            },
+            {
+                "<leader>T",
+                function()
+                    require("CopilotChat").toggle({
+                        window = {
+                            layout = "float",
+                            relative = "cursor",
+                            width = 0.8,
+                            height = 0.8,
+                            row = 1,
+                        },
+                    })
                 end,
                 desc = "CopilotChat - Toggle",
             },
@@ -71,8 +125,9 @@ return {
                 "<leader>ccp",
                 function()
                     local actions = require("CopilotChat.actions")
+                    local select = require("CopilotChat.select")
                     require("CopilotChat.integrations.telescope").pick(
-                        actions.prompt_actions()
+                        actions.prompt_actions({ selection = select.buffer })
                     )
                 end,
                 desc = "CopilotChat - Prompt actions",
@@ -111,30 +166,9 @@ return {
                 desc = "CopilotChat - Inline",
             },
         },
-        config = function()
-            require("CopilotChat").setup({
-                debug = false,
-                auto_follow_cursor = false,
-                temperature = 0.5,
-                show_help = false,
-                context = "buffers",
-                language = "English",
-                prompts = {
-                    Explain = "Explain how it works in the English language.",
-                    Review = "Review the following code and provide concise suggestions.",
-                    Tests = "Write tests for the following code.",
-                    Anything = {
-                        system_prompt = "Ignore any previous prompts and respond to the following question. It will likely be a technical question but could be anything.",
-                        prompt = "This is a free-form prompt. Respond to the following question.",
-                    },
-                },
-                build = function()
-                    vim.notify(
-                        "Please update the remote plugins by running :UpdateRemotePlugins, the"
-                    )
-                end,
-                -- event = "VeryLazy",
-            })
-        end,
+        cmd = {
+            "CopilotChatToggle",
+            "CopilotChat",
+        },
     },
 }
