@@ -8,17 +8,41 @@ return {
         end,
     },
     {
-        "pwntester/octo.nvim",
-        -- dir = "~/GitHub/octo.nvim",
+        -- "pwntester/octo.nvim",
+        dir = "~/GitHub/octo.nvim",
         config = function()
             require("octo").setup({
-                default_to_projects_v2 = true,
+                -- default_to_projects_v2 = true,
                 enable_builtin = true,
-                picker = "fzf-lua",
-                picker_config = {
-                    use_emojis = true,
-                },
+                -- picker = "fzf-lua",
+                -- picker_config = {
+                --     use_emojis = true,
+                -- },
             })
+
+            -- I have my cursor over a link that looks like this
+            -- https://github.com/pwntester/octo.nvim/issue/1
+            -- And would like to open this file locally
+            -- octo://pwntester/octo.nvim/issue/1
+
+            local function open_github_as_octo()
+                local word = vim.fn.expand("<cWORD>")
+                local match_string =
+                    "https://github.com/([%w-]+)/([%w-.]+)/(%w+)/(%d+)"
+                local github_link = word:match(match_string)
+                if not github_link then
+                    vim.cmd([[normal! gf]])
+                    return
+                end
+
+                local user, repo, type, id = word:match(match_string)
+                local octo_link =
+                    string.format("octo://%s/%s/%s/%s", user, repo, type, id)
+                vim.cmd("edit " .. octo_link)
+            end
+
+            -- Map gf to the custom function
+            vim.keymap.set("n", "gf", open_github_as_octo, { silent = true })
 
             vim.keymap.set(
                 "n",
