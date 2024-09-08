@@ -111,14 +111,14 @@ return {
                 "command! LspFormat lua vim.lsp.buf.format({ async = false })"
             )
 
-            -- For shell scripts
-            vim.api.nvim_create_autocmd("BufWritePre", {
-                pattern = "*.sh",
-                group = group,
-                callback = function()
-                    vim.cmd("!shfmt -w %")
-                end,
-            })
+            -- -- For shell scripts
+            -- vim.api.nvim_create_autocmd("BufWritePre", {
+            --     pattern = "*.sh",
+            --     group = group,
+            --     callback = function()
+            --         vim.cmd("!shfmt -w %")
+            --     end,
+            -- })
 
             -- Add the diagnostics to the right of the screen
             -- instead of the left side which pushes it out
