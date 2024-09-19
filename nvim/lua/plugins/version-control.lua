@@ -13,7 +13,9 @@ return {
         config = function()
             require("octo").setup({
                 -- default_to_projects_v2 = true,
+                use_local_fs = false,
                 enable_builtin = true,
+                users = "mentionable",
                 -- picker = "fzf-lua",
                 -- picker_config = {
                 --     use_emojis = true,
