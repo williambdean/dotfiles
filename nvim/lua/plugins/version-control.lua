@@ -1,3 +1,19 @@
+local vim = vim
+
+local function open_github_as_octo_buffer()
+    local word = vim.fn.expand("<cWORD>")
+    local match_string = "https://github.com/([%w-]+)/([%w-.]+)/(%w+)/(%d+)"
+    local github_link = word:match(match_string)
+    if not github_link then
+        vim.cmd([[normal! gf]])
+        return
+    end
+
+    local user, repo, type, id = word:match(match_string)
+    local octo_link = string.format("octo://%s/%s/%s/%s", user, repo, type, id)
+    vim.cmd("edit " .. octo_link)
+end
+
 return {
     { "tpope/vim-fugitive" },
     {
@@ -27,24 +43,32 @@ return {
             -- And would like to open this file locally
             -- octo://pwntester/octo.nvim/issue/1
 
-            local function open_github_as_octo()
-                local word = vim.fn.expand("<cWORD>")
-                local match_string =
-                    "https://github.com/([%w-]+)/([%w-.]+)/(%w+)/(%d+)"
-                local github_link = word:match(match_string)
-                if not github_link then
-                    vim.cmd([[normal! gf]])
-                    return
-                end
-
-                local user, repo, type, id = word:match(match_string)
-                local octo_link =
-                    string.format("octo://%s/%s/%s/%s", user, repo, type, id)
-                vim.cmd("edit " .. octo_link)
-            end
-
             -- Map gf to the custom function
-            vim.keymap.set("n", "gf", open_github_as_octo, { silent = true })
+            vim.keymap.set(
+                "n",
+                "gf",
+                open_github_as_octo_buffer,
+                { silent = true }
+            )
+
+            -- Use telescope to find a commit hash and add it where the cursor is
+            vim.keymap.set("n", "<leader>ch", function()
+                require("telescope.builtin").git_commits({
+                    attach_mappings = function(_, map)
+                        map("i", "<CR>", function(bufnr)
+                            local value =
+                                require("telescope.actions.state").get_selected_entry(
+                                    bufnr
+                                )
+                            require("telescope.actions").close(bufnr)
+
+                            local hash = value.value
+                            vim.api.nvim_put({ hash }, "c", true, true)
+                        end)
+                        return true
+                    end,
+                })
+            end, { silent = true })
 
             vim.keymap.set(
                 "n",
