@@ -63,7 +63,7 @@ return {
                             require("telescope.actions").close(bufnr)
 
                             local hash = value.value
-                            vim.api.nvim_put({ hash }, "c", true, true)
+                            vim.fn.setreg('"', hash)
                         end)
                         return true
                     end,
