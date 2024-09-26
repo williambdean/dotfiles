@@ -120,7 +120,7 @@ return {
                 "<leader>*",
                 function()
                     require("telescope.builtin").grep_string({
-                        search = vim.fn.expand("<cword>"),
+                        search = vim.fn.expand("<cWORD>"),
                     })
                 end,
             },
