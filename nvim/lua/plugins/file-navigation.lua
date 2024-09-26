@@ -113,10 +113,18 @@ return {
         end,
     },
     { "nvim-telescope/telescope-symbols.nvim" },
+    { "xiyaowong/telescope-emoji.nvim" },
     {
         "nvim-telescope/telescope.nvim",
         dependencies = {
             "nvim-lua/plenary.nvim",
+        },
+        extensions = {
+            emoji = {
+                action = function(emoji)
+                    vim.fn.setreg("*", emoji.value)
+                end,
+            },
         },
         keys = {
             {
