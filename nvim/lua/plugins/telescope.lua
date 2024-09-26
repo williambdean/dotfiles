@@ -10,6 +10,7 @@ local find_site_packages = function()
         )
     )
 end
+
 return {
     { "nvim-telescope/telescope-symbols.nvim" },
     { "xiyaowong/telescope-emoji.nvim" },
@@ -94,12 +95,12 @@ return {
             {
                 "<leader>fg",
                 function()
-                    cwd = require("oil").get_current_dir()
+                    local cwd = require("oil").get_current_dir()
                     -- params = {
                     --     cwd = cwd,
                     --     search_dirs = { cwd },
                     -- }
-                    params = {}
+                    local params = {}
                     require("telescope.builtin").live_grep(params)
                 end,
             },
@@ -113,6 +114,14 @@ return {
                 "<leader>fh",
                 function()
                     require("telescope.builtin").help_tags()
+                end,
+            },
+            {
+                "<leader>*",
+                function()
+                    require("telescope.builtin").grep_string({
+                        search = vim.fn.expand("<cword>"),
+                    })
                 end,
             },
         },
