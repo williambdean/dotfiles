@@ -1,5 +1,6 @@
 {
   "CopilotChat.nvim": { "branch": "canary", "commit": "9333944fde3c65868818e245c73aa29eef826e9b" },
+  "cmp-git": { "branch": "main", "commit": "50d526dff0f6bc441b51fc269d9fdc99a50c76af" },
   "copilot.vim": { "branch": "release", "commit": "782461159655b259cff10ecff05efa761e3d4764" },
   "fzf-lua": { "branch": "main", "commit": "cf4f7e095f679856fa8fe74e1539fb60fa552bdd" },
   "gitlinker.nvim": { "branch": "master", "commit": "cc59f732f3d043b626c8702cb725c82e54d35c25" },

@@ -73,6 +73,19 @@ return {
         end,
     },
     {
+        "petertriho/cmp-git",
+        dependencies = { "hrsh7th/nvim-cmp" },
+        opts = {
+            -- options go here
+        },
+        init = function()
+            table.insert(require("cmp").get_config().sources, { name = "git" })
+        end,
+        config = function()
+            require("cmp_git").setup({})
+        end,
+    },
+    {
         -- "pwntester/octo.nvim",
         dir = "~/GitHub/octo.nvim",
         config = function()
