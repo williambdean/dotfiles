@@ -31,8 +31,18 @@ end
 local function create_issues()
     local lines = get_visual_lines()
     for _, line in ipairs(lines) do
-        local title = line:match("^(.*)$")
-        create_issue(title)
+        -- I want to seperate the line into title and body where the separation is the ":" character. If there is
+        -- no ":" character, then the whole line is the title
+        -- Example: "Title: Body" -> title = "Title", body = "Body"
+        -- Example: "Title" -> title = "Title", body = ""
+        -- Example: "Title: Body: More body" -> title = "Title", body = "Body: More body"
+        -- Example: "Title: Body: More body: Even more body" -> title = "Title", body = "Body: More body: Even more body"
+        local title, body = line:match("^(.-):%s*(.*)$")
+        if not title then
+            title = line
+            body = ""
+        end
+        create_issue(title, body)
     end
 end
 
