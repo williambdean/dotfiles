@@ -1,4 +1,43 @@
 local vim = vim
+local _, Job = pcall(require, "plenary.job")
+
+-- @param title string
+-- @param body string
+local function create_issue(title, body)
+    if not Job then
+        return
+    end
+
+    body = body or ""
+
+    Job:new({
+        enable_recording = true,
+        command = "gh",
+        args = { "issue", "create", "--title", title, "--body", body },
+        on_exit = vim.schedule_wrap(function()
+            print("Created issue: " .. title)
+        end),
+    }):start()
+end
+
+local function get_visual_lines()
+    local start_pos = vim.fn.getpos("'<")
+    local end_pos = vim.fn.getpos("'>")
+
+    -- Extract the lines between these positions
+    return vim.api.nvim_buf_get_lines(0, start_pos[2] - 1, end_pos[2], false)
+end
+
+local function create_issues()
+    local lines = get_visual_lines()
+    for _, line in ipairs(lines) do
+        local title = line:match("^(.*)$")
+        create_issue(title)
+    end
+end
+
+-- Add mapping to create issues when in visual selection
+vim.keymap.set("v", "<leader>ic", create_issues, { silent = true })
 
 local function open_github_as_octo_buffer()
     local word = vim.fn.expand("<cWORD>")
