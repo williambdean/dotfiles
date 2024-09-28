@@ -82,7 +82,14 @@ return {
             table.insert(require("cmp").get_config().sources, { name = "git" })
         end,
         config = function()
-            require("cmp_git").setup({})
+            require("cmp_git").setup({
+                filetypes = {
+                    "gitcommit",
+                    "octo",
+                    -- Based on the gh pr create popup
+                    "markdown",
+                },
+            })
         end,
     },
     {
