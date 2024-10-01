@@ -28,6 +28,7 @@ alias gdelete="git branch --merged | grep -v \* | xargs git branch -D "
 alias ic="gh issue create -e"
 alias issues="nvim -c ':Octo issue list'"
 alias prs="nvim -c ':Octo pr list'"
+alias develop="nvim -c ':Octo issue develop'"
 
 # Docker 
 alias enter-docker="docker run --rm -it --entrypoint bash"
