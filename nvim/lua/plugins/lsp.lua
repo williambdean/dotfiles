@@ -1,11 +1,10 @@
-local function get_stylua_config()
+local function get_stylua_config(toml)
   local lspconfig = require("lspconfig")
   local util = require("lspconfig/util")
 
   local stylua_config_path = util.path.join(vim.fn.getcwd(), ".stylua.toml")
   if util.path.exists(stylua_config_path) then
     -- Read in the toml file to table
-    local toml = require("toml")
     local file = io.open(stylua_config_path, "r")
     local config = toml.parse(file:read("*a"))
     return {
@@ -61,6 +60,7 @@ return {
     config = function()
       require("mason").setup()
       require("mason-lspconfig").setup()
+      local toml = require("toml")
 
       local lspconfig = require("lspconfig")
       lspconfig.ruff_lsp.setup({})
@@ -69,7 +69,7 @@ return {
       lspconfig.lua_ls.setup({
         settings = {
           globals = { "vim" },
-          Lua = get_stylua_config(),
+          Lua = get_stylua_config(toml),
         },
         ft = ".lua",
       })
