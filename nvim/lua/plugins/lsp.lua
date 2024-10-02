@@ -1,3 +1,32 @@
+local function get_stylua_config()
+    local lspconfig = require("lspconfig")
+    local util = require("lspconfig/util")
+
+    local stylua_config_path = util.path.join(vim.fn.getcwd(), "stylua.toml")
+    if util.path.exists(stylua_config_path) then
+        return {
+            format = {
+                enable = true,
+                config = stylua_config_path,
+            },
+        }
+    end
+
+    local config = {
+        format = {
+            enable = true,
+            defaultConfig = {
+                indentType = "Spaces",
+                indentWidth = 4,
+                columnWidth = 80,
+                lineEndings = "Unix",
+            },
+        },
+    }
+
+    return config
+end
+
 return {
     {
         "williamboman/mason.nvim",
@@ -35,19 +64,8 @@ return {
             lspconfig.lua_ls.setup({
                 settings = {
                     globals = { "vim" },
-                    Lua = {
-                        format = {
-                            enable = true,
-                            defaultConfig = {
-                                indent_type = "Spaces",
-                                indent_width = "4",
-                                column_width = "80",
-                                line_endings = "Unix",
-                            },
-                        },
-                    },
+                    Lua = get_stylua_config(),
                 },
-
                 ft = ".lua",
             })
 
