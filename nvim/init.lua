@@ -1,12 +1,12 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
-    vim.fn.system({
-        "git",
-        "clone",
-        "--filter=blob:none",
-        "https://github.com/folke/lazy.nvim.git",
-        "--branch=stable",
-    })
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable",
+  })
 end
 vim.opt.rtp:prepend(lazypath)
 
@@ -16,56 +16,56 @@ vim.g.maplocalleader = "\\"
 vim.opt.termguicolors = true
 
 require("lazy").setup({
-    spec = {
-        { import = "plugins" },
+  spec = {
+    { import = "plugins" },
+    {
+      "folke/which-key.nvim",
+      event = "VeryLazy",
+      opts = {
+        -- Your configuration comes here
+        -- or leave it empty to use the default settings
+        -- refer to the configuration section below
+      },
+      keys = {
         {
-            "folke/which-key.nvim",
-            event = "VeryLazy",
-            opts = {
-                -- Your configuration comes here
-                -- or leave it empty to use the default settings
-                -- refer to the configuration section below
-            },
-            keys = {
-                {
-                    "<leader>?",
-                    function()
-                        require("which-key").show({ global = false })
-                    end,
-                    desc = "Buffer Local Keymaps (which-key)",
-                },
-            },
+          "<leader>?",
+          function()
+            require("which-key").show({ global = false })
+          end,
+          desc = "Buffer Local Keymaps (which-key)",
         },
+      },
     },
-    ui = {
-        backdrop = 80,
-    },
+  },
+  ui = {
+    backdrop = 80,
+  },
 })
 
 -- Move around windows with vim keys
 vim.api.nvim_set_keymap(
-    "n",
-    "<leader>h",
-    ":wincmd h<CR>",
-    { noremap = true, silent = true }
+  "n",
+  "<leader>h",
+  ":wincmd h<CR>",
+  { noremap = true, silent = true }
 )
 vim.api.nvim_set_keymap(
-    "n",
-    "<leader>j",
-    ":wincmd j<CR>",
-    { noremap = true, silent = true }
+  "n",
+  "<leader>j",
+  ":wincmd j<CR>",
+  { noremap = true, silent = true }
 )
 vim.api.nvim_set_keymap(
-    "n",
-    "<leader>k",
-    ":wincmd k<CR>",
-    { noremap = true, silent = true }
+  "n",
+  "<leader>k",
+  ":wincmd k<CR>",
+  { noremap = true, silent = true }
 )
 vim.api.nvim_set_keymap(
-    "n",
-    "<leader>l",
-    ":wincmd l<CR>",
-    { noremap = true, silent = true }
+  "n",
+  "<leader>l",
+  ":wincmd l<CR>",
+  { noremap = true, silent = true }
 )
 
 -- Color scheme
@@ -74,10 +74,10 @@ vim.cmd([[colorscheme gruvbox]])
 
 -- Zoom in and make the "o"nly window
 vim.keymap.set(
-    "n",
-    "<leader>O",
-    ":tab split<CR>",
-    { noremap = true, silent = true }
+  "n",
+  "<leader>O",
+  ":tab split<CR>",
+  { noremap = true, silent = true }
 )
 
 -- Enable syntax highlighting
@@ -179,14 +179,14 @@ vim.cmd([[
 
 -- Terminal mode escape key
 vim.api.nvim_set_keymap(
-    "t",
-    "<Esc>",
-    "<C-\\><C-n>",
-    { noremap = true, silent = true }
+  "t",
+  "<Esc>",
+  "<C-\\><C-n>",
+  { noremap = true, silent = true }
 )
 
 vim.g.markdown_fenced_languages =
-    { "python", "bash=sh", "yaml", "json", "vim", "lua" }
+  { "python", "bash=sh", "yaml", "json", "vim", "lua" }
 
 -- Go up and down with center screen
 vim.api.nvim_set_keymap("n", "<C-d>", "<C-d>zz", { noremap = true })
@@ -199,14 +199,14 @@ vim.api.nvim_set_keymap("n", "N", "Nzz", { noremap = true })
 vim.cmd("command! JsonPrettify %!jq .")
 
 vim.api.nvim_create_autocmd("TermOpen", {
-    pattern = "*",
-    command = "startinsert | set winfixheight",
+  pattern = "*",
+  command = "startinsert | set winfixheight",
 })
 vim.api.nvim_create_autocmd("TextYankPost", {
-    pattern = "*",
-    callback = function()
-        vim.highlight.on_yank({ timeout = 200 })
-    end,
+  pattern = "*",
+  callback = function()
+    vim.highlight.on_yank({ timeout = 200 })
+  end,
 })
 
 vim.cmd([[

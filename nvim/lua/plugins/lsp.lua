@@ -1,16 +1,21 @@
-local function get_stylua_config(toml)
-  local lspconfig = require("lspconfig")
-  local util = require("lspconfig/util")
+local function get_stylua_config()
+  return {
+    format = {
+      enable = false,
+    },
+  }
+end
+
+local function get_stylua_config_old()
+  local util = require("lspconfig.util")
 
   local stylua_config_path = util.path.join(vim.fn.getcwd(), ".stylua.toml")
   if util.path.exists(stylua_config_path) then
-    -- Read in the toml file to table
-    local file = io.open(stylua_config_path, "r")
-    local config = toml.parse(file:read("*a"))
+    print("Using the local .stylua.toml")
     return {
       format = {
         enable = true,
-        config = config,
+        config = stylua_config_path,
       },
     }
   end
@@ -55,12 +60,10 @@ return {
     depends = {
       "williamboman/mason.nvim",
       "neovim/nvim-lspconfig",
-      "jonstoler/lua-toml",
     },
     config = function()
       require("mason").setup()
       require("mason-lspconfig").setup()
-      local toml = require("toml")
 
       local lspconfig = require("lspconfig")
       lspconfig.ruff_lsp.setup({})
@@ -69,7 +72,10 @@ return {
       lspconfig.lua_ls.setup({
         settings = {
           globals = { "vim" },
-          Lua = get_stylua_config(toml),
+          Lua = get_stylua_config(),
+          diagnostics = {
+            globals = { "vim" },
+          },
         },
         ft = ".lua",
       })
