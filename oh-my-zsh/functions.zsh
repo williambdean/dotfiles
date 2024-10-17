@@ -169,6 +169,20 @@ function windows() {
 
 alias w=windows
 
+function list-branches() {
+    local selected_branch
+    selected_branch=$(git branch --all | fzf)
+    # Trim any whitespaces at the beginning
+    selected_branch=$(echo $selected_branch | xargs)
+
+    for remote in $(git remote)
+    do
+        selected_branch=${selected_branch#remotes/$remote/}
+    done
+
+    echo $selected_branch
+}
+
 function branches() {
     local selected_branch
     selected_branch=$(git branch --all | fzf)
@@ -184,3 +198,8 @@ function branches() {
 }
 
 alias b=branches
+
+function gitignore-template() {
+    local language=${1:-$(gh api /gitignore/templates --jq '.[]' | fzf)} 
+    gh api /gitignore/templates/$language --jq '.source'
+}
