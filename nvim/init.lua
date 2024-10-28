@@ -212,3 +212,18 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 vim.cmd([[
     command! Note execute 'edit ' .. expand('%:p:h') .. '/note.md'
 ]])
+
+-- While in Insert mode, I want to press <C-s> to run Telescope spell_suggest
+vim.api.nvim_set_keymap(
+  "i",
+  "<C-s>",
+  "<C-o>:Telescope spell_suggest<CR>",
+  { noremap = true, silent = true }
+)
+-- Same but in normal mode
+vim.api.nvim_set_keymap(
+  "n",
+  "<C-s>",
+  ":Telescope spell_suggest<CR>",
+  { noremap = true }
+)
