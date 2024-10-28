@@ -1,5 +1,19 @@
 local function get_stylua_config()
   return {
+    runtime = {
+      version = "LuaJIT",
+      path = vim.split(package.path, ";"),
+    },
+    diagnostics = {
+      globals = { "vim" },
+    },
+    workspace = {
+      library = vim.api.nvim_get_runtime_file("", true),
+      checkThirdParty = false,
+    },
+    telemetry = {
+      enable = false,
+    },
     format = {
       enable = false,
     },
@@ -66,16 +80,14 @@ return {
       require("mason-lspconfig").setup()
 
       local lspconfig = require("lspconfig")
+      lspconfig.graphql.setup({})
       lspconfig.ruff_lsp.setup({})
       lspconfig.pyright.setup({})
+      -- lua
       lspconfig.harper_ls.setup({})
       lspconfig.lua_ls.setup({
         settings = {
-          globals = { "vim" },
           Lua = get_stylua_config(),
-          diagnostics = {
-            globals = { "vim" },
-          },
         },
         ft = ".lua",
       })

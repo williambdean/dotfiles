@@ -1,4 +1,3 @@
-local vim = vim
 local _, Job = pcall(require, "plenary.job")
 
 ---@brief Creates an issue on GitHub using GitHub CLI
@@ -31,6 +30,7 @@ end
 
 local function create_issues()
   local lines = get_visual_lines()
+
   for _, line in ipairs(lines) do
     -- I want to seperate the line into title and body where the separation is the ":" character. If there is
     -- no ":" character, then the whole line is the title
@@ -48,7 +48,16 @@ local function create_issues()
 end
 
 -- Add mapping to create issues when in visual selection
-vim.keymap.set("v", "<leader>ic", create_issues, { silent = true })
+vim.keymap.set("v", "<leader>ic", create_issues, { silent = false })
+
+local function search()
+  local repo = require("octo.utils").get_remote_name()
+
+  local cmd = ":Octo search repo:" .. repo .. " "
+  vim.fn.feedkeys(vim.api.nvim_replace_termcodes(cmd, true, true, true), "n")
+end
+
+vim.keymap.set("n", "<leader>os", search, { silent = true })
 
 local function is_issue(number)
   local repo = require("octo.utils").get_remote_name()
@@ -187,6 +196,12 @@ return {
         "n",
         "<leader>oi",
         "<CMD>Octo issue list<CR>",
+        { silent = true }
+      )
+      vim.keymap.set(
+        "n",
+        "<leader>od",
+        "<CMD>Octo discussion list<CR>",
         { silent = true }
       )
       -- Add the key mapping only for octo filetype
