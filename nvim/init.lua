@@ -228,16 +228,11 @@ vim.api.nvim_set_keymap(
   { noremap = true }
 )
 
--- Function to toggle notes.md in a vertical split
+-- Function to toggle file in a vertical split
 local function toggle_file_in_vsplit(file)
   local current_win = vim.api.nvim_get_current_win()
   local wins = vim.api.nvim_tabpage_list_wins(0)
   local notes_bufnr = -1
-
-  if #wins == 1 then
-    print("This is the only buffer open.")
-    return
-  end
 
   for _, win in ipairs(wins) do
     local bufnr = vim.api.nvim_win_get_buf(win)
@@ -255,23 +250,21 @@ local function toggle_file_in_vsplit(file)
   end
 end
 
-local function toggle_notes_in_vsplit()
-  toggle_file_in_vsplit("notes.md")
+local function create_file_toggle(file)
+  return function()
+    toggle_file_in_vsplit(file)
+  end
 end
 
-local function toggle_python_script_in_vsplit()
-  toggle_file_in_vsplit("script.py")
+local toggles = {
+  { mapping = "<leader>N", file = "note.md" },
+  { mapping = "<leader>P", file = "script.py" },
+}
+for _, toggle in ipairs(toggles) do
+  vim.keymap.set(
+    "n",
+    toggle.mapping,
+    create_file_toggle(toggle.file),
+    { noremap = true, silent = true }
+  )
 end
-
-vim.keymap.set(
-  "n",
-  "<leader>N",
-  toggle_notes_in_vsplit,
-  { noremap = true, silent = true }
-)
-vim.keymap.set(
-  "n",
-  "<leader>P",
-  toggle_python_script_in_vsplit,
-  { noremap = true, silent = true }
-)
