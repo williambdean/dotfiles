@@ -30,5 +30,5 @@ alias issues="nvim -c ':Octo issue list'"
 alias prs="nvim -c ':Octo pr list'"
 alias develop="nvim -c ':Octo issue develop'"
 
-# Docker 
+# Docker
 alias enter-docker="docker run --rm -it --entrypoint bash"

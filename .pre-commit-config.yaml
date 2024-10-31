@@ -1,3 +1,7 @@
+---
+ci:
+  autofix_prs: false
+
 repos:
   - repo: https://github.com/JohnnyMorganz/StyLua
     rev: v0.20.0
@@ -7,3 +11,11 @@ repos:
     rev: v3.9.0-1
     hooks:
       - id: shfmt         # prebuilt upstream executable
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: debug-statements
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files

@@ -21,7 +21,7 @@ function remote-url() {
 
     local python_code="import sys
 x = sys.argv[1]
-for prefix in ('git@', 'https://', 'http://'): 
+for prefix in ('git@', 'https://', 'http://'):
     x = x.replace(prefix, '')
 
 x = x.replace(':', '/')
@@ -38,11 +38,11 @@ print(x)
     fi
 
     if [[ $url_root == gitlab* ]]
-    then 
+    then
         separator="/-/tree/"
     else
         separator="/tree/"
-    fi 
+    fi
 
     echo "https://www.$url_root$separator$current_branch"
 }
@@ -200,6 +200,6 @@ function branches() {
 alias b=branches
 
 function gitignore-template() {
-    local language=${1:-$(gh api /gitignore/templates --jq '.[]' | fzf)} 
+    local language=${1:-$(gh api /gitignore/templates --jq '.[]' | fzf)}
     gh api /gitignore/templates/$language --jq '.source'
 }
