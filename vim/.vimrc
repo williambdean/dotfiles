@@ -60,7 +60,7 @@ call plug#end()
 "copilot_chat.setup({
 "  debug = true,
 "  show_help = "yes",
-"  language = "English", 
+"  language = "English",
 "  prompts = {
 "    Explain = "Explain how it works in the English language.",
 "    Review = "Review the following code and provide concise suggestions.",
@@ -108,7 +108,7 @@ nnoremap <leader>fg <cmd>Telescope live_grep<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 
-" Limelight 
+" Limelight
 let g:limelight_conceal_ctermfg = 'Gray'
 let g:limelight_concel_guibg = 'DarkGray'
 let g:limelight_default_coefficient = 0.7
