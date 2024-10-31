@@ -31,17 +31,17 @@ config.harfbuzz_features = { "calt=0", "clig=0", "liga=0" }
 
 -- Set custom font
 config.font = wezterm.font_with_fallback({
-    "JetBrains Mono",
-    "Fira Code",
-    "Noto Color Emoji",
+  "JetBrains Mono",
+  "Fira Code",
+  "Noto Color Emoji",
 })
 
 -- Set padding around the terminal
 config.window_padding = {
-    left = 5,
-    right = 5,
-    top = 5,
-    bottom = 5,
+  left = 5,
+  right = 5,
+  top = 5,
+  bottom = 5,
 }
 
 -- Enable scrollback
