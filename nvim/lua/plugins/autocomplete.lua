@@ -53,11 +53,42 @@ return {
           { name = "vsnip" },
           { name = "buffer" },
           { name = "path" },
+          { name = "copilot" },
         },
+      })
+      cmp.setup.filetype("copilot-chat", {
+        sources = cmp.config.sources({
+          { name = "copilot" },
+          { name = "buffer" },
+          { name = "path" },
+        }),
       })
     end,
   },
-  { "github/copilot.vim" },
+  {
+    "github/copilot.vim",
+    config = function()
+      -- Enable Copilot for specific filetypes including custom ones
+      vim.g.copilot_filetypes = {
+        ["*"] = true, -- Enable for all filetypes
+        ["copilot-chat"] = true, -- Explicitly enable for copilot-chat
+        ["markdown"] = true, -- Enable for markdown
+        ["yaml"] = true, -- Enable for yaml
+        ["gitcommit"] = true, -- Enable for git commits
+      }
+
+      -- -- Copilot general settings
+      -- vim.g.copilot_no_tab_map = true -- Disable tab mapping
+      vim.g.copilot_assume_mapped = true
+      vim.g.copilot_tab_fallback = ""
+
+      -- Create mapping for manual trigger
+      vim.keymap.set("i", "<C-J>", 'copilot#Accept("<CR>")', {
+        expr = true,
+        replace_keycodes = false,
+      })
+    end,
+  },
   {
     "CopilotC-Nvim/CopilotChat.nvim",
     branch = "canary",
@@ -77,16 +108,16 @@ return {
           vim.opt_local.number = true
 
           -- Get current filetype and set it to markdown if the current filetype is copilot-chat
-          local ft = vim.bo.filetype
-          if ft == "copilot-chat" then
-            vim.bo.filetype = "markdown"
-          end
+          -- local ft = vim.bo.filetype
+          -- if ft == "copilot-chat" then
+          --     vim.bo.filetype = "markdown"
+          -- end
         end,
       })
       require("CopilotChat").setup({
         debug = false,
         auto_follow_cursor = true,
-        temperature = 0.1,
+        model = "claude-3.5-sonnet",
         show_help = false,
         context = "buffers",
         language = "English",
@@ -112,21 +143,6 @@ return {
         "<leader>t",
         function()
           require("CopilotChat").toggle()
-        end,
-        desc = "CopilotChat - Toggle",
-      },
-      {
-        "<leader>T",
-        function()
-          require("CopilotChat").toggle({
-            window = {
-              layout = "float",
-              relative = "cursor",
-              width = 0.8,
-              height = 0.8,
-              row = 1,
-            },
-          })
         end,
         desc = "CopilotChat - Toggle",
       },

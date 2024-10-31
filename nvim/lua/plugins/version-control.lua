@@ -10,6 +10,7 @@ local function create_issue(title, body)
 
   body = body or ""
 
+  -- TODO: Make use of the octo command
   Job:new({
     enable_recording = true,
     command = "gh",
@@ -49,6 +50,43 @@ end
 
 -- Add mapping to create issues when in visual selection
 vim.keymap.set("v", "<leader>ic", create_issues, { silent = false })
+
+local function current_buffer()
+  local utils = require("octo.utils")
+
+  local bufnr = vim.api.nvim_get_current_buf()
+  local buffer = octo_buffers[bufnr]
+
+  if not buffer then
+    utils.error("Not in an octo buffer")
+    return
+  end
+
+  return buffer
+end
+
+vim.keymap.set("n", "<leader>B", function()
+  local buffer = current_buffer()
+  vim.print(buffer)
+end, { silent = true })
+
+local function current_author()
+  local utils = require("octo.utils")
+
+  local bufnr = vim.api.nvim_get_current_buf()
+  local buffer = octo_buffers[bufnr]
+
+  if not buffer then
+    utils.error("Not in an octo buffer")
+    return
+  end
+
+  local author = buffer.node.author.login
+  vim.fn.setreg("*", "@" .. author)
+  utils.info("Copied author to clipboard: " .. author)
+end
+
+vim.keymap.set("n", "<leader>A", current_author, { silent = true })
 
 local function search()
   local repo = require("octo.utils").get_remote_name()
