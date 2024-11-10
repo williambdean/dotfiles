@@ -10,6 +10,29 @@ local function get_query_path()
   return vim.fn.expand(query_path)
 end
 
+local function combine_lines(nodes)
+  local combined = {}
+  for _, node in ipairs(nodes) do
+    if #combined == 0 then
+      table.insert(combined, node)
+    else
+      local last = combined[#combined]
+      if node.start_line == last.end_line + 1 and node.id == last.id then
+        last.end_line = node.end_line
+      else
+        table.insert(combined, node)
+      end
+    end
+  end
+  return combined
+end
+
+local function fold_lines(lines, action)
+  for _, line in ipairs(lines) do
+    vim.cmd(line.start_line + 1 .. "," .. line.end_line + 1 .. action)
+  end
+end
+
 -- Define custom fold functions using Treesitter
 local function process_docstrings(action)
   local bufnr = vim.api.nvim_get_current_buf()
@@ -21,12 +44,16 @@ local function process_docstrings(action)
   local tree = parser:parse()[1]
   local root = tree:root()
 
+  local nodes = {}
   for id, node, _ in query:iter_captures(root, bufnr, 0, -1) do
-    if query.captures[id] == "comment" then
-      local start_line, _, end_line, _ = node:range()
-      vim.cmd(start_line + 1 .. "," .. end_line + 1 .. action)
-    end
+    local start_line, _, end_line, _ = node:range()
+    table.insert(
+      nodes,
+      { start_line = start_line, end_line = end_line, id = query.captures[id] }
+    )
   end
+  local combined = combine_lines(nodes)
+  fold_lines(combined, action)
 end
 
 local function fold_docstrings()
@@ -95,6 +122,8 @@ return {
           select = {
             enable = true,
             keymaps = {
+              ["ab"] = "@block.outer",
+              ["ib"] = "@block.inner",
               ["af"] = "@function.outer",
               ["if"] = "@function.inner",
               ["ac"] = "@class.outer",
