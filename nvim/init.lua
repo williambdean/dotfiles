@@ -238,8 +238,6 @@ vim.cmd([[
     command! Note execute 'edit ' .. expand('%:p:h') .. '/note.md'
 ]])
 
--- While in Insert mode, I want to press <C-s> to run Telescope spell_suggest
-
 -- Function to toggle file in a vertical split
 local function toggle_file_in_vsplit(file)
   local current_win = vim.api.nvim_get_current_win()
@@ -295,8 +293,17 @@ end
 
 -- Map gx to open URLs
 vim.keymap.set("n", "gx", open_url, { noremap = true, silent = true })
-
 vim.g.netrw_browsex_viewer = "wslview"
 
 vim.o.background = "dark"
 vim.cmd([[colorscheme gruvbox]])
+
+-- Trying to speed up the motions
+vim.o.timeoutlen = 300
+vim.o.ttimeoutlen = 0
+
+-- Make sure key movements are fast and responsive
+vim.o.ttyfast = true
+
+-- Set updatetime for faster completion
+vim.o.updatetime = 100

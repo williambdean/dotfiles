@@ -12,10 +12,10 @@ local function get_stylua_config()
       checkThirdParty = false,
     },
     telemetry = {
-      enable = false,
+      enable = true,
     },
     format = {
-      enable = false,
+      enable = true,
     },
   }
 end
