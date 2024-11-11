@@ -18,18 +18,18 @@ return {
             ["cmp.entry.get_documentation"] = true,
           },
         },
-        -- cmdline = {
-        --     enabled = false,
-        -- },
-        -- views = {
-        --     cmdline_popup = {
-        --         enabled = false,
-        --     },
-        -- },
+        cmdline = {
+          enabled = false,
+        },
+        views = {
+          cmdline_popup = {
+            enabled = false,
+          },
+        },
         presets = {
           bottom_search = false,
           command_palette = false,
-          long_message_to_split = false,
+          long_message_to_split = true,
           inc_rename = false,
           lsp_doc_border = false,
         },
@@ -47,33 +47,33 @@ return {
     "ellisonleao/gruvbox.nvim",
     lazy = false,
     priority = 1000,
-    config = function()
-      vim.o.background = "dark"
-      vim.cmd([[colorscheme gruvbox]])
-    end,
+    config = function() end,
   },
-  {
-    "nvim-lualine/lualine.nvim",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-    config = function()
-      require("lualine").setup({
-        options = {
-          theme = "gruvbox",
-          section_separators = { "", "" },
-          component_separators = { "", "" },
-        },
-        sections = {
-          lualine_c = { { "filename", path = 1 } },
-          lualine_y = {
-            { require("recorder").displaySlots },
-          },
-          lualine_z = {
-            { require("recorder").recordingStatus },
-          },
-        },
-      })
-    end,
-  },
+  -- {
+  --   "nvim-lualine/lualine.nvim",
+  --   dependencies = { "nvim-tree/nvim-web-devicons" },
+  --   config = function()
+  --     require("lualine").setup({
+  --       options = {
+  --         theme = "gruvbox",
+  --         -- section_separators = { "", "" },
+  --         -- component_separators = { "", "" },
+  --       section_separators = { "", "" },
+  --       component_separators = { "", "" },
+  --         globalstatus = true,
+  --       },
+  --       sections = {
+  --         lualine_c = { { "filename", path = 1 } },
+  --         lualine_y = {
+  --           { require("recorder").displaySlots },
+  --         },
+  --         lualine_z = {
+  --           { require("recorder").recordingStatus },
+  --         },
+  --       },
+  --     })
+  --   end,
+  -- },
   {
     "rcarriga/nvim-notify",
     lazy = true,

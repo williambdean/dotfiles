@@ -15,7 +15,7 @@ return {
     },
     lazy = true,
     keys = {
-      { "s", "<CMD>lua require'hop'.hint_words()<CR>", desc = "Hop Words" },
+      { "s", "<CMD>lua require'hop'.hint_char1()<CR>", desc = "Hop Char1" },
       { "S", "<CMD>lua require'hop'.hint_char2()<CR>", desc = "Hop Char2" },
     },
     config = function()

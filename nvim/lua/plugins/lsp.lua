@@ -134,6 +134,18 @@ return {
           Lua = get_stylua_config(),
         },
         ft = ".lua",
+        workspace = {
+          storage = {
+            path = vim.fn.stdpath("cache") .. "/workspace",
+          },
+          library = {
+            cache = {
+              enabled = true,
+              path = vim.fn.stdpath("cache") .. "/workspace-library",
+              rate = 0.1,
+            },
+          },
+        },
       })
 
       local group = vim.api.nvim_create_augroup("UserLspConfig", {})

@@ -32,6 +32,18 @@ return {
     cmd = { "Telescope" },
     keys = {
       {
+        "<C-s>",
+        mode = "i",
+        action = "<C-o>:Telescope spell_suggest<CR>",
+        desc = "Spell suggestions",
+      },
+      {
+        "<C-s>",
+        mode = "n",
+        action = ":Telescope spell_suggest<CR>",
+        desc = "Spell suggestions",
+      },
+      {
         "<leader>pf",
         function()
           require("telescope.builtin").find_files({

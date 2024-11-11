@@ -20,28 +20,58 @@ opt.termguicolors = true
 require("lazy").setup({
   spec = {
     { import = "plugins" },
-    -- { 'danilamihailov/beacon.nvim' },
     {
       "ThePrimeagen/refactoring.nvim",
       dependencies = {
         "nvim-lua/plenary.nvim",
         "nvim-treesitter/nvim-treesitter",
       },
-      lazy = true,
+      keys = {
+        {
+          "<leader>re",
+          ":Refactor extract ",
+          mode = "x",
+          desc = "Extract to function",
+        },
+        {
+          "<leader>rf",
+          ":Refactor extract_to_file ",
+          mode = "x",
+          desc = "Extract to file",
+        },
+        {
+          "<leader>rv",
+          ":Refactor extract_var ",
+          mode = "x",
+          desc = "Extract to variable",
+        },
+        {
+          "<leader>ri",
+          ":Refactor inline_var",
+          mode = { "n", "x" },
+          desc = "Inline variable",
+        },
+        {
+          "<leader>rI",
+          ":Refactor inline_func",
+          mode = "n",
+          desc = "Inline function",
+        },
+        {
+          "<leader>rb",
+          ":Refactor extract_block",
+          mode = "n",
+          desc = "Extract block",
+        },
+        {
+          "<leader>rbf",
+          ":Refactor extract_block_to_file",
+          mode = "n",
+          desc = "Extract block to file",
+        },
+      },
       config = function()
         require("refactoring").setup()
-
-        vim.keymap.set("x", "<leader>re", ":Refactor extract ")
-        vim.keymap.set("x", "<leader>rf", ":Refactor extract_to_file ")
-
-        vim.keymap.set("x", "<leader>rv", ":Refactor extract_var ")
-
-        vim.keymap.set({ "n", "x" }, "<leader>ri", ":Refactor inline_var")
-
-        vim.keymap.set("n", "<leader>rI", ":Refactor inline_func")
-
-        vim.keymap.set("n", "<leader>rb", ":Refactor extract_block")
-        vim.keymap.set("n", "<leader>rbf", ":Refactor extract_block_to_file")
       end,
     },
     { "dstein64/vim-startuptime", cmd = "StartupTime" },
@@ -79,7 +109,6 @@ vim.keymap.set(
 
 -- Enable syntax highlighting
 opt.syntax = "on"
-
 -- Set spell checking
 opt.spell = true
 opt.spelllang = "en_us"
@@ -159,7 +188,7 @@ vim.cmd("set clipboard+=unnamedplus")
 --     cache_enabled = 0,
 -- }
 
-vim.keymap.set("v", "<leader>y", '"*y', { noremap = true })
+vim.keymap.set("v", "<leader>y", '"+y', { noremap = true })
 
 vim.api.nvim_set_hl(0, "Normal", { bg = "#000000" })
 vim.api.nvim_set_hl(0, "NonText", { bg = "#000000" })
@@ -210,14 +239,6 @@ vim.cmd([[
 ]])
 
 -- While in Insert mode, I want to press <C-s> to run Telescope spell_suggest
-vim.keymap.set(
-  "i",
-  "<C-s>",
-  "<C-o>:Telescope spell_suggest<CR>",
-  { noremap = true, silent = true }
-)
--- Same but in normal mode
-vim.keymap.set("n", "<C-s>", ":Telescope spell_suggest<CR>", { noremap = true })
 
 -- Function to toggle file in a vertical split
 local function toggle_file_in_vsplit(file)
@@ -256,7 +277,7 @@ for _, toggle in ipairs(toggles) do
     "n",
     toggle.mapping,
     create_file_toggle(toggle.file),
-    { noremap = true, silent = true }
+    { noremap = true, silent = true, desc = "Toggle " .. toggle.file }
   )
 end
 
@@ -276,3 +297,6 @@ end
 vim.keymap.set("n", "gx", open_url, { noremap = true, silent = true })
 
 vim.g.netrw_browsex_viewer = "wslview"
+
+vim.o.background = "dark"
+vim.cmd([[colorscheme gruvbox]])
