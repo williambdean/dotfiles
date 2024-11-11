@@ -52,13 +52,15 @@ end
 return {
   {
     "williamboman/mason.nvim",
+    cmd = "Mason",
     opts = {
       ensure_installed = {
-        "ruff-lsp",
+        "ruff",
         "pyright",
         "lua-language-server",
         "yaml-language-server",
         "shfmt",
+        "codespell",
       },
     },
     config = function()
@@ -71,6 +73,7 @@ return {
   },
   {
     "williamboman/mason-lspconfig.nvim",
+    event = { "BufReadPre", "BufNewFile" },
     depends = {
       "williamboman/mason.nvim",
       "neovim/nvim-lspconfig",
@@ -81,9 +84,50 @@ return {
 
       local lspconfig = require("lspconfig")
       lspconfig.graphql.setup({})
-      lspconfig.ruff_lsp.setup({})
-      lspconfig.pyright.setup({})
-      -- lua
+      lspconfig.ruff.setup({
+        on_new_config = function(config, root_dir)
+          -- Look for .venv directory in the project root
+          local venv_path = vim.fn.finddir(".venv", root_dir .. ";")
+          if venv_path ~= "" then
+            -- Use the site-packages from .venv directory
+            config.cmd_env = {
+              PYTHONPATH = venv_path .. "/lib/python3.*/site-packages",
+            }
+          end
+        end,
+      })
+      lspconfig.pyright.setup({
+        on_init = function(client)
+          client.config.settings = {
+            python = {
+              analysis = {
+                autoSearchPaths = true,
+                useLibraryCodeForTypes = true,
+                diagnosticMode = "workspace",
+              },
+              venvPath = vim.fn.getcwd(),
+              pythonPath = nil, -- Let pyright detect the interpreter
+            },
+          }
+        end,
+        on_new_config = function(config, root_dir)
+          -- Look for .venv or venv directory in the project root
+          local venv = vim.fn.finddir(".venv", root_dir .. ";")
+          if venv == "" then
+            venv = vim.fn.finddir("venv", root_dir .. ";")
+          end
+
+          if venv ~= "" then
+            local python_path = vim.fn.glob(venv .. "/bin/python")
+            config.settings = {
+              python = {
+                pythonPath = python_path,
+                venvPath = venv,
+              },
+            }
+          end
+        end,
+      })
       lspconfig.harper_ls.setup({})
       lspconfig.lua_ls.setup({
         settings = {
@@ -136,16 +180,18 @@ return {
         end,
       })
 
-      -- Define the commands to enable and disable formatting
-      vim.api.nvim_command(
-        "command! LspEnableFormat let g:lsp_format_enabled = v:true"
-      )
-      vim.api.nvim_command(
-        "command! LspDisableFormat let g:lsp_format_enabled = v:false"
-      )
-      vim.api.nvim_command(
-        "command! LspFormat lua vim.lsp.buf.format({ async = false })"
-      )
+      -- Format commands
+      vim.api.nvim_create_user_command("LspEnableFormat", function()
+        vim.g.lsp_format_enabled = true
+      end, {})
+
+      vim.api.nvim_create_user_command("LspDisableFormat", function()
+        vim.g.lsp_format_enabled = false
+      end, {})
+
+      vim.api.nvim_create_user_command("LspFormat", function()
+        vim.lsp.buf.format({ async = false })
+      end, {})
 
       -- -- For shell scripts
       -- vim.api.nvim_create_autocmd("BufWritePre", {
@@ -165,5 +211,6 @@ return {
   },
   {
     "neovim/nvim-lspconfig",
+    event = { "BufReadPre", "BufNewFile" },
   },
 }

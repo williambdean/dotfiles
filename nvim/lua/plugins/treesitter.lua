@@ -70,7 +70,24 @@ return {
     dependencies = {
       "nvim-treesitter/nvim-treesitter-textobjects",
     },
+    ft = { "python" },
     build = ":TSUpdate",
+    cmd = {
+      "TSUpdate",
+      "TSUpdateSync",
+      "FoldDocstrings",
+      "UnfoldDocstrings",
+    },
+    keys = {
+      { "ab", mode = "o" },
+      { "ib", mode = "o" },
+      { "af", mode = "o" },
+      { "if", mode = "o" },
+      { "ac", mode = "o" },
+      { "ic", mode = "o" },
+      { "il", mode = "o" },
+      { "al", mode = "o" },
+    },
     config = function()
       -- Create Neovim commands to fold/unfold docstrings
       vim.api.nvim_create_user_command("FoldDocstrings", fold_docstrings, {})

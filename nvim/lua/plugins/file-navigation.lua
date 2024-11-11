@@ -1,45 +1,22 @@
 -- Move around windows with vim keys
-vim.api.nvim_set_keymap(
-  "n",
-  "<leader>h",
-  ":wincmd h<CR>",
-  { noremap = true, silent = true }
-)
-vim.api.nvim_set_keymap(
-  "n",
-  "<leader>j",
-  ":wincmd j<CR>",
-  { noremap = true, silent = true }
-)
-vim.api.nvim_set_keymap(
-  "n",
-  "<leader>k",
-  ":wincmd k<CR>",
-  { noremap = true, silent = true }
-)
-vim.api.nvim_set_keymap(
-  "n",
-  "<leader>l",
-  ":wincmd l<CR>",
-  { noremap = true, silent = true }
-)
+for direction, key in pairs({ h = "h", j = "j", k = "k", l = "l" }) do
+  vim.keymap.set("n", "<leader>" .. key, function()
+    vim.cmd.wincmd(key)
+  end, { desc = "Move to " .. direction .. " window" })
+end
 
 return {
-  { "nanotee/zoxide.vim" },
+  { "nanotee/zoxide.vim", cmd = { "Lz" } },
   {
     "stevearc/oil.nvim",
     dependencies = {
       "nvim-telescope/telescope.nvim",
       "nvim-tree/nvim-web-devicons",
     },
+    keys = {
+      { "-", mode = "n", "<CMD>Oil<CR>", desc = "Oil - Open parent directory" },
+    },
     config = function()
-      vim.keymap.set(
-        "n",
-        "-",
-        "<CMD>Oil<CR>",
-        { desc = "Oil - Open parent directory" }
-      )
-
       require("oil").setup({
         view_options = {
           show_hidden = true,
@@ -54,6 +31,10 @@ return {
       "nvim-lua/plenary.nvim",
       "nvim-telescope/telescope.nvim",
     },
+    keys = {
+      { "<leader>a", desc = "Harpoon add file" },
+      { "<C-e>", desc = "Harpoon menu" },
+    },
     config = function()
       local harpoon = require("harpoon")
 
@@ -64,38 +45,26 @@ return {
         harpoon.ui:toggle_quick_menu(harpoon:list())
       end)
 
-      vim.keymap.set("n", "<leader>1", function()
-        harpoon:list():select(1)
-      end)
-      vim.keymap.set("n", "<leader>2", function()
-        harpoon:list():select(2)
-      end)
-      vim.keymap.set("n", "<leader>3", function()
-        harpoon:list():select(3)
-      end)
-      vim.keymap.set("n", "<leader>4", function()
-        harpoon:list():select(4)
-      end)
+      -- Number keys (1-4)
+      local number_keys = { "<leader>1", "<leader>2", "<leader>3", "<leader>4" }
+      for i, key in ipairs(number_keys) do
+        vim.keymap.set("n", key, function()
+          harpoon:list():select(i)
+        end)
+      end
 
-      vim.keymap.set("n", "<C-h>", function()
-        harpoon:list():select(1)
-      end)
-      vim.keymap.set("n", "<C-t>", function()
-        harpoon:list():select(2)
-      end)
-      vim.keymap.set("n", "<C-w>", function()
-        harpoon:list():select(3)
-      end)
-      vim.keymap.set("n", "<C-s>", function()
-        harpoon:list():select(4)
-      end)
-
-      vim.keymap.set("n", "<C-n>", function()
-        harpoon:list():next()
-      end)
-      vim.keymap.set("n", "<C-p>", function()
-        harpoon:list():prev()
-      end)
+      -- Control keys
+      local ctrl_keys = {
+        ["h"] = 1,
+        ["t"] = 2,
+        ["w"] = 3,
+        ["s"] = 4,
+      }
+      for key, index in pairs(ctrl_keys) do
+        vim.keymap.set("n", "<C-" .. key .. ">", function()
+          harpoon:list():select(index)
+        end)
+      end
 
       harpoon:setup({})
     end,

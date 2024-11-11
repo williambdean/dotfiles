@@ -9,7 +9,7 @@ return {
     config = function()
       require("noice").setup({
         messages = {
-          enabled = true,
+          enabled = false,
         },
         lsp = {
           override = {
@@ -18,10 +18,18 @@ return {
             ["cmp.entry.get_documentation"] = true,
           },
         },
+        -- cmdline = {
+        --     enabled = false,
+        -- },
+        -- views = {
+        --     cmdline_popup = {
+        --         enabled = false,
+        --     },
+        -- },
         presets = {
-          bottom_search = true,
-          command_palette = true,
-          long_message_to_split = true,
+          bottom_search = false,
+          command_palette = false,
+          long_message_to_split = false,
           inc_rename = false,
           lsp_doc_border = false,
         },
@@ -30,11 +38,20 @@ return {
   },
   {
     "NvChad/nvim-colorizer.lua",
+    ft = { "python" },
     config = function()
-      require("colorizer").setup()
+      require("colorizer").setup({})
     end,
   },
-  { "ellisonleao/gruvbox.nvim", priority = 1000 },
+  {
+    "ellisonleao/gruvbox.nvim",
+    lazy = false,
+    priority = 1000,
+    config = function()
+      vim.o.background = "dark"
+      vim.cmd([[colorscheme gruvbox]])
+    end,
+  },
   {
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -59,6 +76,7 @@ return {
   },
   {
     "rcarriga/nvim-notify",
+    lazy = true,
     config = function()
       vim.api.nvim_set_keymap(
         "n",

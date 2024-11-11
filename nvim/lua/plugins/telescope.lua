@@ -10,12 +10,12 @@ local find_site_packages = function()
 end
 
 return {
-  { "nvim-telescope/telescope-symbols.nvim" },
-  { "xiyaowong/telescope-emoji.nvim" },
   {
     "nvim-telescope/telescope.nvim",
     dependencies = {
       "nvim-lua/plenary.nvim",
+      "nvim-telescope/telescope-symbols.nvim",
+      "xiyaowong/telescope-emoji.nvim",
     },
     extensions = {
       emoji = {
@@ -23,7 +23,13 @@ return {
           vim.fn.setreg("*", emoji.value)
         end,
       },
+      symbols = {
+        action = function(symbol)
+          vim.fn.setreg("*", symbol.value)
+        end,
+      },
     },
+    cmd = { "Telescope" },
     keys = {
       {
         "<leader>pf",
@@ -119,6 +125,14 @@ return {
         function()
           require("telescope.builtin").grep_string({
             search = vim.fn.expand("<cWORD>"),
+          })
+        end,
+      },
+      {
+        "<leader>,",
+        function()
+          require("telescope.builtin").buffers({
+            sort_mru = true,
           })
         end,
       },

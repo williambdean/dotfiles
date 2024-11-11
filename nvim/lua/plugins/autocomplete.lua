@@ -79,8 +79,23 @@ return {
 
       -- -- Copilot general settings
       -- vim.g.copilot_no_tab_map = true -- Disable tab mapping
-      vim.g.copilot_assume_mapped = true
-      vim.g.copilot_tab_fallback = ""
+      -- vim.g.copilot_assume_mapped = true
+      -- vim.g.copilot_tab_fallback = ""
+      vim.g.copilot_no_tab_map = false -- Enable tab mapping
+      vim.g.copilot_assume_mapped = false -- Disable assume mapped
+      -- vim.g.copilot_tab_fallback = "" -- Empty fallback
+
+      vim.keymap.set("i", "<Tab>", function()
+        if require("copilot.suggestion").is_visible() then
+          require("copilot.suggestion").accept()
+        else
+          vim.api.nvim_feedkeys(
+            vim.api.nvim_replace_termcodes("<Tab>", true, false, true),
+            "n",
+            false
+          )
+        end
+      end, { silent = true })
 
       -- Create mapping for manual trigger
       vim.keymap.set("i", "<C-J>", 'copilot#Accept("<CR>")', {

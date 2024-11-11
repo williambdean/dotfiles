@@ -95,7 +95,12 @@ local function search()
   vim.fn.feedkeys(vim.api.nvim_replace_termcodes(cmd, true, true, true), "n")
 end
 
-vim.keymap.set("n", "<leader>os", search, { silent = true })
+vim.keymap.set(
+  "n",
+  "<leader>os",
+  search,
+  { silent = true, desc = "GitHub search for the current repository" }
+)
 
 local function is_issue(number)
   local repo = require("octo.utils").get_remote_name()
@@ -140,23 +145,23 @@ local function open_github_as_octo_buffer()
 
   local uri = get_uri(number)
   vim.cmd("edit " .. uri)
-
-  return
 end
 
 return {
-  { "tpope/vim-fugitive" },
-  -- { "airblade/vim-gitgutter" },
+  { "tpope/vim-fugitive", cmd = { "Git", "G" } },
   {
     "ruifm/gitlinker.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
-    config = function()
-      require("gitlinker").setup({})
-    end,
+    config = true,
+    keys = {
+      "<leader>gy",
+      "<CMD>lua require('gitlinker').get_repo_url()<CR>",
+    },
   },
   {
     "petertriho/cmp-git",
     dependencies = { "hrsh7th/nvim-cmp" },
+    ft = { "gitcommit", "octo", "markdown" },
     opts = {
       -- options go here
     },
@@ -177,6 +182,18 @@ return {
   {
     -- "cwntester/octo.nvim",
     dir = "~/GitHub/octo.nvim",
+    cmd = "Octo",
+    keys = {
+      { "<leader>oo", "<CMD>Octo<CR>", desc = "Open Octo" },
+      { "<leader>ic", "<CMD>Octo issue create<CR>", desc = "Create issue" },
+      { "<leader>op", "<CMD>Octo pr list<CR>", desc = "List pull requests" },
+      { "<leader>oi", "<CMD>Octo issue list<CR>", desc = "List issues" },
+      {
+        "<leader>od",
+        "<CMD>Octo discussion list<CR>",
+        desc = "List discussions",
+      },
+    },
     config = function()
       require("octo").setup({
         -- default_to_projects_v2 = true,
@@ -184,6 +201,18 @@ return {
         enable_builtin = true,
         users = "mentionable",
         timeout = 15000,
+        pull_requests = {
+          order_by = {
+            field = "UPDATED_AT",
+            direction = "DESC",
+          },
+        },
+        issues = {
+          order_by = {
+            field = "UPDATED_AT",
+            direction = "DESC",
+          },
+        },
         -- picker = "fzf-lua",
         -- picker_config = {
         --     use_emojis = true,
@@ -215,33 +244,8 @@ return {
         })
       end, { silent = true })
 
-      vim.keymap.set("n", "<leader>oo", "<CMD>Octo<CR>", { silent = true })
-      vim.keymap.set(
-        "n",
-        "<leader>ic",
-        "<CMD>Octo issue create<CR>",
-        { silent = true }
-      )
       vim.keymap.set("i", "@", "@<C-x><C-o>", { buffer = true, silent = true })
       vim.keymap.set("i", "#", "#<C-x><C-o>", { silent = true, buffer = true })
-      vim.keymap.set(
-        "n",
-        "<leader>op",
-        "<CMD>Octo pr list<CR>",
-        { silent = true }
-      )
-      vim.keymap.set(
-        "n",
-        "<leader>oi",
-        "<CMD>Octo issue list<CR>",
-        { silent = true }
-      )
-      vim.keymap.set(
-        "n",
-        "<leader>od",
-        "<CMD>Octo discussion list<CR>",
-        { silent = true }
-      )
       -- Add the key mapping only for octo filetype
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "octo",

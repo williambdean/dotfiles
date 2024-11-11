@@ -13,28 +13,15 @@ return {
       -- keys = "etovxqpdygfblzhckisuran",
       keys = "asdfghjklqwertyuiozxcvbnm",
     },
+    lazy = true,
+    keys = {
+      { "s", "<CMD>lua require'hop'.hint_words()<CR>", desc = "Hop Words" },
+      { "S", "<CMD>lua require'hop'.hint_char2()<CR>", desc = "Hop Char2" },
+    },
     config = function()
       require("hop").setup({
         multi_windows = true,
       })
-      vim.api.nvim_set_keymap(
-        "n",
-        "s",
-        "<cmd>lua require'hop'.hint_char1()<cr>",
-        { noremap = true, silent = true }
-      )
-      vim.api.nvim_set_keymap(
-        "n",
-        "S",
-        "<cmd>lua require'hop'.hint_char2()<cr>",
-        { noremap = true, silent = true }
-      )
-      -- vim.api.nvim_set_keymap(
-      --     "n",
-      --     "f",
-      --     "<cmd>lua require'hop'.hint_char1({ current_line_only = true })<cr>",
-      --     { noremap = true, silent = true }
-      -- )
     end,
   },
   -- {-- place this in one of your configuration file(s)
