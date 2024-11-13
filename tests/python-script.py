@@ -26,8 +26,15 @@ import pandas as pd
 import numpy as np
 
 
+# Here is a comment
+# More comments
+
 seed = sum(map(ord, "Some random seed"))
 rng = np.random.default_rng(seed)
+
+# Here are some comments
+# More comments
+# Even more comments
 
 
 @dataclass
@@ -92,7 +99,11 @@ def filter_data(df: pd.DataFrame, threshold: float) -> pd.DataFrame:
 
     """
     # This is a comment of the code
-    """This is a multiline comment of the code."""
+    """This is a multiline comment of the code.
+
+    More of the multiline comment
+
+    """
     return df.query("x ** 2 + y ** 2 > @threshold ** 2")
 
 
@@ -116,7 +127,6 @@ def main() -> None:
     """This is the main function.
 
     This is the docstring
-
 
     """
     config = Config(threshold=5, save_file="data.csv")
