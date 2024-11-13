@@ -77,23 +77,28 @@ return {
             cwd = vim.fn.expand("%:p:h")
           end
 
-          -- params = {
-          --     cwd = cwd,
-          --     search_dirs = { cwd },
-          -- }
-          params = {}
+          print("The current working directory")
+          vim.print(cwd)
+
+          params = {
+            cwd = cwd,
+            search_dirs = { cwd },
+          }
+          -- params = {}
 
           -- TODO: Bug where in a git repo but in a non-git directory
+          --
+          require("telescope.builtin").find_files(params)
 
-          local search
-          if is_git_repo() then
-            search = require("telescope.builtin").git_files
-            -- params.use_git_root = false
-          else
-            search = require("telescope.builtin").find_files
-          end
-
-          search(params)
+          -- local search
+          -- if is_git_repo() then
+          --     search = require("telescope.builtin").git_files
+          --     -- params.use_git_root = false
+          -- else
+          --     search = require("telescope.builtin").find_files
+          -- end
+          --
+          -- search(params)
         end,
       },
       {
@@ -111,12 +116,16 @@ return {
       {
         "<leader>fg",
         function()
-          local cwd = require("oil").get_current_dir()
-          -- params = {
-          --     cwd = cwd,
-          --     search_dirs = { cwd },
-          -- }
-          local params = {}
+          local cwd
+          if vim.bo.filetype == "oil" then
+            cwd = require("oil").get_current_dir()
+          else
+            cwd = vim.fn.expand("%:p:h")
+          end
+          local params = {
+            cwd = cwd,
+            search_dirs = { cwd },
+          }
           require("telescope.builtin").live_grep(params)
         end,
       },
