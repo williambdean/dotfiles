@@ -106,12 +106,13 @@ local function create_or_get_output_buf()
     bufnr = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_buf_set_name(bufnr, bufname)
   end
-  vim.bo[bufnr].modifiable = true
   return bufnr
 end
 
 local function show_output_in_buffer(output)
   local bufnr = create_or_get_output_buf()
+  print("The buffer number is " .. bufnr)
+  vim.bo[bufnr].modifiable = true
   -- Clear buffer content
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {})
   -- Set buffer content
@@ -124,18 +125,17 @@ local function show_output_in_buffer(output)
   vim.bo[bufnr].filetype = "nofile"
   vim.bo[bufnr].modifiable = false
   -- Enable terminal colors
-  vim.opt_local.termguicolors = true
-  -- Set the filetype to 'AnsiEsc' to enable ANSI color interpretation
+  -- vim.opt_local.termguicolors = true
   vim.bo[bufnr].filetype = "terminal"
-  -- Enable terminal codes interpretation
-  vim.cmd([[AnsiEsc]])
 end
 
+--Run the test in the current file
+--@param args table
+--@param test_name string
 local function run_test(args, test_name)
   local file_path = vim.fn.expand("%:p")
   print("The file is " .. file_path)
   local test_command = "pytest " .. file_path
-
   if test_name then
     test_command = test_command .. " -k " .. test_name
   end
@@ -201,7 +201,6 @@ return {
         {}
       )
       vim.api.nvim_create_user_command("RunTest", function(args)
-        vim.print(args)
         local test_name = get_test_name()
         if test_name == nil then
           print("No test found")
