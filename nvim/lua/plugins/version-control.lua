@@ -153,10 +153,12 @@ return {
     "ruifm/gitlinker.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
     config = true,
-    keys = {
-      "<leader>gy",
-      "<CMD>lua require('gitlinker').get_repo_url()<CR>",
-    },
+    -- keys = {
+    --     "<leader>gy",
+    --     function()
+    --         require("gitlinker").get_repo_url()
+    --     end,
+    -- },
   },
   {
     "petertriho/cmp-git",
@@ -180,13 +182,16 @@ return {
     end,
   },
   {
-    -- "cwntester/octo.nvim",
     dir = "~/GitHub/octo.nvim",
     cmd = "Octo",
     keys = {
       { "<leader>oo", "<CMD>Octo<CR>", desc = "Open Octo" },
       { "<leader>ic", "<CMD>Octo issue create<CR>", desc = "Create issue" },
-      { "<leader>op", "<CMD>Octo pr list<CR>", desc = "List pull requests" },
+      {
+        "<leader>op",
+        "<CMD>Octo pr list<CR>",
+        desc = "List pull requests",
+      },
       { "<leader>oi", "<CMD>Octo issue list<CR>", desc = "List issues" },
       {
         "<leader>od",
@@ -199,6 +204,7 @@ return {
         -- default_to_projects_v2 = true,
         use_local_fs = false,
         enable_builtin = true,
+        default_to_projects_v2 = true,
         users = "mentionable",
         timeout = 15000,
         pull_requests = {

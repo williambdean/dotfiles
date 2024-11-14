@@ -13,6 +13,7 @@ return {
       "nvim-telescope/telescope.nvim",
       "nvim-tree/nvim-web-devicons",
     },
+    lazy = false,
     keys = {
       { "-", mode = "n", "<CMD>Oil<CR>", desc = "Oil - Open parent directory" },
     },

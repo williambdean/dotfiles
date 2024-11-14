@@ -126,7 +126,8 @@ return {
   {
     "jpalardy/vim-slime",
     lazy = true,
-    event = { "BufReadPre *.py" },
+    event = { "BufReadPre *.py", "BufReadPre *.md" },
+    cmd = { "SlimeConfig" },
     config = function()
       vim.g.slime_target = "tmux"
       vim.g.slime_python_ipython = 1
@@ -139,9 +140,9 @@ return {
       vim.g.slime_bracketed_paste = 1
     end,
   },
-  {
-    "hanschen/vim-ipython-cell",
-    lazy = true,
-    event = { "BufReadPre *.py" },
-  },
+  -- {
+  --     "hanschen/vim-ipython-cell",
+  --     lazy = true,
+  --     event = { "BufReadPre *.py" },
+  -- },
 }
