@@ -201,5 +201,33 @@ alias b=branches
 
 function gitignore-template() {
     local language=${1:-$(gh api /gitignore/templates --jq '.[]' | fzf)}
+    if [ -z "$language" ]
+    then
+        return
+    fi
     gh api /gitignore/templates/$language --jq '.source'
+}
+
+function activate() {
+    local env=$(conda env list --json | jq -r '
+        .envs |
+        .[1:] |
+        map(. | split("/") | .[-1]) |
+        ["base"] + . |
+        join("\n")
+    ' | fzf)
+    if [ -z "$env" ]
+    then
+        return
+    fi
+    conda activate $env
+}
+alias a=activate
+
+function prs_since_last_release() {
+    local publishedAt=$(gh release list \
+        --limit 1 \
+        --json publishedAt \
+        --jq '.[0].publishedAt')
+    gh pr list --search "is:merged merged:>=${publishedAt}"
 }
