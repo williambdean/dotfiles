@@ -1,9 +1,8 @@
-local _, Job = pcall(require, "plenary.job")
-
 ---@brief Creates an issue on GitHub using GitHub CLI
 ---@param title string
 ---@param body string
 local function create_issue(title, body)
+  local _, Job = pcall(require, "plenary.job")
   if not Job then
     return
   end
@@ -21,35 +20,24 @@ local function create_issue(title, body)
   }):start()
 end
 
-local function get_visual_lines()
-  local start_pos = vim.fn.getpos("'<")
-  local end_pos = vim.fn.getpos("'>")
+vim.api.nvim_create_user_command("CreateIssue", function(opts)
+  local start = opts.line1 - 1
+  local stop = opts.line2
+  local lines = vim.api.nvim_buf_get_lines(0, start, stop, false)
 
-  -- Extract the lines between these positions
-  return vim.api.nvim_buf_get_lines(0, start_pos[2] - 1, end_pos[2], false)
-end
-
-local function create_issues()
-  local lines = get_visual_lines()
-
-  for _, line in ipairs(lines) do
-    -- I want to seperate the line into title and body where the separation is the ":" character. If there is
-    -- no ":" character, then the whole line is the title
-    -- Example: "Title: Body" -> title = "Title", body = "Body"
-    -- Example: "Title" -> title = "Title", body = ""
-    -- Example: "Title: Body: More body" -> title = "Title", body = "Body: More body"
-    -- Example: "Title: Body: More body: Even more body" -> title = "Title", body = "Body: More body: Even more body"
-    local title, body = line:match("^(.-):%s*(.*)$")
-    if not title then
-      title = line
-      body = ""
-    end
-    create_issue(title, body)
+  if #lines == 0 then
+    print("No lines selected")
+    return
   end
-end
 
--- Add mapping to create issues when in visual selection
-vim.keymap.set("v", "<leader>ic", create_issues, { silent = false })
+  local title = lines[1]
+  local body = table.concat(lines, "\n", 2)
+  -- Remove any leading or trailing whitespace
+  title = title:gsub("^%s*(.-)%s*$", "%1")
+  body = body:gsub("^%s*(.-)%s*$", "%1")
+
+  create_issue(title, body)
+end, { range = true })
 
 local function current_buffer()
   local utils = require("octo.utils")
@@ -82,7 +70,7 @@ local function current_author()
   end
 
   local author = buffer.node.author.login
-  vim.fn.setreg("*", "@" .. author)
+  vim.fn.setreg("+", "@" .. author)
   utils.info("Copied author to clipboard: " .. author)
 end
 
@@ -148,7 +136,7 @@ local function open_github_as_octo_buffer()
 end
 
 return {
-  { "tpope/vim-fugitive", cmd = { "Git", "G" } },
+  { "tpope/vim-fugitive", cmd = { "Git", "G", "Gw" } },
   {
     "ruifm/gitlinker.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
