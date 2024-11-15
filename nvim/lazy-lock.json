@@ -4,6 +4,7 @@
   "copilot.vim": { "branch": "release", "commit": "87038123804796ca7af20d1b71c3428d858a9124" },
   "fzf-lua": { "branch": "main", "commit": "ce1e24f2a48089b65deefcb0a71a9856839002b5" },
   "gitlinker.nvim": { "branch": "master", "commit": "cc59f732f3d043b626c8702cb725c82e54d35c25" },
+  "go-to.nvim": { "branch": "main", "commit": "30b78328a82c72d91e18f2368acecd99b6c452e4" },
   "gruvbox.nvim": { "branch": "main", "commit": "49d9c0b150ba70efcd831ec7b3cb8ee740067045" },
   "harpoon": { "branch": "harpoon2", "commit": "0378a6c428a0bed6a2781d459d7943843f374bce" },
   "hop.nvim": { "branch": "master", "commit": "08ddca799089ab96a6d1763db0b8adc5320bf050" },
