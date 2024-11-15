@@ -5,6 +5,21 @@ for direction, key in pairs({ h = "h", j = "j", k = "k", l = "l" }) do
   end, { desc = "Move to " .. direction .. " window" })
 end
 
+-- Quickfix navigation
+vim.keymap.set("n", "[c", function()
+  local ok, _ = pcall(vim.cmd.cprevious)
+  if not ok then
+    vim.notify("No previous quickfix item", vim.log.levels.WARN)
+  end
+end, { desc = "Previous quickfix item" })
+
+vim.keymap.set("n", "]c", function()
+  local ok, _ = pcall(vim.cmd.cnext)
+  if not ok then
+    vim.notify("No next quickfix item", vim.log.levels.WARN)
+  end
+end, { desc = "Next quickfix item" })
+
 return {
   { "nanotee/zoxide.vim", cmd = { "Lz" } },
   {
