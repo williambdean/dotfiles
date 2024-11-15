@@ -109,26 +109,6 @@ local function create_or_get_output_buf()
   return bufnr
 end
 
-local function show_output_in_buffer(output)
-  local bufnr = create_or_get_output_buf()
-  print("The buffer number is " .. bufnr)
-  vim.bo[bufnr].modifiable = true
-  -- Clear buffer content
-  vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {})
-  -- Set buffer content
-  local lines = vim.split(output, "\n")
-  vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
-  -- Open buffer in a split
-  vim.cmd("vsplit")
-  vim.api.nvim_win_set_buf(0, bufnr)
-  -- Set buffer options
-  vim.bo[bufnr].filetype = "nofile"
-  vim.bo[bufnr].modifiable = false
-  -- Enable terminal colors
-  -- vim.opt_local.termguicolors = true
-  vim.bo[bufnr].filetype = "terminal"
-end
-
 --Run the test in the current file
 --@param args table
 --@param test_name string
@@ -145,17 +125,23 @@ local function run_test(args, test_name)
   end
   print("The command is " .. test_command)
 
-  local output = ""
+  local output_bufnr = create_or_get_output_buf()
+  vim.api.nvim_buf_set_lines(output_bufnr, 0, -1, false, {})
+  vim.cmd("vsplit")
+  vim.api.nvim_win_set_buf(0, output_bufnr)
+
+  local append_data = function(_, data)
+    if data then
+      vim.api.nvim_buf_set_lines(output_bufnr, -1, -1, false, data)
+    end
+  end
+
+  vim.print(vim.split(test_command, " "))
 
   vim.fn.jobstart(test_command, {
-    on_stdout = function(_, data)
-      output = output .. table.concat(data, "\n")
-    end,
-    on_stderr = function(_, data)
-      output = output .. table.concat(data, "\n")
-    end,
+    on_stdout = append_data,
+    on_stderr = append_data,
     on_exit = function(_, code)
-      show_output_in_buffer(output)
       if code == 0 then
         print("Test passed")
       else
