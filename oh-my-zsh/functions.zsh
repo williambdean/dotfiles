@@ -209,7 +209,7 @@ function gitignore-template() {
 }
 
 function activate() {
-    local env=$(conda env list --json | jq -r '
+    local env=$(micromamba env list --json | jq -r '
         .envs |
         .[1:] |
         map(. | split("/") | .[-1]) |
@@ -220,7 +220,7 @@ function activate() {
     then
         return
     fi
-    conda activate $env
+    micromamba activate $env
 }
 alias a=activate
 
