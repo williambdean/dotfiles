@@ -21,6 +21,13 @@ require("lazy").setup({
   spec = {
     { import = "plugins" },
     {
+      "wd60622/go-to.nvim",
+      opts = {
+        display_only = false,
+        sort_by = "frequency",
+      },
+    },
+    {
       "ThePrimeagen/refactoring.nvim",
       dependencies = {
         "nvim-lua/plenary.nvim",
