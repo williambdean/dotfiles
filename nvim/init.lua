@@ -21,7 +21,7 @@ require("lazy").setup({
   spec = {
     { import = "plugins" },
     {
-      "wd60622/go-to.nvim",
+      dir = "~/GitHub/go-to",
       opts = {
         display_only = false,
         sort_by = "frequency",
@@ -197,9 +197,6 @@ vim.cmd("set clipboard+=unnamedplus")
 
 vim.keymap.set("v", "<leader>y", '"+y', { noremap = true })
 
-vim.api.nvim_set_hl(0, "Normal", { bg = "#000000" })
-vim.api.nvim_set_hl(0, "NonText", { bg = "#000000" })
-
 opt.signcolumn = "yes"
 
 -- Set color column
@@ -304,6 +301,34 @@ vim.g.netrw_browsex_viewer = "wslview"
 
 vim.o.background = "dark"
 vim.cmd([[colorscheme gruvbox]])
+
+-- Define transparency function
+local function enable_transparency()
+  -- General background
+  vim.api.nvim_set_hl(0, "Normal", { bg = "NONE", ctermbg = "NONE" })
+  vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE", ctermbg = "NONE" })
+  vim.api.nvim_set_hl(0, "NonText", { bg = "NONE", ctermbg = "NONE" })
+  vim.api.nvim_set_hl(0, "LineNr", { bg = "NONE", ctermbg = "NONE" })
+  vim.api.nvim_set_hl(0, "SignColumn", { bg = "NONE", ctermbg = "NONE" })
+  vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "NONE", ctermbg = "NONE" })
+
+  -- Additional elements that might need transparency
+  vim.api.nvim_set_hl(0, "VertSplit", { bg = "NONE", ctermbg = "NONE" })
+  vim.api.nvim_set_hl(0, "Folded", { bg = "NONE", ctermbg = "NONE" })
+
+  -- Floating windows and menus
+  vim.opt.winblend = 15
+  vim.opt.pumblend = 15
+end
+
+-- -- Create autocmd to ensure transparency persists
+-- vim.api.nvim_create_autocmd("ColorScheme", {
+--     pattern = "*",
+--     callback = enable_transparency
+-- })
+-- --
+-- -- Enable transparency initially
+-- enable_transparency()
 
 -- Trying to speed up the motions
 vim.o.timeoutlen = 300
