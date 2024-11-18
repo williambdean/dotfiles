@@ -25,6 +25,9 @@ from dataclasses import dataclass
 import pandas as pd
 import numpy as np
 
+VALUE = 1  # This is a comment
+ANOTHER_VALUE = 2  # which wouldn't be collapsed
+
 
 # Here is a comment
 # More comments
