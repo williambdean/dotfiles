@@ -114,7 +114,6 @@ end
 --@param test_name string
 local function run_test(args, test_name)
   local file_path = vim.fn.expand("%:p")
-  print("The file is " .. file_path)
   local test_command = "pytest " .. file_path
   if test_name then
     test_command = test_command .. " -k " .. test_name
@@ -123,10 +122,11 @@ local function run_test(args, test_name)
   if args and args.args and args.args ~= "" then
     test_command = test_command .. " " .. args.args
   end
-  print("The command is " .. test_command)
+  print("Running the command: " .. test_command)
 
   local output_bufnr = create_or_get_output_buf()
   vim.api.nvim_buf_set_lines(output_bufnr, 0, -1, false, {})
+  -- TODO: Change this to be on the right of the current buffer
   vim.cmd("vsplit")
   vim.api.nvim_win_set_buf(0, output_bufnr)
 
@@ -135,8 +135,6 @@ local function run_test(args, test_name)
       vim.api.nvim_buf_set_lines(output_bufnr, -1, -1, false, data)
     end
   end
-
-  vim.print(vim.split(test_command, " "))
 
   vim.fn.jobstart(test_command, {
     on_stdout = append_data,
