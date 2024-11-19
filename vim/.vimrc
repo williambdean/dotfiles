@@ -11,7 +11,7 @@ set nowrap
 set smartcase
 set noswapfile
 set nobackup
-set undodir=~/.vim/undodir
+" set undodir=~/.vim/undodir
 set undofile
 set incsearch
 set scrolloff=15
@@ -133,3 +133,6 @@ let g:slime_bracketed_paste = 1
 "     return substitute(dedented_lines, add_eol_pat, "\n", "g")
 "   end
 " endfunction
+
+" Open netrw file explorer
+nnoremap - :Explore<CR>
