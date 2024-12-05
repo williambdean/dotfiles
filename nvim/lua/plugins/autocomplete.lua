@@ -118,8 +118,6 @@ return {
       { "nvim-telescope/telescope.nvim" },
     },
     config = function()
-      require("CopilotChat.integrations.cmp").setup()
-
       -- Custom buffer for CopilotChat
       vim.api.nvim_create_autocmd("BufEnter", {
         pattern = "copilot-*",
@@ -136,6 +134,7 @@ return {
       })
       require("CopilotChat").setup({
         debug = false,
+        chat_autocomplete = true,
         auto_follow_cursor = true,
         model = "claude-3.5-sonnet",
         show_help = false,
