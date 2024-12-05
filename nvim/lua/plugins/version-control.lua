@@ -15,7 +15,7 @@ local function create_issue(title, body)
     command = "gh",
     args = { "issue", "create", "--title", title, "--body", body },
     on_exit = vim.schedule_wrap(function()
-      print("Created issue: " .. title)
+      vim.notify("Created issue: " .. title)
     end),
   }):start()
 end
