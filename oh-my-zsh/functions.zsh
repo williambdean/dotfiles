@@ -117,9 +117,17 @@ function zsh-link() {
 function tn() {
     local session_name=$(pwd | sed 's/.*\///g')
     if [ -n "$TMUX" ]; then
+        if tmux has-session -t "$session_name" 2> /dev/null; then
+            tmux switch-client -t "$session_name"
+            return
+        fi
         tmux new-session -d -s "$session_name"
         tmux switch-client -t "$session_name"
     else
+        if tmux has-session -t "$session_name" 2> /dev/null; then
+            tmux attach -t "$session_name"
+            return
+        fi
         tmux new -s "$session_name"
     fi
 }
@@ -206,6 +214,14 @@ function gitignore-template() {
         return
     fi
     gh api /gitignore/templates/$language --jq '.source'
+}
+
+function conda-envs() {
+    micromamba env list --json | jq -r '
+        .envs |
+        map(. | split("/") | .[-1]) |
+        join("\n")
+    '
 }
 
 function activate() {
