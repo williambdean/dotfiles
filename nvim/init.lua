@@ -21,6 +21,10 @@ require("lazy").setup({
   spec = {
     { import = "plugins" },
     {
+      dir = "~/GitHub/toggl.nvim",
+      opts = {},
+    },
+    {
       dir = "~/GitHub/go-to",
       opts = {
         display_only = false,
