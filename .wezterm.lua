@@ -53,4 +53,29 @@ config.scrollback_lines = 5000
 -- Set custom cursor style
 config.default_cursor_style = "BlinkingBlock"
 
+local wezterm_key = "CTRL|SHIFT"
+config.keys = config.keys or {}
+-- Tab navigation with ALT+1-9
+for i = 1, 9 do
+  table.insert(config.keys, {
+    key = tostring(i),
+    mods = wezterm_key,
+    action = wezterm.action({ ActivateTab = i - 1 }),
+  })
+end
+-- Relative moving with CTRL+SHIFT+h/l or Left/RightArrow
+local combos = {
+  { key = "LeftArrow", action = -1 },
+  { key = "RightArrow", action = 1 },
+  { key = "h", action = -1 },
+  { key = "l", action = 1 },
+}
+for _, combo in ipairs(combos) do
+  table.insert(config.keys, {
+    key = combo.key,
+    mods = wezterm_key,
+    action = wezterm.action({ ActivateTabRelative = combo.action }),
+  })
+end
+
 return config
