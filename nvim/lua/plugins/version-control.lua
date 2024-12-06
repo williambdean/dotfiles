@@ -1,7 +1,9 @@
----@brief Creates an issue on GitHub using GitHub CLI
----@param title string
----@param body string
-local function create_issue(title, body)
+--- Creates an issue on GitHub using GitHub CLI
+-- @param opts A table containing the title and body of the issue.
+local function create_issue(opts)
+  local title = opts.title
+  local body = opts.body
+
   local _, Job = pcall(require, "plenary.job")
   if not Job then
     return
@@ -9,7 +11,6 @@ local function create_issue(title, body)
 
   body = body or ""
 
-  -- TODO: Make use of the octo command
   Job:new({
     enable_recording = true,
     command = "gh",
@@ -26,17 +27,17 @@ vim.api.nvim_create_user_command("CreateIssue", function(opts)
   local lines = vim.api.nvim_buf_get_lines(0, start, stop, false)
 
   if #lines == 0 then
-    print("No lines selected")
+    vim.notify("No lines selected")
     return
   end
 
   local title = lines[1]
   local body = table.concat(lines, "\n", 2)
   -- Remove any leading or trailing whitespace
-  title = title:gsub("^%s*(.-)%s*$", "%1")
-  body = body:gsub("^%s*(.-)%s*$", "%1")
+  title = vim.trim(title)
+  body = vim.trim(body)
 
-  create_issue(title, body)
+  create_issue({ title = title, body = body })
 end, { range = true })
 
 local function current_buffer()
