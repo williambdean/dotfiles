@@ -136,7 +136,7 @@ return {
         debug = false,
         chat_autocomplete = true,
         auto_follow_cursor = true,
-        model = "claude-3.5-sonnet",
+        -- model = "claude-3.5-sonnet",
         show_help = false,
         context = "buffers",
         language = "English",
