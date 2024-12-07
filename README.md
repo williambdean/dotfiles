@@ -1,3 +1,6 @@
-# Version control on dot files
+# Version control on dotfiles
 
-Symbolic links between these files using `ln -s $(pwd)/source target`
+
+> [!TIP]
+>
+> Symbolic links between these files using `ln -s $(pwd)/source target`
