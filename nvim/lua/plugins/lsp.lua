@@ -8,8 +8,18 @@ local function get_stylua_config()
       globals = { "vim" },
     },
     workspace = {
-      library = vim.api.nvim_get_runtime_file("", true),
+      -- library = vim.api.nvim_get_runtime_file("", true),
       checkThirdParty = false,
+      storage = {
+        path = vim.fn.stdpath("cache") .. "/lua_ls/workspace",
+      },
+      library = {
+        cache = {
+          enabled = true,
+          path = vim.fn.stdpath("cache") .. "/lua_ls/library",
+          rate = 0.1,
+        },
+      },
     },
     telemetry = {
       enable = true,
@@ -134,17 +144,8 @@ return {
           Lua = get_stylua_config(),
         },
         ft = ".lua",
-        workspace = {
-          storage = {
-            path = vim.fn.stdpath("cache") .. "/workspace",
-          },
-          library = {
-            cache = {
-              enabled = true,
-              path = vim.fn.stdpath("cache") .. "/workspace-library",
-              rate = 0.1,
-            },
-          },
+        flags = {
+          debounce_text_changes = 150,
         },
       })
 
@@ -204,15 +205,6 @@ return {
       vim.api.nvim_create_user_command("LspFormat", function()
         vim.lsp.buf.format({ async = false })
       end, {})
-
-      -- -- For shell scripts
-      -- vim.api.nvim_create_autocmd("BufWritePre", {
-      --     pattern = "*.sh",
-      --     group = group,
-      --     callback = function()
-      --         vim.cmd("!shfmt -w %")
-      --     end,
-      -- })
 
       -- Add the diagnostics to the right of the screen
       -- instead of the left side which pushes it out
