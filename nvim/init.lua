@@ -81,9 +81,7 @@ require("lazy").setup({
           desc = "Extract block to file",
         },
       },
-      config = function()
-        require("refactoring").setup()
-      end,
+      opts = {},
     },
     { "dstein64/vim-startuptime", cmd = "StartupTime" },
     {
@@ -236,11 +234,11 @@ vim.api.nvim_create_autocmd({ "TermOpen", "TextYankPost" }, {
   callback = function(ev)
     if ev.event == "TermOpen" then
       vim.cmd("startinsert | set winfixheight")
+      vim.opt.number = false
+      vim.opt.relativenumber = false
     else
-      vim.highlight.on_yank({ timeout = 200 })
+      vim.highlight.on_yank({ timeout = 250 })
     end
-    vim.opt.number = false
-    vim.opt.relativenumber = false
   end,
 })
 
@@ -329,8 +327,8 @@ end
 
 -- -- Create autocmd to ensure transparency persists
 -- vim.api.nvim_create_autocmd("ColorScheme", {
---     pattern = "*",
---     callback = enable_transparency
+--   pattern = "*",
+--   callback = enable_transparency
 -- })
 -- --
 -- -- Enable transparency initially
