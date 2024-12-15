@@ -1,5 +1,7 @@
 -- Taken from TJ DeVries' video on terminals in neovim
 -- https://www.youtube.com/watch?v=ooTcnx066Do
+--
+local M = {}
 
 local function get_query_path(file_name)
   -- Get the current Neovim config directory (relative path)
@@ -47,30 +49,35 @@ end
 
 local job_id = 0
 
-local function open_terminal()
+-- Open a terminal window
+-- @param right boolean
+function M.open_terminal(right)
   vim.cmd.vnew()
   vim.cmd.term()
+  if right then
+    vim.cmd("wincmd L")
+  end
 
   job_id = vim.bo.channel
+  return job_id
 end
 
--- Create a small terminal
-vim.keymap.set("n", "<leader>st", function()
-  open_terminal()
-  vim.cmd.wincmd("J")
-  vim.api.nvim_win_set_height(0, 10)
-end)
-
-local function send_command(command)
-  vim.fn.chansend(job_id, { command .. "\r\n" })
+function M.send_command(command, id)
+  vim.fn.chansend(id or job_id, command .. "\r\n")
 end
 
 --Run the test in the current file
 --@param args table
 --@param test_name string
-local function run_test(args, test_name)
+function M.run_test(args, test_name)
   local file_path = vim.fn.expand("%:p")
-  local test_command = "pytest " .. file_path
+  local python_executable = vim.fn.exepath("python")
+  if python_executable == "" then
+    vim.notify("Python executable not found", vim.log.levels.ERROR)
+    return
+  end
+
+  local test_command = python_executable .. " -m pytest " .. file_path
   if test_name then
     test_command = test_command .. " -k " .. test_name
   end
@@ -79,9 +86,8 @@ local function run_test(args, test_name)
     test_command = test_command .. " " .. args.args
   end
 
-  open_terminal()
-  vim.cmd.wincmd("L")
-  send_command(test_command)
+  M.open_terminal(true)
+  M.send_command(test_command)
 end
 
 vim.api.nvim_create_user_command("RunTest", function(args)
@@ -91,8 +97,26 @@ vim.api.nvim_create_user_command("RunTest", function(args)
     return
   end
 
-  run_test(args, test_name)
+  M.run_test(args, test_name)
 end, { nargs = "*" })
-vim.api.nvim_create_user_command("RunTests", run_test, { nargs = "*" })
 
-return {}
+vim.api.nvim_create_user_command("RunTests", M.run_test, { nargs = "*" })
+
+-- Create a small terminal
+vim.keymap.set("n", "<leader>st", function()
+  M.open_terminal()
+  vim.cmd.wincmd("J")
+  vim.api.nvim_win_set_height(0, 10)
+end)
+
+function M.example()
+  local test_command =
+    "pytest tests/test_example.py -k test_another_test -vvv --color yes"
+  M.open_terminal(true)
+  -- Pause for a second to let the terminal open
+  vim.defer_fn(function()
+    M.send_command(test_command)
+  end, 750)
+end
+
+return M
