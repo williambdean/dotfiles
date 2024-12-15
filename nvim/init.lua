@@ -234,8 +234,8 @@ vim.api.nvim_create_autocmd({ "TermOpen", "TextYankPost" }, {
   callback = function(ev)
     if ev.event == "TermOpen" then
       vim.cmd("startinsert | set winfixheight")
-      vim.opt.number = false
-      vim.opt.relativenumber = false
+      vim.opt_local.number = false
+      vim.opt_local.relativenumber = false
     else
       vim.highlight.on_yank({ timeout = 250 })
     end
@@ -343,3 +343,5 @@ vim.o.ttyfast = true
 
 -- Set updatetime for faster completion
 vim.o.updatetime = 100
+
+require("config.terminal")
