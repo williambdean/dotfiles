@@ -21,11 +21,11 @@ require("lazy").setup({
   spec = {
     { import = "plugins" },
     {
-      dir = "~/GitHub/toggl.nvim",
+      dir = "~/GitHub/neovim-plugins/toggl.nvim",
       opts = {},
     },
     {
-      dir = "~/GitHub/go-to",
+      dir = "~/GitHub/neovim-plugins/go-to",
       opts = {
         display_only = false,
         sort_by = "frequency",
