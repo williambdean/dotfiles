@@ -182,13 +182,15 @@ return {
         severity_sort = true,
       })
 
+      local async = true
+
       -- Modify the autocmd to check the global variable before formatting
       vim.api.nvim_create_autocmd("BufWritePre", {
         -- buffer = buffer,
         group = group,
         callback = function()
           if vim.g.lsp_format_enabled then
-            vim.lsp.buf.format({ async = false })
+            vim.lsp.buf.format({ async = async })
           end
         end,
       })
@@ -203,7 +205,7 @@ return {
       end, {})
 
       vim.api.nvim_create_user_command("LspFormat", function()
-        vim.lsp.buf.format({ async = false })
+        vim.lsp.buf.format({ async = async })
       end, {})
 
       -- Add the diagnostics to the right of the screen
