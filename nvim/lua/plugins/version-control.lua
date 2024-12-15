@@ -171,7 +171,7 @@ return {
     end,
   },
   {
-    dir = "~/GitHub/octo.nvim",
+    dir = "~/GitHub/neovim-plugins/octo.nvim",
     cmd = "Octo",
     keys = {
       { "<leader>oo", "<CMD>Octo<CR>", desc = "Open Octo" },
