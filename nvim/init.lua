@@ -239,6 +239,8 @@ vim.api.nvim_create_autocmd({ "TermOpen", "TextYankPost" }, {
     else
       vim.highlight.on_yank({ timeout = 200 })
     end
+    vim.opt.number = false
+    vim.opt.relativenumber = false
   end,
 })
 
