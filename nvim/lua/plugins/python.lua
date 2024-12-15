@@ -109,6 +109,11 @@ function print_current_visual_selection()
   local lines = get_visual_selection()
   local code = table.concat(lines, "\n")
   local file = io.open("temp-python-script.py", "w")
+  if file == nil then
+    vim.notify("Could not open file")
+    return
+  end
+
   file:write(code)
   file:close()
   os.execute("python temp-python-script.py")
