@@ -21,6 +21,11 @@ require("lazy").setup({
   spec = {
     { import = "plugins" },
     {
+      "marcussimonsen/let-it-snow.nvim",
+      cmd = "LetItSnow", -- Wait with loading until command is run
+      opts = {},
+    },
+    {
       dir = "~/GitHub/neovim-plugins/toggl.nvim",
       opts = {},
     },
@@ -28,7 +33,6 @@ require("lazy").setup({
       dir = "~/GitHub/neovim-plugins/go-to",
       opts = {
         display_only = false,
-        sort_by = "frequency",
       },
     },
     {

@@ -182,7 +182,7 @@ return {
         severity_sort = true,
       })
 
-      local async = true
+      local async = false
 
       -- Modify the autocmd to check the global variable before formatting
       vim.api.nvim_create_autocmd("BufWritePre", {

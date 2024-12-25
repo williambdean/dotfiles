@@ -40,6 +40,10 @@ vim.api.nvim_create_user_command("CreateIssue", function(opts)
   create_issue({ title = title, body = body })
 end, { range = true })
 
+vim.api.nvim_create_user_command("CloseIssue", function(opts)
+  require("config.github").close_issue()
+end, {})
+
 local function current_buffer()
   local utils = require("octo.utils")
 
@@ -137,6 +141,7 @@ local function open_github_as_octo_buffer()
 end
 
 return {
+  { "akinsho/git-conflict.nvim", opts = {} },
   { "tpope/vim-fugitive", cmd = { "Git", "G", "Gw" } },
   {
     "ruifm/gitlinker.nvim",
@@ -256,7 +261,7 @@ return {
     end,
     dependencies = {
       "nvim-lua/plenary.nvim",
-      -- "nvim-telescope/telescope.nvim",
+      "nvim-telescope/telescope.nvim",
       "nvim-tree/nvim-web-devicons",
       "ibhagwan/fzf-lua",
     },

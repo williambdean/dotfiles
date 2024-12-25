@@ -1,3 +1,5 @@
+local docstrings_are_folded = {}
+
 -- Define a function to get the absolute path to the query file
 local function get_query_path(file_name)
   -- Get the current Neovim config directory (relative path)
@@ -57,11 +59,47 @@ local function process_docstrings(action)
 end
 
 local function fold_docstrings()
+  -- Needs to be a python file
+  if vim.bo.filetype ~= "python" then
+    vim.notify("This command only works for Python files")
+    return
+  end
+
+  local bufnr = tostring(vim.api.nvim_get_current_buf())
+
+  if docstrings_are_folded[bufnr] == nil then
+    docstrings_are_folded[bufnr] = false
+  end
+
+  if docstrings_are_folded[bufnr] then
+    vim.notify("The docstrings are already folded")
+    return
+  end
+
   process_docstrings("fold")
+  docstrings_are_folded[bufnr] = true
 end
 
 local function unfold_docstrings()
+  -- Needs to be a python file
+  if vim.bo.filetype ~= "python" then
+    vim.notify("This command only works for Python files")
+    return
+  end
+
+  local bufnr = tostring(vim.api.nvim_get_current_buf())
+
+  if docstrings_are_folded[bufnr] == nil then
+    docstrings_are_folded[bufnr] = false
+  end
+
+  if not docstrings_are_folded[bufnr] then
+    vim.notify("The docstrings are already unfolded")
+    return
+  end
+
   process_docstrings("foldopen")
+  docstrings_are_folded[bufnr] = false
 end
 
 return {
@@ -97,12 +135,23 @@ return {
         unfold_docstrings,
         {}
       )
+
       -- Autocmd to run FoldDocstrings when entering a Python file
       local fold_docstrings_group =
         vim.api.nvim_create_augroup("FoldDocstringGroup", { clear = true })
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "python",
         callback = function()
+          local bufnr = tostring(vim.api.nvim_get_current_buf())
+
+          if docstrings_are_folded[bufnr] == nil then
+            docstrings_are_folded[bufnr] = false
+          end
+
+          if docstrings_are_folded[bufnr] then
+            return
+          end
+
           vim.cmd("FoldDocstrings")
         end,
         group = fold_docstrings_group,
