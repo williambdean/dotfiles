@@ -38,7 +38,10 @@ query {
 }
 ]]
 
-local closing_issues = function(pr_number)
+---Get the closing issue for a PR
+---@param pr_number number
+---@return number
+local closing_issue = function(pr_number)
   local remote_name = utils.get_remote_name()
   local remote_split = vim.split(remote_name, "/")
   local owner, name = remote_split[1], remote_split[2]
@@ -60,14 +63,22 @@ local closing_issues = function(pr_number)
     table.insert(numbers, reference.number)
   end
 
+  if #numbers > 1 then
+    vim.notify("Multiple issues associated with the PR. Using the first one.")
+  end
+
   return numbers[1]
 end
 
 ---Get the current branch
+---@return string
 local current_branch = function()
   return vim.fn.systemlist("git rev-parse --abbrev-ref HEAD")[1]
 end
 
+---Get the PR associated with the current branch
+---@param branch string
+---@return number
 local pr_into_branch = function(branch)
   local cmd = "gh pr list --head "
     .. branch
@@ -76,6 +87,8 @@ local pr_into_branch = function(branch)
 end
 
 --- Create a floating window
+--- @param opts table
+--- @return table
 function M.create_floating_window(opts)
   opts = opts or {}
   local width = opts.width or math.floor(vim.o.columns * 0.65)
@@ -127,14 +140,14 @@ local get_issue = function()
     return mapping[branch].issue
   end
 
-  --- TODO: refine this logic
+  --- TODO: refine this logic to efficiently get the issue number
   if mapping[branch] == nil then
     get_pr()
   end
 
   if mapping[branch].issue == nil then
     local pr_number = get_pr()
-    mapping[branch].issue = closing_issues(pr_number)
+    mapping[branch].issue = closing_issue(pr_number)
   end
 
   return mapping[branch].issue
@@ -155,6 +168,7 @@ local hide_issue = function()
   hide("issue")
 end
 
+---Toggle the floating window and open the file if it's not open
 local toggle = function(item, file)
   if not vim.api.nvim_win_is_valid(item.floating.win) then
     item.floating = M.create_floating_window({ buf = item.floating.buf })
@@ -167,6 +181,7 @@ local toggle = function(item, file)
   end
 end
 
+---Toggle the issue floating window
 M.toggle_issue = function()
   local issue_number = get_issue()
   if issue_number == nil then
@@ -182,6 +197,7 @@ M.toggle_issue = function()
   toggle(item, file)
 end
 
+---Toggle the PR floating window
 M.toggle_pr = function()
   local pr_number = get_pr()
   if pr_number == nil then
