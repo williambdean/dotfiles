@@ -349,3 +349,4 @@ vim.o.ttyfast = true
 vim.o.updatetime = 100
 
 require("config.terminal")
+require("config.issues_prs")
