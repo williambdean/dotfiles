@@ -1,24 +1,67 @@
--- Is the current branch a PR?
--- Is the current branch associated with an issue?
---
---
--- Floating window
--- Store off the mapping from branch to issue and PR
+-- Create a floating window with Issue and PR information for the current branch
+local gh = require("octo.gh")
+local utils = require("octo.utils")
 
 local M = {}
 
-local mapping = {}
-
 local state = {
   issue = {
-    buf = -1,
-    win = -1,
+    number = nil,
+    floating = {
+      buf = -1,
+      win = -1,
+    },
   },
   pull_request = {
-    buf = -1,
-    win = -1,
+    number = nil,
+    floating = {
+      buf = -1,
+      win = -1,
+    },
   },
 }
+
+-- Store of the relationship between branches and issues/PRs
+local mapping = {}
+
+local closing_issues_query = [[
+query {
+  repository(owner: "%s", name: "%s") {
+    pullRequest(number: %s) {
+      closingIssuesReferences(first: 1) {
+        nodes {
+					number
+        }
+      }
+    }
+  }
+}
+]]
+
+local closing_issues = function(pr_number)
+  local remote_name = utils.get_remote_name()
+  local remote_split = vim.split(remote_name, "/")
+  local owner, name = remote_split[1], remote_split[2]
+  local query = string.format(closing_issues_query, owner, name, pr_number)
+  local output = gh.run({
+    args = { "api", "graphql", "-f", string.format("query=%s", query) },
+    mode = "sync",
+  })
+  local resp = vim.fn.json_decode(output)
+  local references =
+    resp.data.repository.pullRequest.closingIssuesReferences.nodes
+
+  if #references < 1 then
+    return nil
+  end
+
+  local numbers = {}
+  for _, reference in ipairs(references) do
+    table.insert(numbers, reference.number)
+  end
+
+  return numbers[1]
+end
 
 ---Get the current branch
 local current_branch = function()
@@ -33,21 +76,20 @@ local pr_into_branch = function(branch)
 end
 
 --- Create a floating window
-local function create_floating_window(opts)
+function M.create_floating_window(opts)
   opts = opts or {}
-  local width = opts.width or math.floor(vim.o.columns * 0.8)
+  local width = opts.width or math.floor(vim.o.columns * 0.65)
   local height = opts.height or math.floor(vim.o.lines * 0.8)
 
   -- Calculate the position to center the window
   local col = math.floor((vim.o.columns - width) / 2)
-  local row = math.floor((vim.o.lines - height) / 2)
+  local row = math.floor((vim.o.lines - height) / 3)
 
   -- Create a buffer
   local buf = nil
   if vim.api.nvim_buf_is_valid(opts.buf) then
     buf = opts.buf
   else
-    vim.notify("Creating a new buffer")
     buf = vim.api.nvim_create_buf(false, true) -- No file, scratch buffer
   end
 
@@ -58,7 +100,7 @@ local function create_floating_window(opts)
     height = height,
     col = col,
     row = row,
-    -- style = "minimal", -- No borders or extra UI elements
+    style = "minimal", -- No borders or extra UI elements
     border = "rounded",
   }
 
@@ -68,64 +110,99 @@ local function create_floating_window(opts)
   return { buf = buf, win = win }
 end
 
-local toggle_terminal = function()
-  if not vim.api.nvim_win_is_valid(state.floating.win) then
-    state.floating = create_floating_window({ buf = state.floating.buf })
-    if vim.bo[state.floating.buf].buftype ~= "terminal" then
-      vim.cmd.terminal()
-    end
-  else
-    vim.api.nvim_win_hide(state.floating.win)
+local get_pr = function()
+  local branch = current_branch()
+  if mapping[branch] == nil then
+    mapping[branch] = {
+      pr = tonumber(pr_into_branch(branch)),
+    }
+  end
+
+  return mapping[branch].pr
+end
+local get_issue = function()
+  local branch = current_branch()
+
+  if mapping[branch] ~= nil and mapping[branch].issue ~= nil then
+    return mapping[branch].issue
+  end
+
+  --- TODO: refine this logic
+  if mapping[branch] == nil then
+    get_pr()
+  end
+
+  if mapping[branch].issue == nil then
+    local pr_number = get_pr()
+    mapping[branch].issue = closing_issues(pr_number)
+  end
+
+  return mapping[branch].issue
+end
+
+local hide = function(kind)
+  local win = state[kind]
+  if vim.api.nvim_win_is_valid(win.floating.win) then
+    vim.api.nvim_win_hide(win.floating.win)
   end
 end
 
-local utils = require("octo.utils")
+local hide_pr = function()
+  hide("pull_request")
+end
 
-local toggle_issue = function()
-  local issue_number = 52
+local hide_issue = function()
+  hide("issue")
+end
+
+local toggle = function(item, file)
+  if not vim.api.nvim_win_is_valid(item.floating.win) then
+    item.floating = M.create_floating_window({ buf = item.floating.buf })
+    local current_file = vim.api.nvim_buf_get_name(item.floating.buf)
+    if current_file ~= file then
+      vim.cmd.edit(file)
+    end
+  else
+    vim.api.nvim_win_hide(item.floating.win)
+  end
+end
+
+M.toggle_issue = function()
+  local issue_number = get_issue()
+  if issue_number == nil then
+    vim.notify("No issue associated with the current branch")
+    return
+  end
+
   local file = utils.get_issue_uri(issue_number)
 
-  if not vim.api.nvim_win_is_valid(state.issue.win) then
-    vim.notify("The floating window is not valid")
+  hide_pr()
 
-    state.issue = create_floating_window({ buf = state.issue.buf })
-    if vim.bo[state.issue.buf].buftype ~= "octo" then
-      vim.notify("I am here running the issue")
-      vim.cmd.edit(file)
-      vim.bo.filetype = "octo"
-    end
-  else
-    vim.api.nvim_win_hide(state.issue.win)
-  end
+  local item = state.issue
+  toggle(item, file)
 end
 
-local toggle_pr = function()
-  local pr_number = 4
+M.toggle_pr = function()
+  local pr_number = get_pr()
+  if pr_number == nil then
+    vim.notify("No PR associated with the current branch")
+    return
+  end
+  state.pull_request.number = pr_number
   local file = utils.get_pull_request_uri(pr_number)
 
-  if not vim.api.nvim_win_is_valid(state.pull_request.win) then
-    state.pull_request =
-      create_floating_window({ buf = state.pull_request.buf })
-    if vim.bo[state.pull_request.buf].buftype ~= "octo" then
-      vim.cmd.edit(file)
-    end
-  else
-    vim.api.nvim_win_hide(state.pull_request.win)
-  end
+  hide_issue()
+
+  local item = state.pull_request
+  toggle(item, file)
 end
 
-local show_state = function()
-  local branch = current_branch()
-  local pr = pr_into_branch(branch)
-  vim.print("The current branch " .. branch)
-  vim.print("The PR number")
-  vim.print(pr)
-  print(vim.inspect(state))
+M.show_state = function()
+  vim.print(mapping)
 end
 
-vim.api.nvim_create_user_command("Terminal", toggle_terminal, {})
-vim.api.nvim_create_user_command("Issue", toggle_issue, {})
-vim.api.nvim_create_user_command("PR", toggle_pr, {})
-vim.api.nvim_create_user_command("State", show_state, {})
+vim.api.nvim_create_user_command("Issue", M.toggle_issue, {})
+vim.api.nvim_create_user_command("PR", M.toggle_pr, {})
+vim.api.nvim_create_user_command("Debug", M.show_state, {})
 
 return M
