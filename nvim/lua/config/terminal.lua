@@ -14,7 +14,30 @@ local function get_query_path(file_name)
   return vim.fn.expand(query_path)
 end
 
-local function get_test_name()
+local get_test_name = function(node, bufnr)
+  for child in node:iter_children() do
+    if child:type() == "identifier" then
+      return vim.treesitter.get_node_text(child, bufnr)
+    elseif child:type() == "function_definition" then
+      for grandchild in child:iter_children() do
+        if grandchild:type() == "identifier" then
+          return vim.treesitter.get_node_text(grandchild, bufnr)
+        end
+      end
+    end
+  end
+  return nil
+end
+
+local between = function(value, start, finish)
+  return value >= start and value <= finish
+end
+
+function M.get_test_names(start_line, end_line)
+  if end_line == nil then
+    end_line = start_line
+  end
+
   local bufnr = vim.api.nvim_get_current_buf()
   local query = vim.treesitter.query.parse(
     "python",
@@ -24,27 +47,64 @@ local function get_test_name()
   local tree = parser:parse()[1]
   local root = tree:root()
 
-  local current_line = vim.api.nvim_win_get_cursor(0)[1]
-
   -- Find the test function containing current line
+  local tests = {}
+
   for _, node in query:iter_captures(root, bufnr, 0, -1) do
-    local start_line, _, end_line, _ = node:range()
-    if current_line >= start_line and current_line <= end_line + 1 then
-      -- Get the function name node (first child of type identifier)
-      for child in node:iter_children() do
-        if child:type() == "identifier" then
-          return vim.treesitter.get_node_text(child, bufnr)
-        elseif child:type() == "function_definition" then
-          for grandchild in child:iter_children() do
-            if grandchild:type() == "identifier" then
-              return vim.treesitter.get_node_text(grandchild, bufnr)
-            end
-          end
-        end
-      end
+    local sline, _, eline, _ = node:range()
+    sline = sline + 1
+    eline = eline + 1
+
+    local inside_range = between(sline, start_line, end_line)
+      or between(eline, start_line, end_line)
+      or between(start_line, sline, eline)
+      or between(end_line, sline, eline)
+
+    -- Get the function name node (first child of type identifier)
+    local test_name = get_test_name(node, bufnr)
+    if test_name ~= nil and inside_range then
+      table.insert(tests, {
+        start_line = sline,
+        end_line = eline,
+        name = test_name,
+      })
     end
   end
-  return nil
+
+  return tests
+end
+
+local unique_items = function(items)
+  local unique = {}
+  for _, item in ipairs(items) do
+    unique[item] = true
+  end
+
+  local result = {}
+  for item, _ in pairs(unique) do
+    table.insert(result, item)
+  end
+
+  return result
+end
+
+local get_tests_in_range = function(start_line, end_line)
+  local tests = M.get_test_names(start_line, end_line)
+  local tests_names = {}
+  for _, test in ipairs(tests) do
+    table.insert(tests_names, test.name)
+  end
+  return unique_items(tests_names)
+end
+
+vim.api.nvim_create_user_command("GetTestNames", function(args)
+  local start_line, end_line = args.line1, args.line2
+  vim.print(get_tests_in_range(start_line, end_line))
+end, { range = true })
+
+local function get_test_under_cursor()
+  local current_line = vim.api.nvim_win_get_cursor(0)[1]
+  return get_tests_in_range(current_line, current_line)
 end
 
 local job_id = 0
@@ -69,7 +129,7 @@ end
 --Run the test in the current file
 --@param args table
 --@param test_name string
-function M.run_test(args, test_name)
+function M.run_test(args, test_names)
   local file_path = vim.fn.expand("%:p")
   local python_executable = vim.fn.exepath("python")
   if python_executable == "" then
@@ -78,8 +138,10 @@ function M.run_test(args, test_name)
   end
 
   local test_command = python_executable .. " -m pytest " .. file_path
-  if test_name then
-    test_command = test_command .. " -k " .. test_name
+
+  local selected = table.concat(test_names, " or ")
+  if selected ~= "" then
+    test_command = test_command .. " -k '" .. selected .. "'"
   end
 
   if args and args.args and args.args ~= "" then
@@ -90,17 +152,30 @@ function M.run_test(args, test_name)
   M.send_command(test_command)
 end
 
-vim.api.nvim_create_user_command("RunTest", function(args)
-  local test_name = get_test_name()
-  if test_name == nil then
-    vim.notify("No test found", vim.log.levels.ERROR)
-    return
+local run_tests = function(args)
+  local start_line, end_line
+
+  if args.range ~= 0 then
+    start_line, end_line = args.line1, args.line2
+  else
+    local current_line = vim.api.nvim_win_get_cursor(0)[1]
+    start_line, end_line = current_line, current_line
   end
 
-  M.run_test(args, test_name)
-end, { nargs = "*" })
+  local tests = get_tests_in_range(start_line, end_line)
+  M.run_test(args, tests)
+end
 
-vim.api.nvim_create_user_command("RunTests", M.run_test, { nargs = "*" })
+vim.api.nvim_create_user_command("DRunTests", function(args)
+  args.args = args.args .. " --pdb"
+  return run_tests(args)
+end, { nargs = "*", range = true })
+
+vim.api.nvim_create_user_command(
+  "RunTests",
+  run_tests,
+  { nargs = "*", range = true }
+)
 
 -- Create a small terminal
 vim.keymap.set("n", "<leader>st", function()
