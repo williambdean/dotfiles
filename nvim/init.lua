@@ -250,47 +250,6 @@ vim.cmd([[
     command! Note execute 'edit ' .. expand('%:p:h') .. '/note.md'
 ]])
 
--- Function to toggle file in a vertical split
-local function toggle_file_in_vsplit(file)
-  local current_win = vim.api.nvim_get_current_win()
-  local wins = vim.api.nvim_tabpage_list_wins(0)
-  local notes_bufnr = -1
-
-  for _, win in ipairs(wins) do
-    local bufnr = vim.api.nvim_win_get_buf(win)
-    local bufname = vim.api.nvim_buf_get_name(bufnr)
-    if bufname:match(file .. "$") then
-      notes_bufnr = bufnr
-      vim.api.nvim_win_close(win, true)
-      return
-    end
-  end
-
-  if notes_bufnr == -1 then
-    vim.cmd("rightbelow vsplit " .. file)
-    vim.cmd("wincmd l") -- Move to the newly created split
-  end
-end
-
-local function create_file_toggle(file)
-  return function()
-    toggle_file_in_vsplit(file)
-  end
-end
-
-local toggles = {
-  { mapping = "<leader>N", file = "note.md" },
-  { mapping = "<leader>P", file = "script.py" },
-}
-for _, toggle in ipairs(toggles) do
-  vim.keymap.set(
-    "n",
-    toggle.mapping,
-    create_file_toggle(toggle.file),
-    { noremap = true, silent = true, desc = "Toggle " .. toggle.file }
-  )
-end
-
 local function is_url(text)
   return text:match("^https?://") ~= nil
 end
@@ -350,3 +309,4 @@ vim.o.updatetime = 100
 
 require("config.terminal")
 require("config.issues_prs")
+require("config.quick_files")
