@@ -59,6 +59,7 @@ return {
           { name = "buffer" },
           { name = "path" },
           { name = "copilot" },
+          { name = "graphql" },
         },
       })
       cmp.setup.filetype("copilot-chat", {

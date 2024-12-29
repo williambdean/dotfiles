@@ -160,6 +160,7 @@ return {
       require("nvim-treesitter.configs").setup({
         ensure_installed = {
           "python",
+          "graphql",
         },
         highlight = {
           enable = true,

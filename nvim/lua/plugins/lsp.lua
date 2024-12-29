@@ -93,7 +93,8 @@ return {
       require("mason-lspconfig").setup()
 
       local lspconfig = require("lspconfig")
-      lspconfig.graphql.setup({})
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      lspconfig.graphql.setup({ capabilities = capabilities })
       lspconfig.ruff.setup({
         on_new_config = function(config, root_dir)
           -- Look for .venv directory in the project root
