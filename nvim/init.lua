@@ -310,3 +310,4 @@ vim.o.updatetime = 100
 require("config.terminal")
 require("config.issues_prs")
 require("config.quick_files")
+require("config.github_queries")
