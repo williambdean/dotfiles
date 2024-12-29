@@ -3,10 +3,22 @@ local gh = require("octo.gh")
 
 local sync_github_cli_query = function(query)
   local output = gh.run({
-    args = { "api", "graphql", "-f", "query=" .. query },
+    args = {
+      "api",
+      "graphql",
+      "--paginate",
+      "--slurp",
+      "-f",
+      "query=" .. query,
+    },
     mode = "sync",
   })
-  return vim.fn.json_decode(output)
+  local resp = vim.fn.json_decode(output)
+  if #resp == 1 then
+    return resp[1]
+  end
+
+  return resp
 end
 
 local function execute_query(start_line, end_line)
