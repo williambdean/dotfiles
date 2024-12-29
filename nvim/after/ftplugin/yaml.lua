@@ -1,9 +1,11 @@
 -- Taken from https://www.youtube.com/watch?v=pKCzpfqBbYs
-vim.opt_local.cursorcolumn = true
-vim.opt_local.shiftwidth = 2
-vim.opt_local.softtabstop = 2
-vim.opt_local.tabstop = 2
-vim.opt_local.expandtab = true
+local set = vim.opt_local
+
+set.cursorcolumn = true
+set.expandtab = true
+set.shiftwidth = 2
+set.softtabstop = 2
+set.tabstop = 2
 
 require("lspconfig").yamlls.setup({
   settings = {
