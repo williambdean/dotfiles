@@ -14,16 +14,13 @@ local sync_github_cli_query = function(opts)
     config.values.timeout = opts.timeout * 1000
   end
 
-  local output = gh.run({
-    args = {
-      "api",
-      "graphql",
-      "--paginate",
-      "--slurp",
-      "-f",
-      "query=" .. opts.query,
+  local output = gh.graphql({
+    query = opts.query,
+    paginate = true,
+    slurp = true,
+    opts = {
+      mode = "sync",
     },
-    mode = "sync",
   })
   local resp = vim.fn.json_decode(output)
 
