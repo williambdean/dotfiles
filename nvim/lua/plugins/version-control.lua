@@ -34,6 +34,30 @@ vim.api.nvim_create_user_command("CreateIssue", function(opts)
   create_issue({ title = title, body = body })
 end, { range = true })
 
+local remove_visual_selection = function()
+  vim.api.nvim_feedkeys(
+    vim.api.nvim_replace_termcodes("<Esc>", true, false, true),
+    "n",
+    false
+  )
+end
+
+local create_reference_issue = function(args)
+  local title = vim.fn.input("Title: ")
+  local body = vim.fn.input("Body: ")
+  body = body .. "\n\n" .. args
+  create_issue({ title = title, body = body })
+  remove_visual_selection()
+end
+
+---Create reference issue
+vim.keymap.set("v", "<leader>cri", function()
+  require("gitlinker").get_buf_range_url("v", {
+    print_url = false,
+    action_callback = create_reference_issue,
+  })
+end, {})
+
 vim.api.nvim_create_user_command("CloseIssue", function(opts)
   require("config.github").close_issue()
 end, {})
