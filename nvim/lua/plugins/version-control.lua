@@ -5,11 +5,17 @@ local function create_issue(opts)
   local body = opts.body or ""
 
   local gh = require("octo.gh")
+  local gh_utils = require("octo.utils")
 
   local args = { "issue", "create", "--title", title, "--body", body }
   gh.run({
     args = args,
-    cb = function(_, _)
+    cb = function(_, stderr)
+      if stderr and stderr ~= "" then
+        vim.notify(stderr, vim.log.levels.ERROR)
+        return
+      end
+
       vim.notify("Created issue: " .. title)
     end,
   })
@@ -43,7 +49,7 @@ local remove_visual_selection = function()
 end
 
 local create_reference_issue = function(args)
-  local title = vim.fn.input("Title: ")
+  local title = vim.fn.input("Issue Title: ")
   local body = vim.fn.input("Body: ")
   body = body .. "\n\n" .. args
   create_issue({ title = title, body = body })
