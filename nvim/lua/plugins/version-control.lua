@@ -2,23 +2,17 @@
 -- @param opts A table containing the title and body of the issue.
 local function create_issue(opts)
   local title = opts.title
-  local body = opts.body
+  local body = opts.body or ""
 
-  local _, Job = pcall(require, "plenary.job")
-  if not Job then
-    return
-  end
+  local gh = require("octo.gh")
 
-  body = body or ""
-
-  Job:new({
-    enable_recording = true,
-    command = "gh",
-    args = { "issue", "create", "--title", title, "--body", body },
-    on_exit = vim.schedule_wrap(function()
+  local args = { "issue", "create", "--title", title, "--body", body }
+  gh.run({
+    args = args,
+    cb = function(_, _)
       vim.notify("Created issue: " .. title)
-    end),
-  }):start()
+    end,
+  })
 end
 
 vim.api.nvim_create_user_command("CreateIssue", function(opts)
