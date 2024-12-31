@@ -5,6 +5,7 @@ local config = require("octo.config")
 ---@class Query
 ---@field query string
 ---@field timeout number|nil The timeout in seconds
+---@field fields table
 
 ---@param opts Query
 ---@return table
@@ -18,6 +19,7 @@ local sync_github_cli_query = function(opts)
     query = opts.query,
     paginate = true,
     slurp = true,
+    fields = opts.fields,
     opts = {
       mode = "sync",
     },
@@ -36,7 +38,8 @@ end
 ---@param start_line number|nil
 ---@param end_line number|nil
 ---@param timeout number|nil The timeout in seconds
-local function execute_query(start_line, end_line, timeout)
+---@param fields table
+local function execute_query(start_line, end_line, timeout, fields)
   start_line = start_line or 0
   end_line = end_line or -1
   local lines = vim.api.nvim_buf_get_lines(0, start_line, end_line, false)
@@ -44,6 +47,7 @@ local function execute_query(start_line, end_line, timeout)
   return sync_github_cli_query({
     query = query,
     timeout = timeout,
+    fields = fields,
   })
 end
 
@@ -65,6 +69,7 @@ end
 ---@class QueryArgs
 ---@field file string The file to write the response to
 ---@field timeoout number The timeout in seconds
+---@field fields table
 
 ---@param args string
 ---@return QueryArgs
@@ -72,15 +77,18 @@ local parse_args = function(args)
   local file = ""
   local timeout = nil
   local split = vim.split(args, " ")
+  local fields = {}
   for _, arg in ipairs(split) do
     if arg:match(".json$") then
       file = arg
-    end
-    if arg:match("--timeout") then
+    elseif arg:match("--timeout") then
       timeout = tonumber(vim.split(arg, "=")[2])
+    elseif args ~= "" then
+      local key, value = unpack(vim.split(arg, "="))
+      fields[key] = value
     end
   end
-  return { file = file, timeout = timeout }
+  return { file = file, timeout = timeout, fields = fields }
 end
 
 vim.api.nvim_create_user_command("Query", function(args)
@@ -91,7 +99,8 @@ vim.api.nvim_create_user_command("Query", function(args)
   end
 
   local query_args = parse_args(args.args)
-  local resp = execute_query(start_line, end_line, query_args.timeout)
+  local resp =
+    execute_query(start_line, end_line, query_args.timeout, query_args.fields)
 
   local file = query_args.file
   if file ~= "" then
