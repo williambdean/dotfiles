@@ -1,5 +1,9 @@
 # Version control on dotfiles
 
+> [!WARNING]
+>
+> These are subject to change and constantly updating!
+
 
 > [!TIP]
 >
