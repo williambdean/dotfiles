@@ -1,5 +1,5 @@
 -- Pull in the wezterm API
-local wezterm = require("wezterm")
+local wezterm = require "wezterm"
 
 -- This will hold the configuration.
 local config = wezterm.config_builder()
@@ -30,11 +30,11 @@ config.harfbuzz_features = { "calt=0", "clig=0", "liga=0" }
 -- config.window_decorations = "NONE"
 
 -- Set custom font
-config.font = wezterm.font_with_fallback({
+config.font = wezterm.font_with_fallback {
   "JetBrains Mono",
   "Fira Code",
   "Noto Color Emoji",
-})
+}
 
 -- Set padding around the terminal
 config.window_padding = {
@@ -60,7 +60,7 @@ for i = 1, 9 do
   table.insert(config.keys, {
     key = tostring(i),
     mods = wezterm_key,
-    action = wezterm.action({ ActivateTab = i - 1 }),
+    action = wezterm.action { ActivateTab = i - 1 },
   })
 end
 -- Relative moving with CTRL+SHIFT+h/l or Left/RightArrow
@@ -74,7 +74,7 @@ for _, combo in ipairs(combos) do
   table.insert(config.keys, {
     key = combo.key,
     mods = wezterm_key,
-    action = wezterm.action({ ActivateTabRelative = combo.action }),
+    action = wezterm.action { ActivateTabRelative = combo.action },
   })
 end
 
