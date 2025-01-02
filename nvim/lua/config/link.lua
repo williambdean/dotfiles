@@ -1,4 +1,5 @@
 --- Link a Issue, PR, or Discussion in a buffer
+--- WIP until octo.nvim has better callback support
 
 local gh = require "octo.gh"
 local gh_picker = require "octo.picker"

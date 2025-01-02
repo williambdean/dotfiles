@@ -88,9 +88,9 @@ M.picker = function(opts)
   local start = opts.line1 - 1
   local stop = opts.line2
   local lines = vim.api.nvim_buf_get_lines(0, start, stop, false)
-  local opts = vim.deepcopy(dropdown_opts)
-  opts.cb = create_callback(start, stop, lines)
-  admonition_picker(opts)
+  local picker_opts = vim.deepcopy(dropdown_opts)
+  picker_opts.cb = create_callback(start, stop, lines)
+  admonition_picker(picker_opts)
 end
 
 return M
