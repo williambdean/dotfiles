@@ -5,7 +5,7 @@ local M = {}
 
 local function get_query_path(file_name)
   -- Get the current Neovim config directory (relative path)
-  local config_dir = vim.fn.stdpath("config")
+  local config_dir = vim.fn.stdpath "config"
 
   -- Concatenate with the relative path to your Treesitter query file
   local query_path = config_dir .. "/after/queries/python/" .. file_name
@@ -41,7 +41,7 @@ function M.get_test_names(start_line, end_line)
   local bufnr = vim.api.nvim_get_current_buf()
   local query = vim.treesitter.query.parse(
     "python",
-    vim.fn.join(vim.fn.readfile(get_query_path("tests.scm")), "\n")
+    vim.fn.join(vim.fn.readfile(get_query_path "tests.scm"), "\n")
   )
   local parser = vim.treesitter.get_parser(bufnr, "python")
   local tree = parser:parse()[1]
@@ -107,31 +107,53 @@ local function get_test_under_cursor()
   return get_tests_in_range(current_line, current_line)
 end
 
-local job_id = 0
+M.state = {
+  job_id = 0,
+  open = false,
+  bufnr = -1,
+}
+
+local reset_state = function()
+  M.state.job_id = 0
+  M.state.open = false
+  M.state.bufnr = -1
+end
 
 -- Open a terminal window
 -- @param right boolean
 function M.open_terminal(right)
-  vim.cmd.vnew()
-  vim.cmd.term()
-  if right then
-    vim.cmd("wincmd L")
+  if M.state.open then
+    return
   end
 
-  job_id = vim.bo.channel
-  return job_id
+  vim.cmd.split()
+  vim.cmd.term()
+
+  if right then
+    vim.cmd "wincmd L"
+  end
+
+  M.state.job_id = vim.bo.channel
+  M.state.open = true
+  M.state.bufnr = vim.api.nvim_get_current_buf()
+
+  -- Register the autocommand for the specific terminal buffer
+  vim.api.nvim_create_autocmd("BufWinLeave", {
+    buffer = M.state.bufnr,
+    callback = reset_state,
+  })
 end
 
 function M.send_command(command, id)
-  vim.fn.chansend(id or job_id, command .. "\r\n")
+  vim.fn.chansend(id or M.state.job_id, command .. "\r\n")
 end
 
 --Run the test in the current file
 --@param args table
 --@param test_name string
 function M.run_test(args, test_names)
-  local file_path = vim.fn.expand("%:p")
-  local python_executable = vim.fn.exepath("python")
+  local file_path = vim.fn.expand "%:p"
+  local python_executable = vim.fn.exepath "python"
   if python_executable == "" then
     vim.notify("Python executable not found", vim.log.levels.ERROR)
     return
@@ -180,7 +202,7 @@ vim.api.nvim_create_user_command(
 -- Create a small terminal
 vim.keymap.set("n", "<leader>st", function()
   M.open_terminal()
-  vim.cmd.wincmd("J")
+  vim.cmd.wincmd "J"
   vim.api.nvim_win_set_height(0, 10)
 end)
 
@@ -193,5 +215,27 @@ function M.example()
     M.send_command(test_command)
   end, 750)
 end
+
+function M.get_visual_lines()
+  local start_pos = vim.fn.getpos "'<"
+  local end_pos = vim.fn.getpos "'>"
+  local start_line = start_pos[2] - 1
+  local end_line = end_pos[2] + 1
+  return vim.api.nvim_buf_get_lines(0, start_line, end_line, false)
+end
+
+vim.api.nvim_create_user_command("GetVisualLines", function()
+  local lines = M.get_visual_lines()
+  vim.notify(table.concat(lines, "\n"))
+end, { range = true })
+
+function M.get_buffer_lines()
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  return table.concat(lines, "\n")
+end
+
+vim.api.nvim_create_user_command("TerminalStatus", function()
+  vim.notify(vim.inspect(M.state))
+end, {})
 
 return M

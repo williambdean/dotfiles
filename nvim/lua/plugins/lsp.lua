@@ -11,12 +11,12 @@ local function get_stylua_config()
       -- library = vim.api.nvim_get_runtime_file("", true),
       checkThirdParty = false,
       storage = {
-        path = vim.fn.stdpath("cache") .. "/lua_ls/workspace",
+        path = vim.fn.stdpath "cache" .. "/lua_ls/workspace",
       },
       library = {
         cache = {
           enabled = true,
-          path = vim.fn.stdpath("cache") .. "/lua_ls/library",
+          path = vim.fn.stdpath "cache" .. "/lua_ls/library",
           rate = 0.1,
         },
       },
@@ -31,11 +31,11 @@ local function get_stylua_config()
 end
 
 local function get_stylua_config_old()
-  local util = require("lspconfig.util")
+  local util = require "lspconfig.util"
 
   local stylua_config_path = util.path.join(vim.fn.getcwd(), ".stylua.toml")
   if util.path.exists(stylua_config_path) then
-    print("Using the local .stylua.toml")
+    print "Using the local .stylua.toml"
     return {
       format = {
         enable = true,
@@ -74,11 +74,11 @@ return {
       },
     },
     config = function()
-      require("mason").setup({
+      require("mason").setup {
         pip = {
           upgrade_pip = true,
         },
-      })
+      }
     end,
   },
   {
@@ -87,15 +87,15 @@ return {
     depends = {
       "williamboman/mason.nvim",
       "neovim/nvim-lspconfig",
+      "hrsh7th/cmp-nvim-lsp",
     },
     config = function()
       require("mason").setup()
       require("mason-lspconfig").setup()
 
-      local lspconfig = require("lspconfig")
+      local lspconfig = require "lspconfig"
       local capabilities = vim.lsp.protocol.make_client_capabilities()
-      lspconfig.graphql.setup({ capabilities = capabilities })
-      lspconfig.ruff.setup({
+      lspconfig.ruff.setup {
         on_new_config = function(config, root_dir)
           -- Look for .venv directory in the project root
           local venv_path = vim.fn.finddir(".venv", root_dir .. ";")
@@ -106,8 +106,24 @@ return {
             }
           end
         end,
-      })
-      lspconfig.pyright.setup({
+      }
+      lspconfig.graphql.setup {
+        capabilities = capabilities,
+        cmd = { "graphql-lsp", "server", "-m", "stream" },
+        filetypes = { "graphql", "gql" },
+        root_dir = lspconfig.util.root_pattern(
+          ".git",
+          ".graphqlrc*",
+          "graphql.config.*",
+          "graphql.config.*"
+        ),
+        settings = {
+          graphql = {
+            schema = "/home/wdean/schema.docs.graphql",
+          },
+        },
+      }
+      lspconfig.pyright.setup {
         on_init = function(client)
           client.config.settings = {
             python = {
@@ -138,9 +154,9 @@ return {
             }
           end
         end,
-      })
-      lspconfig.harper_ls.setup({})
-      lspconfig.lua_ls.setup({
+      }
+      lspconfig.harper_ls.setup {}
+      lspconfig.lua_ls.setup {
         settings = {
           Lua = get_stylua_config(),
         },
@@ -148,7 +164,7 @@ return {
         flags = {
           debounce_text_changes = 150,
         },
-      })
+      }
 
       local group = vim.api.nvim_create_augroup("UserLspConfig", {})
       vim.api.nvim_create_autocmd("LspAttach", {
@@ -169,7 +185,7 @@ return {
       -- Define a global variable to control formatting
       vim.g.lsp_format_enabled = true
 
-      vim.diagnostic.config({
+      vim.diagnostic.config {
         virtual_text = {
           prefix = "●", -- Could be '●', '▎', 'x'
           source = "if_many", -- Or "always"
@@ -181,7 +197,7 @@ return {
         underline = true,
         update_in_insert = false,
         severity_sort = true,
-      })
+      }
 
       local async = false
 
@@ -191,7 +207,7 @@ return {
         group = group,
         callback = function()
           if vim.g.lsp_format_enabled then
-            vim.lsp.buf.format({ async = async })
+            vim.lsp.buf.format { async = async }
           end
         end,
       })
@@ -206,14 +222,14 @@ return {
       end, {})
 
       vim.api.nvim_create_user_command("LspFormat", function()
-        vim.lsp.buf.format({ async = async })
+        vim.lsp.buf.format { async = async }
       end, {})
 
       -- Add the diagnostics to the right of the screen
       -- instead of the left side which pushes it out
-      vim.diagnostic.config({
+      vim.diagnostic.config {
         virtual_text = true,
-      })
+      }
     end,
   },
   {

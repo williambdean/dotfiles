@@ -1,13 +1,13 @@
 -- Additional commands for interacting with GitHub issues
-local pickers = require("telescope.pickers")
-local finders = require("telescope.finders")
+local pickers = require "telescope.pickers"
+local finders = require "telescope.finders"
 local conf = require("telescope.config").values
-local actions = require("telescope.actions")
-local action_state = require("telescope.actions.state")
-local themes = require("telescope.themes")
+local actions = require "telescope.actions"
+local action_state = require "telescope.actions.state"
+local themes = require "telescope.themes"
 
-local octo_commands = require("octo.commands")
-local octo_utils = require("octo.utils")
+local octo_commands = require "octo.commands"
+local octo_utils = require "octo.utils"
 
 local M = {}
 
@@ -18,7 +18,7 @@ local options = {
 }
 
 -- Taken from octo.nvim/pickers/telescope/provider.lua
-local dropdown_opts = themes.get_dropdown({
+local dropdown_opts = themes.get_dropdown {
   layout_config = {
     width = 0.4,
     height = 15,
@@ -26,18 +26,18 @@ local dropdown_opts = themes.get_dropdown({
   prompt_title = false,
   results_title = false,
   previewer = false,
-})
+}
 
 function M.close_issue()
   local bufnr = vim.api.nvim_get_current_buf()
   local buffer = _G.octo_buffers[bufnr]
   if not buffer then
-    octo_utils.notify("Not in an Octo buffer")
+    octo_utils.notify "Not in an Octo buffer"
     return
   end
 
   if not buffer:isIssue() then
-    octo_utils.notify("Not an issue buffer")
+    octo_utils.notify "Not an issue buffer"
     return
   end
 
@@ -45,7 +45,7 @@ function M.close_issue()
   pickers
     .new(opts, {
       prompt_title = "Close Issue",
-      finder = finders.new_table({
+      finder = finders.new_table {
         results = options,
         entry_maker = function(entry)
           return {
@@ -54,7 +54,7 @@ function M.close_issue()
             ordinal = entry.display,
           }
         end,
-      }),
+      },
       sorter = conf.generic_sorter(opts),
       attach_mappings = function(prompt_bufnr, map)
         actions.select_default:replace(function()

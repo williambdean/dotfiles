@@ -3,7 +3,7 @@ local docstrings_are_folded = {}
 -- Define a function to get the absolute path to the query file
 local function get_query_path(file_name)
   -- Get the current Neovim config directory (relative path)
-  local config_dir = vim.fn.stdpath("config")
+  local config_dir = vim.fn.stdpath "config"
 
   -- Concatenate with the relative path to your Treesitter query file
   local query_path = config_dir .. "/after/queries/python/" .. file_name
@@ -40,7 +40,7 @@ local function process_docstrings(action)
   local bufnr = vim.api.nvim_get_current_buf()
   local query = vim.treesitter.query.parse(
     "python",
-    vim.fn.join(vim.fn.readfile(get_query_path("python_docstrings.scm")), "\n")
+    vim.fn.join(vim.fn.readfile(get_query_path "python_docstrings.scm"), "\n")
   )
   local parser = vim.treesitter.get_parser(bufnr, "python")
   local tree = parser:parse()[1]
@@ -61,7 +61,7 @@ end
 local function fold_docstrings()
   -- Needs to be a python file
   if vim.bo.filetype ~= "python" then
-    vim.notify("This command only works for Python files")
+    vim.notify "This command only works for Python files"
     return
   end
 
@@ -72,18 +72,18 @@ local function fold_docstrings()
   end
 
   if docstrings_are_folded[bufnr] then
-    vim.notify("The docstrings are already folded")
+    vim.notify "The docstrings are already folded"
     return
   end
 
-  process_docstrings("fold")
+  process_docstrings "fold"
   docstrings_are_folded[bufnr] = true
 end
 
 local function unfold_docstrings()
   -- Needs to be a python file
   if vim.bo.filetype ~= "python" then
-    vim.notify("This command only works for Python files")
+    vim.notify "This command only works for Python files"
     return
   end
 
@@ -94,11 +94,11 @@ local function unfold_docstrings()
   end
 
   if not docstrings_are_folded[bufnr] then
-    vim.notify("The docstrings are already unfolded")
+    vim.notify "The docstrings are already unfolded"
     return
   end
 
-  process_docstrings("foldopen")
+  process_docstrings "foldopen"
   docstrings_are_folded[bufnr] = false
 end
 
@@ -152,12 +152,12 @@ return {
             return
           end
 
-          vim.cmd("FoldDocstrings")
+          vim.cmd "FoldDocstrings"
         end,
         group = fold_docstrings_group,
       })
 
-      require("nvim-treesitter.configs").setup({
+      require("nvim-treesitter.configs").setup {
         ensure_installed = {
           "python",
           "graphql",
@@ -200,7 +200,7 @@ return {
             },
           },
         },
-      })
+      }
     end,
   },
 }

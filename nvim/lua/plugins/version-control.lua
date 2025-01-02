@@ -4,21 +4,21 @@ local function create_issue(opts)
   local title = opts.title
   local body = opts.body or ""
 
-  local gh = require("octo.gh")
-  local gh_utils = require("octo.utils")
+  local gh = require "octo.gh"
+  local gh_utils = require "octo.utils"
 
   local args = { "issue", "create", "--title", title, "--body", body }
-  gh.run({
+  gh.run {
     args = args,
     cb = function(_, stderr)
       if stderr and stderr ~= "" then
-        vim.notify(stderr, vim.log.levels.ERROR)
+        gh_utils.error(stderr)
         return
       end
 
       vim.notify("Created issue: " .. title)
     end,
-  })
+  }
 end
 
 vim.api.nvim_create_user_command("CreateIssue", function(opts)
@@ -27,7 +27,7 @@ vim.api.nvim_create_user_command("CreateIssue", function(opts)
   local lines = vim.api.nvim_buf_get_lines(0, start, stop, false)
 
   if #lines == 0 then
-    vim.notify("No lines selected")
+    vim.notify "No lines selected"
     return
   end
 
@@ -37,7 +37,7 @@ vim.api.nvim_create_user_command("CreateIssue", function(opts)
   title = vim.trim(title)
   body = vim.trim(body)
 
-  create_issue({ title = title, body = body })
+  create_issue { title = title, body = body }
 end, { range = true })
 
 local remove_visual_selection = function()
@@ -49,10 +49,11 @@ local remove_visual_selection = function()
 end
 
 local create_reference_issue = function(args)
-  local title = vim.fn.input("Issue Title: ")
-  local body = vim.fn.input("Body: ")
+  local title = vim.fn.input "Issue Title: "
+  local body = vim.fn.input "Body: "
   body = body .. "\n\n" .. args
-  create_issue({ title = title, body = body })
+  body = vim.trim(body)
+  create_issue { title = title, body = body }
   remove_visual_selection()
 end
 
@@ -65,17 +66,17 @@ vim.keymap.set("v", "<leader>cri", function()
 end, {})
 
 vim.api.nvim_create_user_command("CloseIssue", function(opts)
-  require("config.github").close_issue()
+  require("config.close-issue").close_issue()
 end, {})
 
 local function current_buffer()
-  local utils = require("octo.utils")
+  local utils = require "octo.utils"
 
   local bufnr = vim.api.nvim_get_current_buf()
   local buffer = octo_buffers[bufnr]
 
   if not buffer then
-    utils.error("Not in an octo buffer")
+    utils.error "Not in an octo buffer"
     return
   end
 
@@ -88,13 +89,13 @@ vim.keymap.set("n", "<leader>B", function()
 end, { silent = true })
 
 local function current_author()
-  local utils = require("octo.utils")
+  local utils = require "octo.utils"
 
   local bufnr = vim.api.nvim_get_current_buf()
   local buffer = octo_buffers[bufnr]
 
   if not buffer then
-    utils.error("Not in an octo buffer")
+    utils.error "Not in an octo buffer"
     return
   end
 
@@ -134,15 +135,15 @@ local function is_issue(number)
 end
 
 local function open_github_as_octo_buffer()
-  local utils = require("octo.utils")
-  local word = vim.fn.expand("<cWORD>")
+  local utils = require "octo.utils"
+  local word = vim.fn.expand "<cWORD>"
 
   local match_string = "https://github.com/([%w-]+)/([%w-.]+)/(%w+)/(%d+)"
   local github_link = word:match(match_string)
-  local number = word:match("#(%d+)")
+  local number = word:match "#(%d+)"
 
   if not github_link and not number then
-    vim.cmd([[normal! gf]])
+    vim.cmd [[normal! gf]]
     return
   end
 
@@ -189,14 +190,14 @@ return {
       table.insert(require("cmp").get_config().sources, { name = "git" })
     end,
     config = function()
-      require("cmp_git").setup({
+      require("cmp_git").setup {
         filetypes = {
           "gitcommit",
           "octo",
           -- Based on the gh pr create popup
           "markdown",
         },
-      })
+      }
     end,
   },
   {
@@ -218,13 +219,34 @@ return {
       },
     },
     config = function()
-      require("octo").setup({
+      require("octo").setup {
         -- default_to_projects_v2 = true,
         use_local_fs = false,
         enable_builtin = true,
         default_to_projects_v2 = true,
         users = "mentionable",
         timeout = 15000,
+        commands = {
+          auth = {
+            status = function()
+              local output = vim.fn.system "gh auth status --active"
+              vim.notify(output)
+            end,
+            switch = function(user)
+              vim.notify("Switching to user: " .. user)
+            end,
+          },
+          milestone = {
+            crazy_new = function()
+              vim.notify "Creating a new milestone"
+            end,
+          },
+          -- some_new_command = {
+          --   new = function()
+          --     vim.notify("Creating a new command")
+          --   end,
+          -- },
+        },
         pull_requests = {
           order_by = {
             field = "UPDATED_AT",
@@ -241,7 +263,7 @@ return {
         -- picker_config = {
         --     use_emojis = true,
         -- },
-      })
+      }
 
       -- I have my cursor over a link that looks like this
       -- https://github.com/pwntester/octo.nvim/issue/1
@@ -253,7 +275,7 @@ return {
 
       -- Use telescope to find a commit hash and add it where the cursor is
       vim.keymap.set("n", "<leader>ch", function()
-        require("telescope.builtin").git_commits({
+        require("telescope.builtin").git_commits {
           attach_mappings = function(_, map)
             map("i", "<CR>", function(bufnr)
               local value =
@@ -265,7 +287,7 @@ return {
             end)
             return true
           end,
-        })
+        }
       end, { silent = true })
 
       vim.keymap.set("i", "@", "@<C-x><C-o>", { buffer = true, silent = true })

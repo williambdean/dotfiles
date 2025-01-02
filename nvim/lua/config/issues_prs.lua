@@ -1,6 +1,6 @@
 -- Create a floating window with Issue and PR information for the current branch
-local gh = require("octo.gh")
-local utils = require("octo.utils")
+local gh = require "octo.gh"
+local utils = require "octo.utils"
 
 local M = {}
 
@@ -46,10 +46,10 @@ local closing_issue = function(pr_number)
   local remote_split = vim.split(remote_name, "/")
   local owner, name = remote_split[1], remote_split[2]
   local query = string.format(closing_issues_query, owner, name, pr_number)
-  local output = gh.run({
+  local output = gh.run {
     args = { "api", "graphql", "-f", string.format("query=%s", query) },
     mode = "sync",
-  })
+  }
   local resp = vim.fn.json_decode(output)
   local references =
     resp.data.repository.pullRequest.closingIssuesReferences.nodes
@@ -64,7 +64,7 @@ local closing_issue = function(pr_number)
   end
 
   if #numbers > 1 then
-    vim.notify("Multiple issues associated with the PR. Using the first one.")
+    vim.notify "Multiple issues associated with the PR. Using the first one."
   end
 
   return numbers[1]
@@ -161,17 +161,17 @@ local hide = function(kind)
 end
 
 local hide_pr = function()
-  hide("pull_request")
+  hide "pull_request"
 end
 
 local hide_issue = function()
-  hide("issue")
+  hide "issue"
 end
 
 ---Toggle the floating window and open the file if it's not open
 local toggle = function(item, file)
   if not vim.api.nvim_win_is_valid(item.floating.win) then
-    item.floating = M.create_floating_window({ buf = item.floating.buf })
+    item.floating = M.create_floating_window { buf = item.floating.buf }
     local current_file = vim.api.nvim_buf_get_name(item.floating.buf)
     if current_file ~= file then
       vim.cmd.edit(file)
@@ -185,7 +185,7 @@ end
 M.toggle_issue = function()
   local issue_number = get_issue()
   if issue_number == nil then
-    vim.notify("No issue associated with the current branch")
+    vim.notify "No issue associated with the current branch"
     return
   end
 
@@ -201,7 +201,7 @@ end
 M.toggle_pr = function()
   local pr_number = get_pr()
   if pr_number == nil then
-    vim.notify("No PR associated with the current branch")
+    vim.notify "No PR associated with the current branch"
     return
   end
   state.pull_request.number = pr_number

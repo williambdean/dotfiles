@@ -3,7 +3,7 @@ local function switch_to_test_file()
   local current_file = vim.api.nvim_buf_get_name(bufnr)
 
   -- Check if file is a Python file
-  if not current_file:match("%.py$") then
+  if not current_file:match "%.py$" then
     vim.notify("Not a Python file", vim.log.levels.WARN)
     return
   end
@@ -18,8 +18,8 @@ local function switch_to_test_file()
   -- Remove cwd from the beginning of the path
   local relative_path = current_file:sub(#cwd + 1)
 
-  local first_dir = relative_path:match("^([^/]+)/")
-  local file_name = current_file:match("([^/]+)$")
+  local first_dir = relative_path:match "^([^/]+)/"
+  local file_name = current_file:match "([^/]+)$"
 
   -- Check if it's in tests directory
   local in_tests = first_dir == "tests"
@@ -57,8 +57,8 @@ vim.keymap.set(
 )
 
 function get_visual_selection()
-  local start_pos = vim.fn.getpos("'<")
-  local end_pos = vim.fn.getpos("'>")
+  local start_pos = vim.fn.getpos "'<"
+  local end_pos = vim.fn.getpos "'>"
   local start_line = start_pos[2]
   local end_line = end_pos[2]
   local lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)
@@ -67,7 +67,7 @@ end
 
 local function python_main_block()
   -- Go to the end of the file
-  vim.api.nvim_command("normal! G")
+  vim.api.nvim_command "normal! G"
   -- Insert Python main block
   vim.api.nvim_buf_set_lines(0, -1, -1, false, {
     "",
@@ -75,7 +75,7 @@ local function python_main_block()
     'if __name__ == "__main__":',
     "    # TODO: write your code here",
   })
-  vim.api.nvim_command("normal! G")
+  vim.api.nvim_command "normal! G"
 end
 
 local function random_seed()
@@ -110,14 +110,14 @@ function print_current_visual_selection()
   local code = table.concat(lines, "\n")
   local file = io.open("temp-python-script.py", "w")
   if file == nil then
-    vim.notify("Could not open file")
+    vim.notify "Could not open file"
     return
   end
 
   file:write(code)
   file:close()
-  os.execute("python temp-python-script.py")
-  os.remove("temp-python-script.py")
+  os.execute "python temp-python-script.py"
+  os.remove "temp-python-script.py"
 end
 
 vim.keymap.set(

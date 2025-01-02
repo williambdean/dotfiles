@@ -41,7 +41,7 @@ end
 local create_toggle = function(state)
   return function(file)
     if not vim.api.nvim_win_is_valid(state.win) then
-      state = M.create_floating_window({ buf = state.buf })
+      state = M.create_floating_window { buf = state.buf }
       local current_file = vim.api.nvim_buf_get_name(state.buf)
       if current_file ~= file then
         vim.cmd.edit(file)
@@ -73,7 +73,7 @@ local function create_toggle_file_in_vsplit(file)
 
     if notes_bufnr == -1 then
       vim.cmd("rightbelow vsplit " .. file)
-      vim.cmd("wincmd l") -- Move to the newly created split
+      vim.cmd "wincmd l" -- Move to the newly created split
     end
   end
 end

@@ -1,6 +1,6 @@
 local function quick_chat(with_buffer)
-  local chat = require("CopilotChat")
-  local select = require("CopilotChat.select")
+  local chat = require "CopilotChat"
+  local select = require "CopilotChat.select"
 
   local prompt = "Quick Chat: "
 
@@ -34,25 +34,26 @@ return {
       "CmdlineEnter",
     },
     config = function()
-      local cmp = require("cmp")
-      cmp.setup({
+      local cmp = require "cmp"
+      cmp.setup {
         snippet = {
           expand = function(args)
             vim.fn["vsnip#anonymous"](args.body)
           end,
         },
-
+        completion = {
+          keyword_length = 1, -- Set the minimum keyword length to trigger completion
+        },
         mapping = {
           ["<C-d>"] = cmp.mapping.scroll_docs(-4),
           ["<C-f>"] = cmp.mapping.scroll_docs(4),
           ["<C-Space>"] = cmp.mapping.complete(),
           ["<C-e>"] = cmp.mapping.close(),
-          ["<CR>"] = cmp.mapping.confirm({
+          ["<CR>"] = cmp.mapping.confirm {
             behavior = cmp.ConfirmBehavior.Insert,
             select = true,
-          }),
+          },
         },
-
         sources = {
           { name = "nvim_lsp" },
           { name = "vsnip" },
@@ -61,13 +62,13 @@ return {
           { name = "copilot" },
           { name = "graphql" },
         },
-      })
+      }
       cmp.setup.filetype("copilot-chat", {
-        sources = cmp.config.sources({
+        sources = cmp.config.sources {
           { name = "copilot" },
           { name = "buffer" },
           { name = "path" },
-        }),
+        },
       })
     end,
   },
@@ -133,7 +134,7 @@ return {
           -- end
         end,
       })
-      require("CopilotChat").setup({
+      require("CopilotChat").setup {
         debug = false,
         chat_autocomplete = true,
         auto_follow_cursor = true,
@@ -151,12 +152,10 @@ return {
           },
         },
         build = function()
-          vim.notify(
-            "Please update the remote plugins by running :UpdateRemotePlugins, the"
-          )
+          vim.notify "Please update the remote plugins by running :UpdateRemotePlugins, the"
         end,
         event = "VeryLazy",
-      })
+      }
     end,
     keys = {
       {
@@ -183,7 +182,7 @@ return {
       {
         "<leader>cch",
         function()
-          local actions = require("CopilotChat.actions")
+          local actions = require "CopilotChat.actions"
           require("CopilotChat.integrations.telescope").pick(
             actions.help_actions()
           )
@@ -193,10 +192,10 @@ return {
       {
         "<leader>ccp",
         function()
-          local actions = require("CopilotChat.actions")
-          local select = require("CopilotChat.select")
+          local actions = require "CopilotChat.actions"
+          local select = require "CopilotChat.select"
           require("CopilotChat.integrations.telescope").pick(
-            actions.prompt_actions({ selection = select.buffer })
+            actions.prompt_actions { selection = select.buffer }
           )
         end,
         desc = "CopilotChat - Prompt actions",
@@ -204,10 +203,10 @@ return {
       {
         "<leader>ccv",
         function()
-          local chat = require("CopilotChat")
-          local select = require("CopilotChat.select")
+          local chat = require "CopilotChat"
+          local select = require "CopilotChat.select"
 
-          local question = vim.fn.input("Quick Chat (Visual): ")
+          local question = vim.fn.input "Quick Chat (Visual): "
           chat.ask(question, { selection = select.visual })
         end,
         mode = "v",
@@ -216,10 +215,10 @@ return {
       {
         "<leader>cci",
         function()
-          local chat = require("CopilotChat")
-          local select = require("CopilotChat.select")
+          local chat = require "CopilotChat"
+          local select = require "CopilotChat.select"
 
-          local question = vim.fn.input("Quick Chat (Visual): ")
+          local question = vim.fn.input "Quick Chat (Visual): "
           chat.ask(question, {
             selection = select.visual,
             window = {

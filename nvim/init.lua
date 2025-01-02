@@ -1,14 +1,14 @@
 local opt = vim.opt
 
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  vim.fs({
+  vim.fs {
     "git",
     "clone",
     "--filter=blob:none",
     "https://github.com/folke/lazy.nvim.git",
     "--branch=stable",
-  })
+  }
 end
 opt.rtp:prepend(lazypath)
 
@@ -16,8 +16,9 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
 opt.termguicolors = true
+opt.showmode = false
 
-require("lazy").setup({
+require("lazy").setup {
   spec = {
     { import = "plugins" },
     {
@@ -100,7 +101,7 @@ require("lazy").setup({
         {
           "<leader>?",
           function()
-            require("which-key").show({ global = false })
+            require("which-key").show { global = false }
           end,
           desc = "Buffer Local Keymaps (which-key)",
         },
@@ -110,7 +111,7 @@ require("lazy").setup({
   ui = {
     backdrop = 50,
   },
-})
+}
 
 -- Zoom in and make the "o"nly window
 vim.keymap.set(
@@ -165,7 +166,7 @@ opt.scrolloff = 15
 opt.relativenumber = true
 -- Highlight line numbers
 -- vim.cmd("highlight LineNr guifg=#5eacd3")       -- Change the color code as per your preference
-vim.cmd("highlight CursorLineNr guifg=#fabd2f") -- Change the color code as per your preference
+vim.cmd "highlight CursorLineNr guifg=#fabd2f" -- Change the color code as per your preference
 opt.cursorline = true
 -- Turn off the line across the screen
 opt.cursorlineopt = "number"
@@ -174,11 +175,11 @@ opt.cursorlineopt = "number"
 opt.encoding = "utf-8"
 
 -- Configure backspace behavior
-opt.backspace:remove("indent")
-opt.backspace:append({ "indent", "eol", "start" })
+opt.backspace:remove "indent"
+opt.backspace:append { "indent", "eol", "start" }
 
 -- Copy and paste to system clipboard
-vim.cmd("set clipboard+=unnamedplus")
+vim.cmd "set clipboard+=unnamedplus"
 -- vim.api.nvim_set_keymap("v", "<leader>y", '"*y', { noremap = true })
 --
 
@@ -207,13 +208,13 @@ opt.signcolumn = "yes"
 
 -- Set color column
 opt.colorcolumn = "88"
-vim.cmd("highlight ColorColumn ctermbg=0 guibg=grey")
-vim.cmd([[
+vim.cmd "highlight ColorColumn ctermbg=0 guibg=grey"
+vim.cmd [[
     autocmd FileType octo setlocal colorcolumn=0
-]])
-vim.cmd([[
+]]
+vim.cmd [[
     autocmd FileType copilot-chat setlocal colorcolumn=0
-]])
+]]
 
 -- Terminal mode escape key
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true })
@@ -229,7 +230,7 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz", { noremap = true })
 vim.keymap.set("n", "n", "nzz", { noremap = true })
 vim.keymap.set("n", "N", "Nzz", { noremap = true })
 
-vim.cmd("command! JsonPrettify %!jq .")
+vim.cmd "command! JsonPrettify %!jq ."
 
 local group = vim.api.nvim_create_augroup("InitGroup", { clear = true })
 vim.api.nvim_create_autocmd({ "TermOpen", "TextYankPost" }, {
@@ -237,26 +238,26 @@ vim.api.nvim_create_autocmd({ "TermOpen", "TextYankPost" }, {
   pattern = "*",
   callback = function(ev)
     if ev.event == "TermOpen" then
-      vim.cmd("startinsert | set winfixheight")
+      vim.cmd "startinsert | set winfixheight"
       vim.opt_local.number = false
       vim.opt_local.relativenumber = false
     else
-      vim.highlight.on_yank({ timeout = 250 })
+      vim.highlight.on_yank { timeout = 250 }
     end
   end,
 })
 
-vim.cmd([[
+vim.cmd [[
     command! Note execute 'edit ' .. expand('%:p:h') .. '/note.md'
-]])
+]]
 
 local function is_url(text)
-  return text:match("^https?://") ~= nil
+  return text:match "^https?://" ~= nil
 end
 
 -- Function to open URL under cursor
 local function open_url()
-  local cursor_word = vim.fn.expand("<cfile>")
+  local cursor_word = vim.fn.expand "<cfile>"
   if is_url(cursor_word) then
     vim.fn.system(string.format('wslview "%s"', cursor_word))
   end
@@ -267,7 +268,7 @@ vim.keymap.set("n", "gx", open_url, { noremap = true, silent = true })
 vim.g.netrw_browsex_viewer = "wslview"
 
 vim.o.background = "dark"
-vim.cmd([[colorscheme gruvbox]])
+vim.cmd [[colorscheme gruvbox]]
 
 -- Define transparency function
 local function enable_transparency()
@@ -307,7 +308,7 @@ vim.o.ttyfast = true
 -- Set updatetime for faster completion
 vim.o.updatetime = 100
 
-require("config.terminal")
-require("config.issues_prs")
-require("config.quick_files")
-require("config.github_queries")
+require "config.terminal"
+require "config.issues_prs"
+require "config.quick_files"
+require "config.github_queries"

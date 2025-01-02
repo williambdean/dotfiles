@@ -7,7 +7,7 @@ set.shiftwidth = 2
 set.softtabstop = 2
 set.tabstop = 2
 
-require("lspconfig").yamlls.setup({
+require("lspconfig").yamlls.setup {
   settings = {
     yaml = {
       validate = true,
@@ -19,4 +19,4 @@ require("lspconfig").yamlls.setup({
       },
     },
   },
-})
+}

@@ -7,7 +7,7 @@ return {
       "rcarriga/nvim-notify",
     },
     config = function()
-      require("noice").setup({
+      require("noice").setup {
         messages = {
           enabled = false,
         },
@@ -19,7 +19,7 @@ return {
           },
         },
         cmdline = {
-          enabled = false,
+          enabled = true,
         },
         views = {
           cmdline_popup = {
@@ -33,14 +33,14 @@ return {
           inc_rename = false,
           lsp_doc_border = false,
         },
-      })
+      }
     end,
   },
   {
     "NvChad/nvim-colorizer.lua",
     ft = { "python" },
     config = function()
-      require("colorizer").setup({})
+      require("colorizer").setup {}
     end,
   },
   {
@@ -85,7 +85,7 @@ return {
         { noremap = true, silent = true }
       )
 
-      require("notify").setup({
+      require("notify").setup {
         background_colour = "#000000",
         fps = 30,
         icons = {
@@ -102,7 +102,7 @@ return {
         stages = "fade_in_slide_out",
         timeout = 5000,
         top_down = true,
-      })
+      }
     end,
   },
 }

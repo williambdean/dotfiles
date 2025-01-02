@@ -1,6 +1,6 @@
 ---Create a command to execute a GraphQL query from a file
-local gh = require("octo.gh")
-local config = require("octo.config")
+local gh = require "octo.gh"
+local config = require "octo.config"
 
 ---@class Query
 ---@field query string
@@ -15,7 +15,7 @@ local sync_github_cli_query = function(opts)
     config.values.timeout = opts.timeout * 1000
   end
 
-  local output = gh.graphql({
+  local output = gh.graphql {
     query = opts.query,
     paginate = true,
     slurp = true,
@@ -23,7 +23,7 @@ local sync_github_cli_query = function(opts)
     opts = {
       mode = "sync",
     },
-  })
+  }
   local resp = vim.fn.json_decode(output)
 
   config.values.timeout = original_timeout
@@ -44,11 +44,11 @@ local function execute_query(start_line, end_line, timeout, fields)
   end_line = end_line or -1
   local lines = vim.api.nvim_buf_get_lines(0, start_line, end_line, false)
   local query = table.concat(lines, "\n")
-  return sync_github_cli_query({
+  return sync_github_cli_query {
     query = query,
     timeout = timeout,
     fields = fields,
-  })
+  }
 end
 
 local write_to_file = function(file, content)
@@ -69,8 +69,9 @@ end
 ---@class QueryArgs
 ---@field file string The file to write the response to
 ---@field timeoout number The timeout in seconds
----@field fields table
+---@field fields table The fields to include in the query. For instance, owner=wd60622
 
+---Parse the arguments passed to the Query command
 ---@param args string
 ---@return QueryArgs
 local parse_args = function(args)
@@ -79,9 +80,9 @@ local parse_args = function(args)
   local split = vim.split(args, " ")
   local fields = {}
   for _, arg in ipairs(split) do
-    if arg:match(".json$") then
+    if arg:match ".json$" then
       file = arg
-    elseif arg:match("--timeout") then
+    elseif arg:match "--timeout" then
       timeout = tonumber(vim.split(arg, "=")[2])
     elseif args ~= "" then
       local key, value = unpack(vim.split(arg, "="))
@@ -91,6 +92,8 @@ local parse_args = function(args)
   return { file = file, timeout = timeout, fields = fields }
 end
 
+---Run a GitHub query from the current buffer using the GitHub CLI.
+---The output is either printed to the screen or written to JSON file.
 vim.api.nvim_create_user_command("Query", function(args)
   local start_line, end_line
   if args.range ~= 0 then

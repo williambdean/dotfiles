@@ -1,11 +1,11 @@
 local is_git_repo = function()
-  local git_dir = vim.fn.system("git rev-parse --is-inside-work-tree")
+  local git_dir = vim.fn.system "git rev-parse --is-inside-work-tree"
   return vim.v.shell_error == 0
 end
 
 local find_site_packages = function()
   return vim.trim(
-    vim.fn.system("python -c 'import site; print(site.getsitepackages()[0])'")
+    vim.fn.system "python -c 'import site; print(site.getsitepackages()[0])'"
   )
 end
 
@@ -46,25 +46,25 @@ return {
       {
         "<leader>pf",
         function()
-          require("telescope.builtin").find_files({
+          require("telescope.builtin").find_files {
             cwd = find_site_packages(),
             glob_pattern = "*.py",
-          })
+          }
         end,
       },
       {
         "<leader>pg",
         function()
-          require("telescope.builtin").live_grep({
+          require("telescope.builtin").live_grep {
             cwd = find_site_packages(),
             glob_pattern = "*.py",
-          })
+          }
         end,
       },
       {
         "<leader>fp",
         function()
-          require("telescope.builtin").oldfiles({ only_cwd = true })
+          require("telescope.builtin").oldfiles { only_cwd = true }
         end,
       },
       {
@@ -104,7 +104,7 @@ return {
       {
         "<leader>fd",
         function()
-          require("telescope.builtin").find_files({ hidden = true })
+          require("telescope.builtin").find_files { hidden = true }
         end,
       },
       {
@@ -141,17 +141,17 @@ return {
       {
         "<leader>*",
         function()
-          require("telescope.builtin").grep_string({
-            search = vim.fn.expand("<cWORD>"),
-          })
+          require("telescope.builtin").grep_string {
+            search = vim.fn.expand "<cWORD>",
+          }
         end,
       },
       {
         "<leader>,",
         function()
-          require("telescope.builtin").buffers({
+          require("telescope.builtin").buffers {
             sort_mru = true,
-          })
+          }
         end,
       },
     },

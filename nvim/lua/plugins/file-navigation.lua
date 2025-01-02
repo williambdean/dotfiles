@@ -1,5 +1,5 @@
 -- Move around windows with vim keys
-for direction, key in pairs({ h = "h", j = "j", k = "k", l = "l" }) do
+for direction, key in pairs { h = "h", j = "j", k = "k", l = "l" } do
   vim.keymap.set("n", "<leader>" .. key, function()
     vim.cmd.wincmd(key)
   end, { desc = "Move to " .. direction .. " window" })
@@ -33,11 +33,11 @@ return {
       { "-", mode = "n", "<CMD>Oil<CR>", desc = "Oil - Open parent directory" },
     },
     config = function()
-      require("oil").setup({
+      require("oil").setup {
         view_options = {
           show_hidden = true,
         },
-      })
+      }
     end,
   },
   {
@@ -52,7 +52,7 @@ return {
       { "<C-e>", desc = "Harpoon menu" },
     },
     config = function()
-      local harpoon = require("harpoon")
+      local harpoon = require "harpoon"
 
       vim.keymap.set("n", "<leader>a", function()
         harpoon:list():add()
@@ -82,7 +82,7 @@ return {
         end)
       end
 
-      harpoon:setup({})
+      harpoon:setup {}
     end,
   },
 }

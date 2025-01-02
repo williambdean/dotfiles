@@ -19,9 +19,9 @@ return {
       { "S", "<CMD>lua require'hop'.hint_char2()<CR>", desc = "Hop Char2" },
     },
     config = function()
-      require("hop").setup({
+      require("hop").setup {
         multi_windows = true,
-      })
+      }
     end,
   },
   -- {-- place this in one of your configuration file(s)
