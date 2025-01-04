@@ -233,7 +233,17 @@ return {
               vim.notify(output)
             end,
             switch = function(user)
-              vim.notify("Switching to user: " .. user)
+              local cmd = "gh auth switch"
+              if user then
+                cmd = cmd .. " --user " .. user
+              end
+              local output = vim.trim(vim.fn.system(cmd))
+              vim.notify(output)
+
+              -- Change the viewer global
+              local split = vim.split(output, " ")
+              user = split[#split]
+              vim.g.octo_viewer = user
             end,
           },
           milestone = {
