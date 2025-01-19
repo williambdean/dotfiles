@@ -246,16 +246,6 @@ return {
               vim.g.octo_viewer = user
             end,
           },
-          milestone = {
-            crazy_new = function()
-              vim.notify "Creating a new milestone"
-            end,
-          },
-          -- some_new_command = {
-          --   new = function()
-          --     vim.notify("Creating a new command")
-          --   end,
-          -- },
         },
         pull_requests = {
           order_by = {
