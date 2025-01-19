@@ -1,12 +1,17 @@
 local M = {}
 
+local defaults = {
+  width = 0.80,
+  height = 0.80,
+}
+
 --- Create a floating window
 --- @param opts table
 --- @return table
 function M.create_floating_window(opts)
   opts = opts or {}
-  local width = opts.width or math.floor(vim.o.columns * 0.70)
-  local height = opts.height or math.floor(vim.o.lines * 0.8)
+  local width = opts.width or math.floor(vim.o.columns * defaults.width)
+  local height = opts.height or math.floor(vim.o.lines * defaults.height)
 
   -- Calculate the position to center the window
   local col = math.floor((vim.o.columns - width) / 2)
@@ -90,7 +95,16 @@ local create_file_toggle = function(file)
 end
 
 local toggles = {
-  { mapping = "<leader>N", file = "note.md", toggle = create_file_toggle },
+  {
+    mapping = "<leader>N",
+    file = "note.md",
+    toggle = create_file_toggle,
+  },
+  {
+    mapping = "<leader><leader>",
+    file = "~/todo.md",
+    toggle = create_file_toggle,
+  },
   {
     mapping = "<leader>P",
     file = "script.py",
