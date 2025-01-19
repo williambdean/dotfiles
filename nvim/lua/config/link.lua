@@ -1,7 +1,5 @@
 --- Link a Issue, PR, or Discussion in a buffer
---- WIP until octo.nvim has better callback support
 
-local gh = require "octo.gh"
 local gh_picker = require "octo.picker"
 
 local pickers = require "telescope.pickers"
@@ -11,28 +9,49 @@ local actions = require "telescope.actions"
 local action_state = require "telescope.actions.state"
 local themes = require "telescope.themes"
 
-local insert_text = function(name)
+local kind_map = {
+  issue = gh_picker.issues,
+  pr = gh_picker.prs,
+  discussion = gh_picker.discussions,
+}
+
+-- Send the keys to link the Issue, PR, or Discussion
+local selected_callback = function(selected)
+  vim.schedule(function()
+    vim.cmd.startinsert()
+    vim.api.nvim_feedkeys(" #" .. tostring(selected.obj.number), "n", true)
+  end)
+end
+
+local create_picker = function(kind)
+  local picker = kind_map[kind]
+
   return function()
-    vim.schedule(function()
-      vim.cmd.startinsert()
-      vim.api.nvim_feedkeys(" " .. name, "n", true)
-    end)
+    picker { cb = selected_callback }
   end
 end
 
-local get_and_insert_text = function()
-  local name = vim.fn.input "Enter the name of the link: "
-  vim.schedule(function()
-    vim.cmd.startinsert()
-    vim.api.nvim_feedkeys(" " .. name, "n", true)
+local get_prompt_and_search = function()
+  local opts = {
+    prompt = "Enter the search query: ",
+    default = "",
+  }
+  vim.ui.input(opts, function(prompt)
+    if prompt == "" then
+      return
+    end
+    gh_picker.search {
+      prompt = prompt,
+      cb = selected_callback,
+    }
   end)
 end
 
 local selections = {
-  Issue = insert_text "Issue",
-  ["Pull Request"] = insert_text "PR",
-  Discussion = insert_text "Discussion",
-  Search = get_and_insert_text,
+  Issue = create_picker "issue",
+  ["Pull Request"] = create_picker "pr",
+  Discussion = create_picker "discussion",
+  Search = get_prompt_and_search,
 }
 
 local selection_names = {}
