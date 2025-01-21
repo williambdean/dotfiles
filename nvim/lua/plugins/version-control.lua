@@ -7,17 +7,21 @@ local function create_issue(opts)
   local gh = require "octo.gh"
   local gh_utils = require "octo.utils"
 
-  local args = { "issue", "create", "--title", title, "--body", body }
-  gh.run {
-    args = args,
-    cb = function(_, stderr)
-      if stderr and stderr ~= "" then
-        gh_utils.error(stderr)
-        return
-      end
+  local cb = function(_, stderr)
+    if stderr and stderr ~= "" then
+      gh_utils.error(stderr)
+      return
+    end
 
-      vim.notify("Created issue: " .. title)
-    end,
+    vim.notify("Created issue: " .. title)
+  end
+
+  gh.issue.create {
+    title = title,
+    body = body,
+    opts = {
+      cb = cb,
+    },
   }
 end
 
@@ -57,12 +61,18 @@ local create_reference_issue = function(args)
   remove_visual_selection()
 end
 
+local has_upstream = function()
+  local output = vim.fn.system "git remote -v"
+  return string.find(output, "upstream")
+end
+
 ---Create reference issue
 vim.keymap.set("v", "<leader>cri", function()
-  require("gitlinker").get_buf_range_url("v", {
-    print_url = false,
-    action_callback = create_reference_issue,
-  })
+  require("gitlinker").link {
+    action = create_reference_issue,
+    message = false,
+    remote = has_upstream() and "upstream" or "origin",
+  }
 end, {})
 
 vim.api.nvim_create_user_command("CloseIssue", function(opts)
@@ -106,19 +116,23 @@ end
 
 vim.keymap.set("n", "<leader>A", current_author, { silent = true })
 
-local function search()
-  local repo = require("octo.utils").get_remote_name()
+local function search(opts)
+  local cmd = ":Octo search "
 
-  local cmd = ":Octo search repo:" .. repo .. " "
+  if opts.include_repo then
+    local repo = require("octo.utils").get_remote_name()
+    cmd = cmd .. "repo:" .. repo .. " "
+  end
+
   vim.fn.feedkeys(vim.api.nvim_replace_termcodes(cmd, true, true, true), "n")
 end
 
-vim.keymap.set(
-  "n",
-  "<leader>os",
-  search,
-  { silent = true, desc = "GitHub search for the current repository" }
-)
+vim.keymap.set("n", "<leader>os", function()
+  search { include_repo = true }
+end, { silent = true, desc = "GitHub search for the current repository" })
+vim.keymap.set("n", "<leader>oS", function()
+  search { include_repo = false }
+end, { silent = true, desc = "GitHub search" })
 
 local function is_issue(number)
   local repo = require("octo.utils").get_remote_name()
@@ -169,15 +183,23 @@ return {
   { "akinsho/git-conflict.nvim", opts = {} },
   { "tpope/vim-fugitive", cmd = { "Git", "G", "Gw" } },
   {
-    "ruifm/gitlinker.nvim",
+    "linrongbin16/gitlinker.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
     config = true,
-    -- keys = {
-    --     "<leader>gy",
-    --     function()
-    --         require("gitlinker").get_repo_url()
-    --     end,
-    -- },
+    keys = {
+      {
+        "<leader>gy",
+        function()
+          require("gitlinker").link {
+            message = false,
+            action = require("gitlinker.actions").clipboard,
+            remote = has_upstream() and "upstream" or "origin",
+          }
+        end,
+        desc = "Copy GitHub link",
+        mode = { "n", "v" },
+      },
+    },
   },
   {
     "petertriho/cmp-git",
@@ -229,15 +251,21 @@ return {
         commands = {
           auth = {
             status = function()
-              local output = vim.fn.system "gh auth status --active"
+              local gh = require "octo.gh"
+              local output =
+                gh.auth.status { active = true, opts = { mode = "sync" } }
               vim.notify(output)
             end,
             switch = function(user)
-              local cmd = "gh auth switch"
+              local gh = require "octo.gh"
+
+              local opts = {
+                opts = { mode = "sync" },
+              }
               if user then
-                cmd = cmd .. " --user " .. user
+                opts.user = user
               end
-              local output = vim.trim(vim.fn.system(cmd))
+              local output = gh.auth.switch(opts)
               vim.notify(output)
 
               -- Change the viewer global
