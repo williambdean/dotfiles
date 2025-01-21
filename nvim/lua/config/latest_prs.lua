@@ -2,19 +2,13 @@ local gh = require "octo.gh"
 local utils = require "octo.utils"
 
 local get_date_of_last_release = function()
-  local args = {
-    "release",
-    "list",
-    "--limit",
-    1,
-    "--json",
-    "publishedAt",
-    "--jq",
-    ".[0].publishedAt",
-  }
-  return gh.run {
-    args = args,
-    mode = "sync",
+  return gh.release.list {
+    limit = 1,
+    json = "publishedAt",
+    jq = ".[0].publishedAt",
+    opts = {
+      mode = "sync",
+    },
   }
 end
 

@@ -15,7 +15,7 @@ local sync_github_cli_query = function(opts)
     config.values.timeout = opts.timeout * 1000
   end
 
-  local output = gh.graphql {
+  local output = gh.api.graphql {
     query = opts.query,
     paginate = true,
     slurp = true,

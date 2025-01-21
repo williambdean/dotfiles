@@ -25,10 +25,10 @@ local state = {
 local mapping = {}
 
 local closing_issues_query = [[
-query {
-  repository(owner: "%s", name: "%s") {
-    pullRequest(number: %s) {
-      closingIssuesReferences(first: 1) {
+query($owner: String!, $name: String!, $pr_number: Int!, $n_referencing: Int = 1) {
+  repository(owner: $owner, name: $name) {
+    pullRequest(number: $pr_number) {
+      closingIssuesReferences(first: $n_referencing) {
         nodes {
 					number
         }
@@ -45,10 +45,16 @@ local closing_issue = function(pr_number)
   local remote_name = utils.get_remote_name()
   local remote_split = vim.split(remote_name, "/")
   local owner, name = remote_split[1], remote_split[2]
-  local query = string.format(closing_issues_query, owner, name, pr_number)
-  local output = gh.run {
-    args = { "api", "graphql", "-f", string.format("query=%s", query) },
-    mode = "sync",
+  local output = gh.api.graphql {
+    query = closing_issues_query,
+    fields = {
+      owner = owner,
+      name = name,
+      pr_number = pr_number,
+    },
+    opts = {
+      mode = "sync",
+    },
   }
   local resp = vim.fn.json_decode(output)
   local references =
@@ -80,10 +86,21 @@ end
 ---@param branch string
 ---@return number
 local pr_into_branch = function(branch)
-  local cmd = "gh pr list --head "
-    .. branch
-    .. " --json number --jq '.[0].number'"
-  return vim.fn.systemlist(cmd)[1]
+  local stdout, stderr = gh.pr.list {
+    head = branch,
+    json = "number",
+    jq = ".[0].number",
+    opts = {
+      mode = "sync",
+    },
+  }
+
+  if stderr ~= "" then
+    vim.notify(stderr, vim.log.levels.ERROR)
+    return nil
+  end
+
+  return tonumber(vim.trim(stdout))
 end
 
 --- Create a floating window
@@ -127,7 +144,7 @@ local get_pr = function()
   local branch = current_branch()
   if mapping[branch] == nil then
     mapping[branch] = {
-      pr = tonumber(pr_into_branch(branch)),
+      pr = pr_into_branch(branch),
     }
   end
 
@@ -147,6 +164,10 @@ local get_issue = function()
 
   if mapping[branch].issue == nil then
     local pr_number = get_pr()
+    if pr_number == nil then
+      return nil
+    end
+
     mapping[branch].issue = closing_issue(pr_number)
   end
 
