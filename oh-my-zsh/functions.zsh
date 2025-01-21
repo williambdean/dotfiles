@@ -116,15 +116,16 @@ function zsh-link() {
 # Modified
 function tn() {
     local session_name=$(pwd | sed 's/.*\///g')
+
     if [ -n "$TMUX" ]; then
-        if tmux has-session -t "$session_name" 2> /dev/null; then
+        if tmux has-session -t="$session_name" 2> /dev/null; then
             tmux switch-client -t "$session_name"
             return
         fi
         tmux new-session -d -s "$session_name"
         tmux switch-client -t "$session_name"
     else
-        if tmux has-session -t "$session_name" 2> /dev/null; then
+        if tmux has-session -t="$session_name" 2> /dev/null; then
             tmux attach -t "$session_name"
             return
         fi
