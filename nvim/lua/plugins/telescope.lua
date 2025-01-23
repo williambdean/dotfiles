@@ -51,6 +51,7 @@ return {
             glob_pattern = "*.py",
           }
         end,
+        desc = "Find Python environment files",
       },
       {
         "<leader>pg",
@@ -60,12 +61,14 @@ return {
             glob_pattern = "*.py",
           }
         end,
+        desc = "Grep Python environment files",
       },
       {
         "<leader>fp",
         function()
           require("telescope.builtin").oldfiles { only_cwd = true }
         end,
+        desc = "Find previous files",
       },
       {
         "<leader>ff",
@@ -94,21 +97,29 @@ return {
           --
           -- search(params)
         end,
+        desc = "Find files",
       },
       {
         "<leader>fc",
         function()
           require("telescope.builtin").resume()
         end,
+        desc = "Continue last search",
       },
       {
         "<leader>fd",
         function()
-          require("telescope.builtin").find_files { hidden = true }
+          local dotfiles_dir = vim.fn.expand "$HOME/GitHub/dotfiles"
+          require("telescope.builtin").find_files {
+            cwd = dotfiles_dir,
+            search_dirs = { dotfiles_dir },
+            prompt_title = "Dotfiles",
+          }
         end,
+        desc = "Find dotfiles",
       },
       {
-        "<leader>fg",
+        "<leader>/",
         function()
           local cwd
           if vim.bo.filetype == "oil" then
@@ -125,18 +136,14 @@ return {
           end
           require("telescope.builtin").live_grep(params)
         end,
-      },
-      {
-        "<leader>fb",
-        function()
-          require("telescope.builtin").buffers()
-        end,
+        desc = "Find grep",
       },
       {
         "<leader>fh",
         function()
           require("telescope.builtin").help_tags()
         end,
+        desc = "Find help tags",
       },
       {
         "<leader>*",
@@ -145,6 +152,7 @@ return {
             search = vim.fn.expand "<cWORD>",
           }
         end,
+        desc = "Search word under cursor",
       },
       {
         "<leader>,",
@@ -153,6 +161,7 @@ return {
             sort_mru = true,
           }
         end,
+        desc = "Find buffers",
       },
     },
   },
