@@ -119,6 +119,14 @@ return {
         desc = "Find dotfiles",
       },
       {
+        "<leader>fg",
+        function()
+          vim.notify("Use <leader>/ instead", vim.log.levels.WARN)
+        end,
+        desc = "Old mapping",
+      },
+
+      {
         "<leader>/",
         function()
           local cwd
