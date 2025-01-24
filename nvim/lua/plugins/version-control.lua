@@ -63,7 +63,14 @@ end
 
 local has_upstream = function()
   local output = vim.fn.system "git remote -v"
-  return string.find(output, "upstream")
+  local lines = vim.split(output, "\n")
+
+  for _, line in ipairs(lines) do
+    if vim.startswith(line, "upstream") then
+      return true
+    end
+  end
+  return false
 end
 
 ---Create reference issue
