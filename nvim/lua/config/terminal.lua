@@ -1,6 +1,5 @@
 -- Taken from TJ DeVries' video on terminals in neovim
 -- https://www.youtube.com/watch?v=ooTcnx066Do
---
 local M = {}
 
 local function get_query_path(file_name)
@@ -153,7 +152,7 @@ end
 --@param test_name string
 function M.run_test(args, test_names)
   local file_path = vim.fn.expand "%:p"
-  local python_executable = vim.fn.exepath "python"
+  local python_executable = require("config.python").get_executable()
   if python_executable == "" then
     vim.notify("Python executable not found", vim.log.levels.ERROR)
     return
@@ -205,16 +204,6 @@ vim.keymap.set("n", "<leader>st", function()
   vim.cmd.wincmd "J"
   vim.api.nvim_win_set_height(0, 10)
 end)
-
-function M.example()
-  local test_command =
-    "pytest tests/test_example.py -k test_another_test -vvv --color yes"
-  M.open_terminal(true)
-  -- Pause for a second to let the terminal open
-  vim.defer_fn(function()
-    M.send_command(test_command)
-  end, 750)
-end
 
 function M.get_visual_lines()
   local start_pos = vim.fn.getpos "'<"
