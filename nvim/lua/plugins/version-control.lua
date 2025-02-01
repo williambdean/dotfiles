@@ -193,6 +193,7 @@ return {
     "linrongbin16/gitlinker.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
     config = true,
+    cmd = { "GitLink" },
     keys = {
       {
         "<leader>gy",
