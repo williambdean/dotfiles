@@ -71,6 +71,20 @@ return {
         desc = "Find previous files",
       },
       {
+        "<leader>zf",
+        function()
+          local builtin = require "telescope.builtin"
+          local zoxide = require "config.zoxide"
+          zoxide.picker(function(cwd)
+            builtin.find_files {
+              cwd = cwd,
+              search_dirs = { cwd },
+            }
+          end)
+        end,
+        desc = "Zoxide then grep",
+      },
+      {
         "<leader>ff",
         function()
           local cwd
@@ -124,6 +138,20 @@ return {
           vim.notify("Use <leader>/ instead", vim.log.levels.WARN)
         end,
         desc = "Old mapping",
+      },
+      {
+        "<leader>z/",
+        function()
+          local builtin = require "telescope.builtin"
+          local zoxide = require "config.zoxide"
+          zoxide.picker(function(cwd)
+            builtin.live_grep {
+              cwd = cwd,
+              search_dirs = { cwd },
+            }
+          end)
+        end,
+        desc = "Zoxide then grep",
       },
 
       {
