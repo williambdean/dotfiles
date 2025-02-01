@@ -108,7 +108,9 @@ vim.api.nvim_create_user_command("Query", function(args)
   local file = query_args.file
   if file ~= "" then
     vim.notify("Writing response to " .. file)
-    write_json_to_file(file, resp)
+    local current_directory = vim.fn.expand "%:p:h"
+    local save_file = current_directory .. "/" .. file
+    write_json_to_file(save_file, resp)
   else
     vim.print(resp)
   end
