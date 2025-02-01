@@ -82,7 +82,7 @@ return {
             }
           end)
         end,
-        desc = "Zoxide then grep",
+        desc = "Zoxide then file picker",
       },
       {
         "<leader>ff",
