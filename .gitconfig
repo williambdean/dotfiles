@@ -1,0 +1,31 @@
+[user]
+	email = wd60622@gmail.com
+	name = Will Dean
+[alias]
+    a = add
+    br = branch
+    ci = commit
+    cleanup-merged = "!git branch --merged | grep -v '\\*\\|main\\|master' | xargs -n 1 git branch -d"
+    co = checkout
+    hash = rev-parse --short HEAD
+    hist = log --pretty=format:'%h %ad | %s%d [%an]' --graph --date=short
+    lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+    ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate
+    s = status --short
+    uncommit = reset --sort HEAD^
+[credential]
+	helper = store
+[core]
+	editor = nvim
+[push]
+	autoSetupRemote = true
+[init]
+	defaultBranch = main
+[pull]
+	rebase = false
+[credential "https://github.com"]
+	helper =
+	helper = !/home/linuxbrew/.linuxbrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !/home/linuxbrew/.linuxbrew/bin/gh auth git-credential
