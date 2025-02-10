@@ -17,6 +17,7 @@ vim.g.maplocalleader = "\\"
 
 opt.termguicolors = true
 opt.showmode = false
+opt.splitright = true
 
 require("lazy").setup {
   spec = {
@@ -314,3 +315,9 @@ require "config.quick_files"
 require "config.github_queries"
 require "config.latest_prs"
 require "config.link"
+
+local test_files = require "config.test_files"
+
+vim.api.nvim_create_user_command("GetBufInfo", function()
+  vim.print(vim.inspect(test_files.buffer_info()))
+end, {})

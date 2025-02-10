@@ -8,42 +8,18 @@ local function switch_to_test_file()
     return
   end
 
-  local cwd = vim.fn.getcwd()
-
-  -- Ensure cwd ends with separator
-  if cwd:sub(-1) ~= "/" then
-    cwd = cwd .. "/"
-  end
-
-  -- Remove cwd from the beginning of the path
-  local relative_path = current_file:sub(#cwd + 1)
-
-  local first_dir = relative_path:match "^([^/]+)/"
-  local file_name = current_file:match "([^/]+)$"
-
+  local buffer_info = require("config.test_files").buffer_info()
   -- Check if it's in tests directory
-  local in_tests = first_dir == "tests"
+  local in_tests = buffer_info.first_dir == "tests"
 
   if not in_tests then
-    -- Replace the first directory with "tests"
-    local test_file_path = current_file
-      :gsub(first_dir, "tests")
-      :gsub(file_name, "test_" .. file_name)
-    vim.cmd("edit " .. test_file_path)
+    vim.cmd("edit " .. buffer_info.test_file_path)
     return
   end
 
-  local module_file_name = relative_path:gsub("test_", ""):gsub("tests/", "")
-
-  -- Directories off of the cwd
-  local directories = vim.fn.glob("./*/", true, true)
-
-  for _, dir in ipairs(directories) do
-    local module_file = dir .. module_file_name
-    if vim.fn.filereadable(module_file) == 1 then
-      vim.cmd("edit " .. module_file)
-      return
-    end
+  if buffer_info.python_module ~= nil then
+    vim.cmd("edit " .. buffer_info.python_module)
+    return
   end
 
   vim.notify("Could not find the module file", vim.log.levels.WARN)
