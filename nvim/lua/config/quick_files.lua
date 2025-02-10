@@ -1,3 +1,4 @@
+--- Quickly navigate to set of files that are used for various purposes
 local M = {}
 
 local defaults = {
