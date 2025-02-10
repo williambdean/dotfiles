@@ -256,6 +256,9 @@ return {
         default_to_projects_v2 = true,
         users = "mentionable",
         timeout = 15000,
+        notifications = {
+          current_repo_only = true,
+        },
         commands = {
           auth = {
             status = function()
