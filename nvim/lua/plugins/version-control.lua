@@ -123,7 +123,7 @@ end
 
 vim.keymap.set("n", "<leader>A", current_author, { silent = true })
 
-local function search(opts)
+local function github_search(opts)
   local cmd = ":Octo search "
 
   if opts.include_repo then
@@ -135,10 +135,10 @@ local function search(opts)
 end
 
 vim.keymap.set("n", "<leader>os", function()
-  search { include_repo = true }
+  github_search { include_repo = true }
 end, { silent = true, desc = "GitHub search for the current repository" })
 vim.keymap.set("n", "<leader>oS", function()
-  search { include_repo = false }
+  github_search { include_repo = false }
 end, { silent = true, desc = "GitHub search" })
 
 local function is_issue(number)
@@ -261,74 +261,13 @@ return {
         },
         commands = {
           label = {
-            edit = function(label)
-              local gh = require "octo.gh"
-              local utils = require "octo.utils"
-
-              if utils.is_blank(label) then
-                utils.error "No label provided"
-                return
-              end
-
-              --- Get the description of a label
-              --- @param label string
-              --- @return string description
-              local get_label_description = function(label)
-                return gh.label.list {
-                  json = "description",
-                  search = label,
-                  jq = ".[0].description",
-                  opts = {
-                    mode = "sync",
-                  },
-                }
-              end
-
-              --- Change the description of a label
-              --- @param label string
-              --- @param description string
-              --- @return nil
-              local change_label_description = function(label, description)
-                vim.ui.input({
-                  prompt = "Description for " .. label .. ": ",
-                  default = description,
-                }, function(new_description)
-                  if new_description == nil then
-                    new_description = ""
-                  end
-
-                  if new_description == "" then
-                    new_description = description
-                  end
-
-                  new_description = vim.fn.trim(new_description)
-
-                  if new_description == description then
-                    utils.info("No changes made to description for " .. label)
-                    return
-                  end
-
-                  utils.info(
-                    "Updating description for "
-                      .. label
-                      .. " to "
-                      .. new_description
-                  )
-
-                  gh.label.edit {
-                    label,
-                    description = new_description,
-                  }
-                end)
-              end
-
-              local description = get_label_description(label)
-              if description == "" then
-                utils.error("Nothing found for " .. label)
-                return
-              end
-
-              change_label_description(label, description)
+            list = function()
+              local picker = require "octo.picker"
+              picker.labels {
+                cb = function(labels)
+                  vim.notify(vim.inspect(labels))
+                end,
+              }
             end,
           },
           picker = {
