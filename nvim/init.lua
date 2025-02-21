@@ -90,6 +90,7 @@ require("lazy").setup {
       opts = {},
     },
     { "dstein64/vim-startuptime", cmd = "StartupTime" },
+    { "folke/snacks.nvim" },
     {
       "folke/which-key.nvim",
       event = "VeryLazy",
