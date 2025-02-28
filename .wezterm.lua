@@ -10,7 +10,7 @@ config.initial_cols = 110
 
 -- Use wsl
 config.default_domain = "WSL:Ubuntu"
-config.font_size = 12.5
+config.font_size = 11.75
 
 -- Set the color scheme
 config.color_scheme = "Gruvbox Dark"
