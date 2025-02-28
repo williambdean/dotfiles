@@ -5,7 +5,6 @@
 --- Example: :CommandHelp gh pr list
 ---
 local set_buffer_settings = function()
-  -- Create a new buffer and set the output there
   vim.cmd "setlocal filetype=help"
   vim.cmd "setlocal buftype=nofile"
   vim.cmd "setlocal bufhidden=wipe"
