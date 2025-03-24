@@ -261,3 +261,25 @@ function pr {
 
     nvim -c ":Octo pr edit $pr_number"
 }
+
+sessions () {
+        sesh connect $(sesh list | fzf)
+}
+
+alias s=sessions
+
+pr-branches () {
+        local author_filter=""
+        if [ -n "$1" ]
+        then
+                author_filter="author:$1"
+        fi
+        local branches=$(gh pr list --search "$author_filter" --json headRefName --jq '.[].headRefName')
+        if [ -n "$branches" ]
+        then
+                echo $branches | fzf
+        else
+            echo "No branches found using that filter"
+
+        fi
+}
