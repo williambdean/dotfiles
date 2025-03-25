@@ -1,20 +1,27 @@
 --- Creates an issue on GitHub using GitHub CLI
+---
 -- @param opts A table containing the title and body of the issue.
 local function create_issue(opts)
   local title = opts.title
   local body = opts.body or ""
 
   local gh = require "octo.gh"
-  local gh_utils = require "octo.utils"
+  local utils = require "octo.utils"
 
-  local cb = function(_, stderr)
-    if stderr and stderr ~= "" then
-      gh_utils.error(stderr)
-      return
-    end
-
-    vim.notify("Created issue: " .. title)
-  end
+  local cb = gh.create_callback {
+    success = function(output)
+      utils.info("Created issue: " .. title)
+      local answer = vim.fn.confirm("Open issue in buffer?", "&Yes\n&No", 2)
+      if answer == 2 then
+        return
+      end
+      -- Returns the URL of the issue
+      -- https://github.com/wd60622/dotfiles/issues/78
+      -- Return the number of the issue which is the last part
+      local issue_number = output:match "issues/(%d+)$"
+      vim.cmd("Octo issue edit " .. issue_number)
+    end,
+  }
 
   gh.issue.create {
     title = title,
@@ -128,7 +135,11 @@ local function github_search(opts)
 
   if opts.include_repo then
     local repo = require("octo.utils").get_remote_name()
-    cmd = cmd .. "repo:" .. repo .. " "
+    if repo ~= nil then
+      cmd = cmd .. "repo:" .. repo .. " "
+    else
+      vim.notify("No remote found", vim.log.levels.ERROR)
+    end
   end
 
   vim.fn.feedkeys(vim.api.nvim_replace_termcodes(cmd, true, true, true), "n")
@@ -141,18 +152,54 @@ vim.keymap.set("n", "<leader>oS", function()
   github_search { include_repo = false }
 end, { silent = true, desc = "GitHub search" })
 
-local function is_issue(number)
-  local repo = require("octo.utils").get_remote_name()
+local get_typename = function(opts)
+  local gh = require "octo.gh"
+  local utils = require "octo.utils"
 
-  local cmd = string.format(
-    "gh api repos/%s/issues/%d --jq '.pull_request'",
-    repo,
-    number
-  )
+  local query = [[
+  query($owner: String!, $name: String!, $number: Int!) {
+    repository(owner: $owner, name: $name) {
+      issueOrPullRequest(number: $number) {
+        __typename
+      }
+      discussion(number: $number) {
+        __typename
+      }
+    }
+  }
+  ]]
 
-  local result = vim.fn.system(cmd):gsub("^%s*(.-)%s*$", "%1")
+  opts.repo = opts.repo or utils.get_remote_name()
+  local owner, name = utils.split_repo(opts.repo)
 
-  return result == ""
+  local fields = {
+    owner = owner,
+    name = name,
+    number = opts.number,
+  }
+
+  local result = gh.api.graphql {
+    query = query,
+    fields = fields,
+    opts = {
+      mode = "sync",
+    },
+  }
+  result = vim.json.decode(result)
+
+  local repository = result.data.repository
+
+  local issueOrPullRequest = repository.issueOrPullRequest
+  if not utils.is_blank(issueOrPullRequest) then
+    return issueOrPullRequest.__typename
+  end
+
+  local discussion = repository.discussion
+  if not utils.is_blank(discussion) then
+    return discussion.__typename
+  end
+
+  return nil
 end
 
 local function open_github_as_octo_buffer()
@@ -175,13 +222,16 @@ local function open_github_as_octo_buffer()
     return
   end
 
-  local get_uri
-  if is_issue(number) then
-    get_uri = utils.get_issue_uri
-  else
-    get_uri = utils.get_pull_request_uri
-  end
+  local typename = get_typename {
+    number = number,
+  }
+  local get_uri = {
+    Issue = utils.get_issue_uri,
+    PullRequest = utils.get_pull_request_uri,
+    Discussion = utils.get_discussion_uri,
+  }
 
+  get_uri = get_uri[typename]
   local uri = get_uri(number)
   vim.cmd("edit " .. uri)
 end
@@ -248,18 +298,42 @@ return {
         desc = "List discussions",
       },
     },
+    depencencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons",
+    },
     config = function()
       require("octo").setup {
         -- default_to_projects_v2 = true,
         use_local_fs = false,
         enable_builtin = true,
         default_to_projects_v2 = true,
-        users = "mentionable",
+        users = "assignable",
         timeout = 15000,
         notifications = {
           current_repo_only = true,
         },
+        mappings = {
+          notification = {
+            read = { lhs = "<C-r>", desc = "mark notification as read" },
+          },
+        },
+        use_timeline_icons = true,
         commands = {
+          pr = {
+            update = function()
+              local utils = require "octo.utils"
+              local buffer = utils.get_current_buffer()
+              if not buffer or not buffer:isPullRequest() then
+                utils.error "Not in a pull request buffer"
+                return
+              end
+
+              require("config.update-pr-branch").update_branch {
+                id = buffer.node.id,
+              }
+            end,
+          },
           label = {
             list = function()
               local picker = require "octo.picker"
@@ -270,8 +344,45 @@ return {
               }
             end,
           },
-          picker = {
-            select = function()
+          notification = {
+            list = function()
+              local utils = require "octo.utils"
+
+              local opts = {}
+
+              if vim.fn.confirm("Current Repo Only?", "&Yes\n&No", 1) == 1 then
+                opts.repo = utils.get_remote_name()
+              end
+
+              require("octo.picker").notifications(opts)
+            end,
+            all = function()
+              local utils = require "octo.utils"
+
+              local opts = { all = true }
+
+              if vim.fn.confirm("Current Repo Only?", "&Yes\n&No", 1) == 1 then
+                opts.repo = utils.get_remote_name()
+              end
+
+              require("octo.picker").notifications(opts)
+            end,
+          },
+          config = {
+            notifications = function()
+              local cfg = require("octo.config").values
+              local utils = require "octo.utils"
+
+              cfg.notifications.current_repo_only =
+                not cfg.notifications.current_repo_only
+
+              utils.info(
+                "Current repo only set to "
+                  .. tostring(cfg.notifications.current_repo_only)
+              )
+              ---TODO: This doesn't actually update
+            end,
+            picker = function()
               require("config.easy_picker").new(
                 { "telescope", "fzf-lua", "snacks" },
                 {
@@ -303,14 +414,20 @@ return {
               if user then
                 opts.user = user
               end
-              local output = gh.auth.switch(opts)
-              vim.notify(output)
+              local _, output = gh.auth.switch(opts)
+              vim.notify("Output: " .. output, vim.log.levels.INFO)
 
               -- Change the viewer global
               local split = vim.split(output, " ")
               user = split[#split]
               vim.g.octo_viewer = user
             end,
+          },
+        },
+        discussions = {
+          order_by = {
+            field = "UPDATED_AT",
+            direction = "DESC",
           },
         },
         pull_requests = {
@@ -362,12 +479,9 @@ return {
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "octo",
         callback = function()
-          vim.keymap.set(
-            "n",
-            "la",
-            "<CMD>Octo label add<CR>",
-            { silent = true, buffer = true }
-          )
+          vim.keymap.set("n", "la", function()
+            vim.notify "Use <localleader>la instead"
+          end, { silent = true, buffer = true })
         end,
       })
     end,
