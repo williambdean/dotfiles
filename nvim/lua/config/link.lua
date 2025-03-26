@@ -1,6 +1,7 @@
 --- Link a Issue, PR, or Discussion in a buffer
 
-local gh_picker = require "octo.picker"
+local picker = require "octo.picker"
+local utils = require "octo.utils"
 
 local pickers = require "telescope.pickers"
 local finders = require "telescope.finders"
@@ -10,9 +11,9 @@ local action_state = require "telescope.actions.state"
 local themes = require "telescope.themes"
 
 local kind_map = {
-  issue = gh_picker.issues,
-  pr = gh_picker.prs,
-  discussion = gh_picker.discussions,
+  issue = picker.issues,
+  pr = picker.prs,
+  discussion = picker.discussions,
 }
 
 -- Send the keys to link the Issue, PR, or Discussion
@@ -24,10 +25,8 @@ local selected_callback = function(selected)
 end
 
 local create_picker = function(kind)
-  local picker = kind_map[kind]
-
   return function()
-    picker { cb = selected_callback }
+    kind_map[kind] { cb = selected_callback }
   end
 end
 
@@ -40,7 +39,7 @@ local get_prompt_and_search = function()
     if prompt == "" then
       return
     end
-    gh_picker.search {
+    picker.search {
       prompt = prompt,
       cb = selected_callback,
     }
@@ -52,6 +51,14 @@ local selections = {
   ["Pull Request"] = create_picker "pr",
   Discussion = create_picker "discussion",
   Search = get_prompt_and_search,
+  Merged = function()
+    local repo = utils.get_remote_name()
+    local prompt = "is:merged repo:" .. repo
+    picker.search {
+      prompt = prompt,
+      opts = { cb = selected_callback },
+    }
+  end,
 }
 
 local selection_names = {}
