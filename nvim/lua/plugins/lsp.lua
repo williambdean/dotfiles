@@ -71,6 +71,7 @@ return {
         "yaml-language-server",
         "shfmt",
         "codespell",
+        "html-lsp",
       },
     },
     config = function()
@@ -87,14 +88,16 @@ return {
     depends = {
       "williamboman/mason.nvim",
       "neovim/nvim-lspconfig",
-      "hrsh7th/cmp-nvim-lsp",
+      -- "hrsh7th/cmp-nvim-lsp",
+      "sahhen/blink.nvim",
     },
     config = function()
       require("mason").setup()
       require("mason-lspconfig").setup()
 
       local lspconfig = require "lspconfig"
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      -- local capabilities = vim.lsp.protocol.make_client_capabilities()
+      local capabilities = require("blink.cmp").get_lsp_capabilities()
       lspconfig.ruff.setup {
         on_new_config = function(config, root_dir)
           -- Look for .venv directory in the project root
@@ -106,6 +109,22 @@ return {
             }
           end
         end,
+      }
+      lspconfig.html.setup {
+        capabilities = capabilities,
+      }
+      lspconfig.rust_analyzer.setup {
+        capabilities = capabilities,
+        settings = {
+          ["rust-analyzer"] = {
+            cargo = {
+              loadOutDirsFromCheck = true,
+            },
+            procMacro = {
+              enable = true,
+            },
+          },
+        },
       }
       lspconfig.graphql.setup {
         capabilities = capabilities,
@@ -183,7 +202,7 @@ return {
         end,
       })
       -- Define a global variable to control formatting
-      vim.g.lsp_format_enabled = true
+      local lsp_format_enabled = true
 
       vim.diagnostic.config {
         virtual_text = {
@@ -206,7 +225,12 @@ return {
         -- buffer = buffer,
         group = group,
         callback = function()
-          if vim.g.lsp_format_enabled then
+          local filetype = vim.bo.filetype
+          if filetype == "markdown" then
+            return
+          end
+
+          if lsp_format_enabled then
             vim.lsp.buf.format { async = async }
           end
         end,
@@ -214,11 +238,11 @@ return {
 
       -- Format commands
       vim.api.nvim_create_user_command("LspEnableFormat", function()
-        vim.g.lsp_format_enabled = true
+        lsp_format_enabled = true
       end, {})
 
       vim.api.nvim_create_user_command("LspDisableFormat", function()
-        vim.g.lsp_format_enabled = false
+        lsp_format_enabled = false
       end, {})
 
       vim.api.nvim_create_user_command("LspFormat", function()
