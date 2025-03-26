@@ -98,12 +98,23 @@ function readme() {
 }
 
 # Adding and removing jupyter kernels
-function new_kernel() {
-    ipython kernel install --name "$1" --user
+function list-kernels() {
+    python -m jupyter kernelspec list --json | jq -r '.kernelspecs | keys[]'
 }
 
-function remove_kernel() {
-    jupyter kernelspec remove "$1"
+function add-kernel() {
+    read "name?Enter the name of the kernel: "
+    read "display_name?Enter the display name of the kernel: "
+    python -m ipykernel install --user --name=$name --display-name $display_name
+}
+
+function remove-kernel() {
+    local kernel=$(list-kernels | fzf)
+    if [ -z "$kernel" ]
+    then
+        return
+    fi
+    jupyter kernelspec remove "$kernel"
 }
 
 # Link file to ZSH_CUSTOM
