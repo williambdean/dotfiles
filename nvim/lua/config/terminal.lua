@@ -188,7 +188,7 @@ local run_tests = function(args)
 end
 
 vim.api.nvim_create_user_command("DRunTests", function(args)
-  args.args = args.args .. " --pdb"
+  args.args = args.args .. " --pdb -vvv"
   return run_tests(args)
 end, { nargs = "*", range = true })
 
