@@ -93,30 +93,15 @@ vim.api.nvim_create_user_command("CloseIssue", function(opts)
   require("config.close-issue").close_issue()
 end, {})
 
-local function current_buffer()
-  local utils = require "octo.utils"
-
-  local bufnr = vim.api.nvim_get_current_buf()
-  local buffer = octo_buffers[bufnr]
-
-  if not buffer then
-    utils.error "Not in an octo buffer"
-    return
-  end
-
-  return buffer
-end
-
 vim.keymap.set("n", "<leader>B", function()
-  local buffer = current_buffer()
+  local buffer = require("octo.utils").get_current_buffer()
   vim.print(buffer)
 end, { silent = true })
 
 local function current_author()
   local utils = require "octo.utils"
 
-  local bufnr = vim.api.nvim_get_current_buf()
-  local buffer = octo_buffers[bufnr]
+  local buffer = utils.get_current_buffer()
 
   if not buffer then
     utils.error "Not in an octo buffer"
@@ -281,6 +266,10 @@ return {
     end,
   },
   {
+    "lewis6991/gitsigns.nvim",
+    opts = {},
+  },
+  {
     dir = "~/GitHub/neovim-plugins/octo.nvim",
     cmd = "Octo",
     keys = {
@@ -321,6 +310,59 @@ return {
         use_timeline_icons = true,
         commands = {
           pr = {
+            auto = function()
+              local gh = require "octo.gh"
+              local picker = require "octo.picker"
+              local utils = require "octo.utils"
+
+              local buffer = utils.get_current_buffer()
+
+              local auto_merge = function(number)
+                local cb = function()
+                  utils.info "This PR will be auto-merged"
+                end
+                local opts = { cb = cb }
+                gh.pr.merge { number, auto = true, squash = true, opts = opts }
+              end
+
+              if not buffer or not buffer:isPullRequest() then
+                picker.prs {
+                  cb = function(selected)
+                    auto_merge(selected.obj.number)
+                  end,
+                }
+                return
+              else
+                auto_merge(buffer.node.number)
+              end
+            end,
+            celebrate = function()
+              local utils = require "octo.utils"
+              local buffer = utils.get_current_buffer()
+              if not buffer or not buffer:isPullRequest() then
+                utils.error "Wrong place to celebrate"
+                return
+              end
+
+              local state = buffer.node.state
+
+              if state ~= "MERGED" then
+                utils.error "PR is not merged yet. Isn't it too early to celebrate?"
+                return
+              end
+
+              if vim.g.octo_viewer ~= buffer.node.author.login then
+                utils.info(
+                  "You are not the author of this PR. Go celebrate with "
+                    .. buffer.node.author.login
+                )
+                return
+              end
+
+              utils.info(
+                "Congratulations! 🎉 Well done on " .. buffer.node.title
+              )
+            end,
             update = function()
               local utils = require "octo.utils"
               local buffer = utils.get_current_buffer()
