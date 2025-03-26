@@ -94,9 +94,10 @@ return {
             cwd = vim.loop.cwd()
           end
 
-          params = {
+          local params = {
             cwd = cwd,
             search_dirs = { cwd },
+            no_ignore = false,
           }
 
           require("telescope.builtin").find_files(params)
