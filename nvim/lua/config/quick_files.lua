@@ -53,6 +53,12 @@ local create_toggle = function(state)
         vim.cmd.edit(file)
       end
     else
+      -- Save the buffer before hiding the window
+      if vim.api.nvim_buf_get_option(state.buf, "modified") then
+        vim.api.nvim_buf_call(state.buf, function()
+          vim.cmd "write"
+        end)
+      end
       vim.api.nvim_win_hide(state.win)
     end
 
