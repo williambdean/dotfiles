@@ -294,3 +294,12 @@ pr-branches () {
 
         fi
 }
+
+# Taken from https://www.youtube.com/watch?v=0Z71je-X6YM
+field() {
+    awk -F "${2:- }" "{ print \$${1:-1} }"
+}
+
+total() {
+    awk -F "${2:- }" "{ s += \$${1:-1} } END { print s }"
+}
