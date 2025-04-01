@@ -108,6 +108,11 @@ local toggles = {
     toggle = create_file_toggle,
   },
   {
+    mapping = "<leader>I",
+    file = "issues.md",
+    toggle = create_file_toggle,
+  },
+  {
     mapping = "<leader><leader>",
     file = "~/todo.md",
     toggle = create_file_toggle,
