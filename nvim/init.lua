@@ -23,6 +23,26 @@ require("lazy").setup {
   spec = {
     { import = "plugins" },
     {
+      "stevearc/conform.nvim",
+      opts = {
+        format_on_save = {
+          -- These options will be passed to conform.format()
+          timeout_ms = 500,
+          lsp_format = "fallback",
+        },
+      },
+    },
+    {
+      "Eandrju/cellular-automaton.nvim",
+      config = function()
+        vim.keymap.set(
+          "n",
+          "<leader>fml",
+          "<cmd>CellularAutomaton make_it_rain<CR>"
+        )
+      end,
+    },
+    {
       "marcussimonsen/let-it-snow.nvim",
       cmd = "LetItSnow", -- Wait with loading until command is run
       opts = {},
@@ -114,14 +134,6 @@ require("lazy").setup {
     backdrop = 50,
   },
 }
-
--- Zoom in and make the "o"nly window
-vim.keymap.set(
-  "n",
-  "<leader>O",
-  ":tab split<CR>",
-  { noremap = true, silent = true, desc = "Open current buffer in a new tab" }
-)
 
 -- Enable syntax highlighting
 opt.syntax = "on"
@@ -232,7 +244,17 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz", { noremap = true })
 vim.keymap.set("n", "n", "nzz", { noremap = true })
 vim.keymap.set("n", "N", "Nzz", { noremap = true })
 
-vim.cmd "command! JsonPrettify %!jq ."
+local function json_prettify(query)
+  query = query or "."
+  vim.cmd("%!jq '" .. query .. "'")
+end
+
+-- Create the command that calls the function
+vim.api.nvim_create_user_command("Jq", function(opts)
+  json_prettify(opts.args)
+end, { nargs = "?" })
+
+vim.api.nvim_create_user_command("JsonPrettify", json_prettify, { nargs = "?" })
 
 local group = vim.api.nvim_create_augroup("InitGroup", { clear = true })
 vim.api.nvim_create_autocmd({ "TermOpen", "TextYankPost" }, {
@@ -269,8 +291,10 @@ end
 vim.keymap.set("n", "gx", open_url, { noremap = true, silent = true })
 vim.g.netrw_browsex_viewer = "wslview"
 
-vim.o.background = "dark"
-vim.cmd [[colorscheme gruvbox]]
+-- vim.o.background = "dark"
+-- vim.cmd [[colorscheme gruvbox]]
+--
+vim.cmd "colorscheme github_dark_high_contrast"
 
 -- Define transparency function
 local function enable_transparency()
@@ -290,6 +314,7 @@ local function enable_transparency()
   vim.opt.winblend = 15
   vim.opt.pumblend = 15
 end
+-- vim.cmd "highlight Normal guibg=NONE guifg=NONE ctermbg=NONE ctermfg=NONE"
 
 -- -- Create autocmd to ensure transparency persists
 -- vim.api.nvim_create_autocmd("ColorScheme", {
@@ -311,11 +336,15 @@ vim.o.ttyfast = true
 vim.o.updatetime = 100
 
 require "config.terminal"
-require "config.issues_prs"
+-- require "config.issues_prs"
 require "config.quick_files"
 require "config.github_queries"
 require "config.latest_prs"
 require "config.link"
+require "config.hash"
+require "config.zoom"
+require "config.command-helper"
+require "config.gist-comments"
 
 local test_files = require "config.test_files"
 
