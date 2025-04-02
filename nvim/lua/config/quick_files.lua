@@ -132,4 +132,15 @@ for _, toggle in ipairs(toggles) do
   )
 end
 
+vim.api.nvim_create_user_command("QuickFile", function()
+  vim.ui.select(toggles, {
+    prompt = "Select a file: ",
+    format_item = function(entry)
+      return entry.file
+    end,
+  }, function(selected)
+    vim.cmd.edit(selected.file)
+  end)
+end, {})
+
 return M

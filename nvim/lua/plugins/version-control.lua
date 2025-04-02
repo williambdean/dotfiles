@@ -94,9 +94,24 @@ vim.api.nvim_create_user_command("CloseIssue", function(opts)
 end, {})
 
 vim.keymap.set("n", "<leader>B", function()
-  local buffer = require("octo.utils").get_current_buffer()
-  vim.print(buffer)
-end, { silent = true })
+  local utils = require "octo.utils"
+  local buffer = utils.get_current_buffer()
+  if not buffer then
+    utils.error "Not in an octo buffer"
+    return
+  end
+
+  vim.ui.select({ "timelineItems", "full" }, {
+    prompt = "Select an item",
+  }, function(selected)
+    local item = selected == "full" and buffer or buffer.node[selected]
+    if not item then
+      utils.error "No item selected"
+      return
+    end
+    vim.notify(vim.inspect(item))
+  end)
+end)
 
 local function current_author()
   local utils = require "octo.utils"
@@ -115,18 +130,28 @@ end
 
 vim.keymap.set("n", "<leader>A", current_author, { silent = true })
 
-local function github_search(opts)
+local function create_octo_search(opts)
   local cmd = ":Octo search "
+  local utils = require "octo.utils"
 
   if opts.include_repo then
-    local repo = require("octo.utils").get_remote_name()
+    local repo = utils.get_remote_name()
     if repo ~= nil then
       cmd = cmd .. "repo:" .. repo .. " "
     else
-      vim.notify("No remote found", vim.log.levels.ERROR)
+      utils.error "No remote found"
     end
   end
 
+  if opts.query then
+    cmd = cmd .. opts.query
+  end
+
+  return cmd
+end
+
+local function github_search(opts)
+  local cmd = create_octo_search(opts)
   vim.fn.feedkeys(vim.api.nvim_replace_termcodes(cmd, true, true, true), "n")
 end
 
@@ -290,6 +315,7 @@ return {
     depencencies = {
       "nvim-lua/plenary.nvim",
       "nvim-tree/nvim-web-devicons",
+      "nvim-telescope/telescope.nvim",
     },
     config = function()
       require("octo").setup {
@@ -379,9 +405,15 @@ return {
           label = {
             list = function()
               local picker = require "octo.picker"
+
               picker.labels {
                 cb = function(labels)
-                  vim.notify(vim.inspect(labels))
+                  local label = labels[1].name
+
+                  github_search {
+                    query = "label:" .. label,
+                    include_repo = true,
+                  }
                 end,
               }
             end,
