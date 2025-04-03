@@ -188,6 +188,27 @@ return {
             return
           end
           opts.cwd = obsidian.directory
+          opts.attach_mappings = function(prompt_bufnr, map)
+            map("i", "<CR>", function()
+              local actions = require "telescope.actions"
+              local action_state = require "telescope.actions.state"
+              local current_line = action_state.get_current_line()
+              local selection = action_state.get_selected_entry()
+
+              if selection == nil then
+                local file_path = obsidian.directory .. "/" .. current_line
+                local dir_path = vim.fn.fnamemodify(file_path, ":h")
+
+                vim.fn.mkdir(dir_path, "p")
+
+                vim.cmd.edit { bang = true, args = { file_path } }
+              else
+                actions.select_default(prompt_bufnr)
+              end
+              return true
+            end)
+            return true
+          end
           require("telescope.builtin").find_files(opts)
         end,
         desc = "Find Obsidian notes",
