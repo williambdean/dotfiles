@@ -307,3 +307,24 @@ total() {
 ff() {
     aerospace list-windows --all | fzf --bind 'enter:execute(bash -c "aerospace focus --window-id {1}")+abort'
 }
+
+transfer-files() {
+    if [[ -z "$1" ]]; then
+        echo "Usage: transfer-files <source_directory> [destination_directory]"
+        return 1
+    fi
+    local source=$1
+    local destination=${2:-$(pwd)}
+    local locations=$(FZF_DEFAULT_COMMAND="find $source -mindepth 1 -maxdepth 1" fzf -m)
+
+    echo "$locations" | while IFS= read -r location; do
+        if [[ -n "$location" ]]; then
+            mv "$location" "$destination"
+            echo "Move: $(basename "$location")"
+        fi
+    done
+}
+
+move-from-downloads() {
+    transfer-files $HOME/Downloads
+}
