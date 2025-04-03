@@ -126,6 +126,7 @@ require("lazy").setup {
       "folke/snacks.nvim",
       ---@type snacks.Config
       opts = {
+        input = { enabled = false },
         picker = { enabled = true },
       },
     },
