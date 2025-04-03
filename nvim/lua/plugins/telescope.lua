@@ -200,7 +200,6 @@ return {
                 local dir_path = vim.fn.fnamemodify(file_path, ":h")
 
                 vim.fn.mkdir(dir_path, "p")
-
                 vim.cmd.edit { bang = true, args = { file_path } }
               else
                 actions.select_default(prompt_bufnr)
