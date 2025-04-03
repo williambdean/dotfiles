@@ -176,6 +176,23 @@ return {
         desc = "Find grep",
       },
       {
+        "<leader>fo",
+        function()
+          local opts = {}
+          local obsidian = require "config.obsidian"
+          if not obsidian.directory_exists then
+            vim.notify(
+              "Obsidian vault not found. Please set the directory in your config.",
+              vim.log.levels.WARN
+            )
+            return
+          end
+          opts.cwd = obsidian.directory
+          require("telescope.builtin").find_files(opts)
+        end,
+        desc = "Find Obsidian notes",
+      },
+      {
         "<leader>fh",
         function()
           require("telescope.builtin").help_tags()
