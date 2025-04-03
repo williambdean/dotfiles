@@ -303,3 +303,7 @@ field() {
 total() {
     awk -F "${2:- }" "{ s += \$${1:-1} } END { print s }"
 }
+
+ff() {
+    aerospace list-windows --all | fzf --bind 'enter:execute(bash -c "aerospace focus --window-id {1}")+abort'
+}
