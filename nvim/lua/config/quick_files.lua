@@ -114,7 +114,7 @@ local toggles = {
   },
   {
     mapping = "<leader><leader>",
-    file = "~/todo.md",
+    file = require "config.obsidian".file_name "todo.md",
     toggle = create_file_toggle,
   },
   {
