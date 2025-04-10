@@ -296,6 +296,7 @@ return {
         Explain = "Explain how it works in the English language.",
         Review = "Review the following code and provide concise suggestions.",
         Tests = "Write tests for the following code.",
+        Anything = "Respond to the following question.",
       },
       build = function()
         vim.notify "Please update the remote plugins by running :UpdateRemotePlugins, the"
