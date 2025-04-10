@@ -35,5 +35,9 @@ alias develop="nvim -c ':Octo issue develop'"
 alias merged="nvim -c ':Octo search repo:{owner}/{repo} is:merged'"
 alias switch="gh auth switch"
 
+alias db="nvim -c ':DBUI'"
+
 # Docker
 alias enter-docker="docker run --rm -it --entrypoint bash"
+
+alias off="pmset displaysleepnow"
