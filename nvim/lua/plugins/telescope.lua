@@ -176,7 +176,7 @@ return {
         desc = "Find grep",
       },
       {
-        "<leader>fo",
+        "<leader>nf",
         function()
           local opts = {}
           local obsidian = require "config.obsidian"
