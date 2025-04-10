@@ -320,11 +320,58 @@ transfer-files() {
     echo "$locations" | while IFS= read -r location; do
         if [[ -n "$location" ]]; then
             mv "$location" "$destination"
-            echo "Move: $(basename "$location")"
+            echo "Moved: $(basename "$location")"
         fi
     done
 }
 
 move-from-downloads() {
     transfer-files $HOME/Downloads
+}
+
+downloads() {
+    local source=${1:-$HOME/Downloads}
+    FZF_DEFAULT_COMMAND="find $source -mindepth 1 -maxdepth 1" fzf -m
+}
+
+
+repos() {
+    local first=${2:-15}
+    gh search repos $1 --limit $first --json fullName --jq '.[].fullName' | fzf
+}
+
+org-repos() {
+    repos "org:$1" 100
+}
+
+star() {
+  if [ -z "$1" ]; then
+    echo "Usage: star <owner>/<repo>"
+    return 1
+  fi
+
+  # Split the input by '/'
+  IFS='/' read -r owner repo <<< "$1"
+
+  if [ -z "$owner" ] || [ -z "$repo" ]; then
+    echo "Invalid format. Usage: add-star <owner>/<repo>"
+    return 1
+  fi
+
+  repo_id=$(gh api graphql -f query='query($owner: String!, $name: String!) {
+    repository(owner: $owner, name: $name) { id }
+  }' -f owner="$owner" -f name="$repo" | jq -r '.data.repository.id')
+
+  if [ -z "$repo_id" ]; then
+    echo "Repository $owner/$repo not found"
+    return 1
+  fi
+
+  if gh api graphql -f query='mutation($starrableId: ID!) {
+    addStar(input: {starrableId: $starrableId}) { starrable { id } }
+  }' -f starrableId="$repo_id" > /dev/null 2>&1; then
+    echo "Starred $owner/$repo"
+  else
+    echo "Failed to star $owner/$repo"
+  fi
 }
