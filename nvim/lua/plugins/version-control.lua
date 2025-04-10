@@ -299,7 +299,39 @@ return {
     cmd = "Octo",
     keys = {
       { "<leader>oo", "<CMD>Octo<CR>", desc = "Open Octo" },
-      { "<leader>ic", "<CMD>Octo issue create<CR>", desc = "Create issue" },
+      {
+        "<leader>ic",
+        function()
+          --- Check if in normal or visual mode
+          local mode = vim.api.nvim_get_mode().mode
+
+          if mode == "v" then
+            local start = vim.fn.getpos "'<"
+            local stop = vim.fn.getpos "'>"
+            local lines =
+              vim.api.nvim_buf_get_lines(0, start[2] - 1, stop[2], false)
+            local title = lines[1]
+            local body = table.concat(lines, "\n", 2)
+            -- Remove any leading or trailing whitespace
+            title = vim.trim(title)
+            body = vim.trim(body)
+
+            create_issue { title = title, body = body }
+          end
+
+          vim.ui.input({ prompt = "Issue title: " }, function(title)
+            if not title then
+              return
+            end
+
+            vim.ui.input({ prompt = "Issue body: " }, function(body)
+              create_issue { title = title, body = body }
+            end)
+          end)
+        end,
+        mode = { "n", "v" },
+        desc = "Create issue",
+      },
       {
         "<leader>op",
         "<CMD>Octo pr list<CR>",
@@ -335,6 +367,13 @@ return {
         },
         use_timeline_icons = true,
         commands = {
+          release = {
+            list = function(repo)
+              require("config.releases").create_picker {
+                repo = repo,
+              }
+            end,
+          },
           pr = {
             auto = function()
               local gh = require "octo.gh"
@@ -468,6 +507,67 @@ return {
                   end,
                 }
               )
+            end,
+          },
+          issue = {
+            transfer = function(total)
+              local limit = total or 100
+              local gh = require "octo.gh"
+              local utils = require "octo.utils"
+
+              local buffer = utils.get_current_buffer()
+
+              if not buffer or not buffer:isIssue() then
+                utils.error "Not in an issue buffer"
+                return
+              end
+
+              local viewer = vim.g.octo_viewer
+
+              local number = buffer.node.number
+
+              gh.repo.list {
+                limit = limit,
+                json = "id,nameWithOwner",
+                opts = {
+                  cb = gh.create_callback {
+                    success = function(output)
+                      local repos = vim.json.decode(output)
+
+                      vim.ui.select(repos, {
+                        prompt = "Select a repository:",
+                        format_item = function(item)
+                          local name = item.nameWithOwner
+                          name = string.gsub(name, viewer .. "/", "")
+                          return name
+                        end,
+                      }, function(selected)
+                        if not selected then
+                          utils.error "No repository selected"
+                          return
+                        end
+
+                        local message = function()
+                          utils.info(
+                            "Transferring issue "
+                              .. number
+                              .. " to "
+                              .. selected.nameWithOwner
+                          )
+                        end
+
+                        gh.issue.transfer {
+                          number,
+                          selected.nameWithOwner,
+                          opts = {
+                            cb = gh.create_callback { success = message },
+                          },
+                        }
+                      end)
+                    end,
+                  },
+                },
+              }
             end,
           },
           auth = {
