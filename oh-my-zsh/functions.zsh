@@ -151,25 +151,6 @@ function timezsh() {
 }
 
 
-function sessions() {
-    local session
-    session=$(tmux list-sessions -F "#{session_name}")
-
-    if [ -z "$session" ]; then
-        return 1
-    fi
-
-    selected_session=$(echo "$session" | fzf)
-
-    if [ -n "$TMUX" ]; then
-        tmux switch-client -t "$selected_session"
-    else
-        tmux attach-session -t "$selected_session"
-    fi
-}
-
-alias s=sessions
-
 function windows() {
     local window
     window=$(tmux list-windows -F "#{window_id}: #{window_name}")
@@ -274,7 +255,7 @@ function pr {
 }
 
 sessions () {
-        sesh connect $(sesh list | fzf)
+    sesh connect $(sesh list | grep -v '~/github' | fzf)
 }
 
 alias s=sessions
