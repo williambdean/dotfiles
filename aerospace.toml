@@ -215,7 +215,7 @@ automatically-unhide-macos-hidden-apps = false
 # Find these with aerospace list-apps
 [[on-window-detected]]
 if.app-id = 'com.github.wez.wezterm'
-run = 'move-node-to-workspace T'
+run = 'move-node-to-workspace W'
 
 [[on-window-detected]]
 if.app-id = 'com.apple.Safari'
