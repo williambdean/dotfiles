@@ -255,7 +255,7 @@ function pr {
 }
 
 sessions () {
-    sesh connect $(sesh list | grep -v '~/github' | fzf)
+    sesh connect $(sesh list | grep -v '~/GitHub' | fzf)
 }
 
 alias s=sessions
@@ -297,6 +297,7 @@ transfer-files() {
     local source=$1
     local destination=${2:-$(pwd)}
     local locations=$(FZF_DEFAULT_COMMAND="find $source -mindepth 1 -maxdepth 1" fzf -m)
+    # local locations=$(FZF_DEFAULT_COMMAND="find $source -mindepth 1 -maxdepth 1 -type f -printf '%T@ %p\n' | sort -nr | cut -d' ' -f2-" fzf -m)
 
     echo "$locations" | while IFS= read -r location; do
         if [[ -n "$location" ]]; then
