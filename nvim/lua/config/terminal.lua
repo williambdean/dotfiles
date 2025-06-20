@@ -87,7 +87,7 @@ local unique_items = function(items)
   return result
 end
 
-local get_tests_in_range = function(start_line, end_line)
+M.get_tests_in_range = function(start_line, end_line)
   local tests = M.get_test_names(start_line, end_line)
   local tests_names = {}
   for _, test in ipairs(tests) do
@@ -98,12 +98,12 @@ end
 
 vim.api.nvim_create_user_command("GetTestNames", function(args)
   local start_line, end_line = args.line1, args.line2
-  vim.print(get_tests_in_range(start_line, end_line))
+  vim.print(M.get_tests_in_range(start_line, end_line))
 end, { range = true })
 
-local function get_test_under_cursor()
+function M.get_test_under_cursor()
   local current_line = vim.api.nvim_win_get_cursor(0)[1]
-  return get_tests_in_range(current_line, current_line)
+  return M.get_tests_in_range(current_line, current_line)
 end
 
 M.state = {
@@ -173,7 +173,7 @@ function M.run_test(args, test_names)
   M.send_command(test_command)
 end
 
-local run_tests = function(args)
+M.run_tests = function(args)
   local start_line, end_line
 
   if args.range ~= 0 then
@@ -183,18 +183,18 @@ local run_tests = function(args)
     start_line, end_line = current_line, current_line
   end
 
-  local tests = get_tests_in_range(start_line, end_line)
+  local tests = M.get_tests_in_range(start_line, end_line)
   M.run_test(args, tests)
 end
 
 vim.api.nvim_create_user_command("DRunTests", function(args)
   args.args = args.args .. " --pdb -vvv"
-  return run_tests(args)
+  return M.run_tests(args)
 end, { nargs = "*", range = true })
 
 vim.api.nvim_create_user_command(
   "RunTests",
-  run_tests,
+  M.run_tests,
   { nargs = "*", range = true }
 )
 
