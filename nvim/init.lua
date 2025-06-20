@@ -35,6 +35,12 @@ require("lazy").setup {
   spec = {
     { import = "plugins" },
     {
+      "chomosuke/typst-preview.nvim",
+      lazy = false, -- or ft = 'typst'
+      version = "1.*",
+      opts = {}, -- lazy.nvim will implicitly calls `setup {}`
+    },
+    {
       "stevearc/conform.nvim",
       opts = {
         format_on_save = {
@@ -312,7 +318,7 @@ vim.g.netrw_browsex_viewer = "wslview"
 
 -- vim.o.background = "dark"
 -- vim.cmd [[colorscheme gruvbox]]
---
+
 vim.cmd "colorscheme github_dark_high_contrast"
 
 -- Define transparency function
@@ -366,6 +372,10 @@ require "config.command-helper"
 require "config.gist-comments"
 
 local test_files = require "config.test_files"
+
+vim.api.nvim_create_user_command("Rc", function()
+  vim.edit "~/.zshrc"
+end, {})
 
 vim.api.nvim_create_user_command("GetBufInfo", function()
   vim.print(vim.inspect(test_files.buffer_info()))
