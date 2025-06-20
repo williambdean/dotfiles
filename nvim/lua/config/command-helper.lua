@@ -41,6 +41,12 @@ vim.api.nvim_create_user_command("CommandHelp", function(opts)
     return
   end
 
+  local is_uv = "--uv"
+  if string.match(cmd, is_uv) then
+    cmd = string.gsub(cmd, is_uv, "")
+    cmd = "uv run " .. cmd
+  end
+
   cmd = cmd .. " --help"
   local output = vim.fn.systemlist(cmd)
 
