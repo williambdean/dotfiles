@@ -3,5 +3,6 @@
 # Can have other files that will not be tracked
 oh-my-zsh/*/*.zsh
 
-
 __pycache__/
+
+.git
