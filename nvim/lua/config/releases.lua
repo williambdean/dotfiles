@@ -81,6 +81,7 @@ end, {})
 
 M.create_picker = function(opts)
   opts = opts or {}
+  opts.repo = opts.repo or utils.get_remote_name()
 
   -- Create custom layout configuration
   local layout_config = {
@@ -141,16 +142,11 @@ M.create_picker = function(opts)
                 map("i", "<CR>", function()
                   local selection =
                     action_state.get_selected_entry(prompt_bufnr)
+                  local repo = opts.repo
                   actions.close(prompt_bufnr)
-                  gh.release.view {
-                    selection.obj.tagName,
-                    repo = selection.obj.repo,
-                    json = "url",
-                    jq = ".url",
-                    opts = {
-                      cb = gh.create_callback { success = utils.copy_url },
-                    },
-                  }
+
+                  utils.get("release", selection.obj.tagName, repo)
+
                   return true
                 end)
                 return true
