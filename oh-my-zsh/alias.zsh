@@ -40,4 +40,7 @@ alias db="nvim -c ':DBUI'"
 # Docker
 alias enter-docker="docker run --rm -it --entrypoint bash"
 
+# Turn the screen off
 alias off="pmset displaysleepnow"
+
+alias cd=z
