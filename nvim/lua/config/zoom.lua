@@ -1,3 +1,4 @@
+--- Zoom toggle with <leader>O
 local M = {}
 
 local zoomed = false
