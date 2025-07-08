@@ -79,6 +79,13 @@ return {
             builtin.find_files {
               cwd = cwd,
               search_dirs = { cwd },
+              attach_mappings = function(_, map)
+                map("i", "<CR>", function(prompt_bufnr)
+                  require("telescope.actions").select_default(prompt_bufnr)
+                  vim.cmd.lcd(cwd)
+                end)
+                return true
+              end,
             }
           end)
         end,
@@ -97,7 +104,10 @@ return {
           local params = {
             cwd = cwd,
             search_dirs = { cwd },
+            follow = true,
+            hidden = true,
             no_ignore = false,
+            no_ignore_parent = false,
           }
 
           require("telescope.builtin").find_files(params)
@@ -149,6 +159,13 @@ return {
             builtin.live_grep {
               cwd = cwd,
               search_dirs = { cwd },
+              attach_mappings = function(_, map)
+                map("i", "<CR>", function(prompt_bufnr)
+                  require("telescope.actions").select_default(prompt_bufnr)
+                  vim.cmd.lcd(cwd)
+                end)
+                return true
+              end,
             }
           end)
         end,
