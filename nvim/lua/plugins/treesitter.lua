@@ -129,33 +129,33 @@ return {
     },
     config = function()
       -- Create Neovim commands to fold/unfold docstrings
-      vim.api.nvim_create_user_command("FoldDocstrings", fold_docstrings, {})
-      vim.api.nvim_create_user_command(
-        "UnfoldDocstrings",
-        unfold_docstrings,
-        {}
-      )
+      -- vim.api.nvim_create_user_command("FoldDocstrings", fold_docstrings, {})
+      -- vim.api.nvim_create_user_command(
+      --   "UnfoldDocstrings",
+      --   unfold_docstrings,
+      --   {}
+      -- )
 
-      -- Autocmd to run FoldDocstrings when entering a Python file
-      local fold_docstrings_group =
-        vim.api.nvim_create_augroup("FoldDocstringGroup", { clear = true })
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = "python",
-        callback = function()
-          local bufnr = tostring(vim.api.nvim_get_current_buf())
-
-          if docstrings_are_folded[bufnr] == nil then
-            docstrings_are_folded[bufnr] = false
-          end
-
-          if docstrings_are_folded[bufnr] then
-            return
-          end
-
-          vim.cmd "FoldDocstrings"
-        end,
-        group = fold_docstrings_group,
-      })
+      -- -- Autocmd to run FoldDocstrings when entering a Python file
+      -- local fold_docstrings_group =
+      --     vim.api.nvim_create_augroup("FoldDocstringGroup", { clear = true })
+      -- vim.api.nvim_create_autocmd("FileType", {
+      --   pattern = "python",
+      --   callback = function()
+      --     local bufnr = tostring(vim.api.nvim_get_current_buf())
+      --
+      --     if docstrings_are_folded[bufnr] == nil then
+      --       docstrings_are_folded[bufnr] = false
+      --     end
+      --
+      --     if docstrings_are_folded[bufnr] then
+      --       return
+      --     end
+      --
+      --     vim.cmd "FoldDocstrings"
+      --   end,
+      --   group = fold_docstrings_group,
+      -- })
 
       require("nvim-treesitter.configs").setup {
         ensure_installed = {
