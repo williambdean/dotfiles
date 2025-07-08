@@ -16,7 +16,7 @@ M.get_executable = function()
   local path = vim.fn.exepath "python"
 
   if path == "" then
-    return "python"
+    return "python3"
   end
 
   if path:sub(1, 1) ~= "/" then
