@@ -1,3 +1,4 @@
+--- Navigation between test files and their source files
 local M = {}
 
 --- Search for a likely culprit for the module name
