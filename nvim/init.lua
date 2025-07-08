@@ -41,6 +41,19 @@ require("lazy").setup {
       opts = {}, -- lazy.nvim will implicitly calls `setup {}`
     },
     {
+      "iamcco/markdown-preview.nvim",
+      cmd = {
+        "MarkdownPreviewToggle",
+        "MarkdownPreview",
+        "MarkdownPreviewStop",
+      },
+      build = "cd app && npm install",
+      init = function()
+        vim.g.mkdp_filetypes = { "markdown" }
+      end,
+      ft = { "markdown" },
+    },
+    {
       "stevearc/conform.nvim",
       opts = {
         format_on_save = {
