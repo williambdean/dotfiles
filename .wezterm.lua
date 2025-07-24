@@ -10,17 +10,16 @@ config.initial_cols = 110
 
 -- Use wsl
 -- config.default_domain = "WSL:Ubuntu"
-config.font_size = 18
+config.font_size = 18.5
 
 -- Set the color scheme
 config.color_scheme = "Gruvbox Dark"
 
 -- Set the transparency of the background
-config.window_background_opacity = 0.825
+config.window_background_opacity = 0.8
 
 -- No tabs at the top
 config.hide_tab_bar_if_only_one_tab = true
-
 config.window_close_confirmation = "NeverPrompt"
 
 -- Turn off ligatures
