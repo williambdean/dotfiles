@@ -1,3 +1,8 @@
+issues.md
+test.md
+
+nvim/spell/
+
 .DS_Store
 
 # Can have other files that will not be tracked
