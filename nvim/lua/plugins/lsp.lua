@@ -69,9 +69,11 @@ return {
         "pyright",
         "lua-language-server",
         "yaml-language-server",
+        "typescript-language-server",
         "shfmt",
         "codespell",
         "html-lsp",
+        "prettier",
       },
     },
     config = function()
@@ -110,9 +112,15 @@ return {
           end
         end,
       }
+      -- lspconfig.prettier.setup {
+      --   capabilities = capabilities,
+      --   filetypes = { "javascript", "typescript", "html", "css", "json" },
+      --   root_dir = lspconfig.util.root_pattern(".git", ".prettierrc"),
+      -- }
       lspconfig.html.setup {
         capabilities = capabilities,
       }
+      lspconfig.ts_ls.setup { capabilities = capabilities }
       lspconfig.rust_analyzer.setup {
         capabilities = capabilities,
         settings = {
