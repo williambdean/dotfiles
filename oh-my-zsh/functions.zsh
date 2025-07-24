@@ -357,3 +357,7 @@ star() {
     echo "Failed to star $owner/$repo"
   fi
 }
+
+function fvim() {
+    vim $(fzf)
+}
