@@ -15,7 +15,10 @@ local find_module_path = function(module_file_name)
 
   for _, dir in ipairs(directories) do
     local module_file = dir .. module_file_name
-    if vim.fn.filereadable(module_file) == 1 then
+    local init_file = dir .. "__init__.py"
+    if
+      vim.fn.filereadable(module_file) == 1 and vim.fn.filereadable(init_file)
+    then
       return module_file
     end
   end
