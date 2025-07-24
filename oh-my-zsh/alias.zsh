@@ -44,3 +44,5 @@ alias enter-docker="docker run --rm -it --entrypoint bash"
 alias off="pmset displaysleepnow"
 
 alias cd=z
+
+alias bvim="NVIM_APPNAME=bare-config nvim"
