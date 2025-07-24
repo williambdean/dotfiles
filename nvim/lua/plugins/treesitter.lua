@@ -161,6 +161,7 @@ return {
         ensure_installed = {
           "python",
           "graphql",
+          "rst",
         },
         highlight = {
           enable = true,
