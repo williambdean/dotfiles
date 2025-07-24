@@ -9,6 +9,7 @@ local function switch_to_test_file()
   end
 
   local buffer_info = require("config.test_files").buffer_info()
+
   -- Check if it's in tests directory
   local in_tests = buffer_info.first_dir == "tests"
 
