@@ -89,6 +89,14 @@ vim.keymap.set("v", "<leader>cri", function()
   }
 end, {})
 
+vim.keymap.set("v", "<leader>gho", function()
+  require("gitlinker").link {
+    action = require("gitlinker.actions").open_in_browser,
+    message = false,
+    remote = has_upstream() and "upstream" or "origin",
+  }
+end, {})
+
 vim.api.nvim_create_user_command("CloseIssue", function(opts)
   require("config.close-issue").close_issue()
 end, {})
@@ -429,6 +437,7 @@ return {
               )
             end,
             update = function()
+              local gh = require "octo.gh"
               local utils = require "octo.utils"
               local buffer = utils.get_current_buffer()
               if not buffer or not buffer:isPullRequest() then
@@ -436,8 +445,9 @@ return {
                 return
               end
 
-              require("config.update-pr-branch").update_branch {
-                id = buffer.node.id,
+              gh.pr["update-branch"] {
+                buffer.node.number,
+                opts = { cb = gh.create_callback {} },
               }
             end,
           },
@@ -447,17 +457,21 @@ return {
 
               picker.labels {
                 cb = function(labels)
-                  local label = labels[1].name
+                  local combined_labels = ""
+                  for _, l in ipairs(labels) do
+                    combined_labels = combined_labels .. "," .. l.name
+                  end
+                  combined_labels = string.sub(combined_labels, 2) -- Remove leading comma
 
                   github_search {
-                    query = "label:" .. label,
+                    query = "label:" .. combined_labels,
                     include_repo = true,
                   }
                 end,
               }
             end,
           },
-          notification = {
+          my_notification = {
             list = function()
               local utils = require "octo.utils"
 
@@ -510,6 +524,27 @@ return {
             end,
           },
           issue = {
+            transfer_to_repo = function(repo)
+              local gh = require "octo.gh"
+              local utils = require "octo.utils"
+
+              local buffer = utils.get_current_buffer()
+
+              if not buffer or not buffer:isIssue() then
+                utils.error "Not in an issue buffer"
+                return
+              end
+
+              local number = buffer.node.number
+
+              gh.issue.transfer {
+                number,
+                repo,
+                opts = {
+                  cb = gh.create_callback {},
+                },
+              }
+            end,
             transfer = function(total)
               local limit = total or 100
               local gh = require "octo.gh"
