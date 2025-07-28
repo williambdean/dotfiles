@@ -465,3 +465,6 @@ end, {})
 vim.api.nvim_create_user_command("GetBufInfo", function()
   vim.print(vim.inspect(test_files.buffer_info()))
 end, {})
+
+vim.keymap.set("t", "<C-n>", "<Down>", { noremap = true, silent = true })
+vim.keymap.set("t", "<C-p>", "<Up>", { noremap = true, silent = true })
