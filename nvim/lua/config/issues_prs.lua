@@ -20,7 +20,7 @@ local create_state = function()
     floating = {
       buf = -1,
       win = -1,
-    }
+    },
   }
 end
 
@@ -32,7 +32,6 @@ local current_buffer = function()
   local buffer = _G.octo_buffers[bufnr]
   return buffer
 end
-
 
 local state = {
   issues = {
@@ -61,7 +60,6 @@ local state = {
 ---
 ---@type table<string, BranchMapping>
 
-
 -- Store of the relationship between branches and issues/PRs
 -- example mapping = {
 --  feature_branch = {
@@ -85,7 +83,6 @@ query($owner: String!, $name: String!, $pr_number: Int!, $n_referencing: Int = 1
   }
 }
 ]]
-
 
 ---Get the closing issues for a PR
 ---@param opts table
@@ -139,7 +136,6 @@ local pr_into_branch = function(branch)
 
   return tonumber(vim.trim(stdout))
 end
-
 
 --- Create a floating window
 --- @param opts table
@@ -302,7 +298,6 @@ local number_in_table = function(number, table)
   return false
 end
 
-
 M.mark = function()
   local buffer = current_buffer()
 
@@ -324,12 +319,17 @@ M.mark = function()
     mapping[branch].pr = number
   elseif buffer:isIssue() then
     mapping[branch].issues = mapping[branch].issues or {}
-    local numbers = vim.tbl_map(function(issue) return issue.number end, mapping[branch].issues)
+    local numbers = vim.tbl_map(function(issue)
+      return issue.number
+    end, mapping[branch].issues)
     if number_in_table(number, numbers) then
       utils.error "Issue already marked"
       return
     end
-    table.insert(mapping[branch].issues, { number = number, title = buffer.node.title })
+    table.insert(
+      mapping[branch].issues,
+      { number = number, title = buffer.node.title }
+    )
   end
 end
 
@@ -345,10 +345,10 @@ M.pick_issue = function()
 
   local toggle_issue = function()
     hide_current()
-    state =
+    state = create_state()
   end
 
-  require "config.easy_picker".new(issues, {
+  require("config.easy_picker").new(issues, {
     selected_callback = function(selected)
       vim.print(vim.inspect(selected))
     end,
