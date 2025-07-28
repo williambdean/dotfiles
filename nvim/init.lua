@@ -35,6 +35,37 @@ require("lazy").setup {
   spec = {
     { import = "plugins" },
     {
+      "L3MON4D3/LuaSnip",
+      -- follow latest release.
+      version = "v2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+      -- install jsregexp (optional!).
+      build = "make install_jsregexp",
+      event = "InsertEnter",
+      dependencies = { "rafamadriz/friendly-snippets" }, -- optional
+      config = function()
+        require("luasnip.loaders.from_vscode").lazy_load()
+      end,
+    },
+    {
+      dir = "~/github/neovim-plugins/bible-verse.nvim",
+      -- Lazy load on plugin commands
+      cmd = { "BibleVerse", "BibleVerseQuery", "BibleVerseInsert" },
+      dependencies = {
+        "MunifTanjim/nui.nvim",
+      },
+      opts = {
+        diatheke = {
+          -- (MANDATORY)
+          -- Corresponds to the diatheke module; diatheke's -b flag.
+          -- In this example, we are using KJV module.
+          translation = "KJV",
+        },
+      },
+      -- plugin is not set up by default
+      config = true,
+    },
+    { "mluders/comfy-line-numbers.nvim", opts = {} },
+    {
       "chomosuke/typst-preview.nvim",
       lazy = false, -- or ft = 'typst'
       version = "1.*",
@@ -274,6 +305,8 @@ vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true })
 vim.g.markdown_fenced_languages =
   { "python", "bash=sh", "yaml", "json", "vim", "lua" }
 
+vim.cmd [[ autocmd FileType rst setlocal syntax=off ]]
+
 -- Go up and down with center screen
 vim.keymap.set("n", "<C-d>", "<C-d>zz", { noremap = true })
 vim.keymap.set("n", "<C-u>", "<C-u>zz", { noremap = true })
@@ -383,11 +416,50 @@ require "config.hash"
 require "config.zoom"
 require "config.command-helper"
 require "config.gist-comments"
+require "config.snippets"
+require "config.last-command"
+require "config.register"
+require "config.dump"
+
+local sphinx = require "config.sphinx"
+
+-- Function for command completion
+local function complete_doc_url(arg_lead, cmd_line, cursor_pos)
+  local args = vim.split(cmd_line, " ")
+  local num_args = #args
+
+  -- If the cursor is at the end of the command or after the first argument
+  if num_args == 2 then -- Completing the action (e.g., :DocUrl <cursor>)
+    local actions = { "open", "copy" }
+    local completions = {}
+    for _, action in ipairs(actions) do
+      if action:find(arg_lead, 1, true) then
+        table.insert(completions, action)
+      end
+    end
+    return completions
+  elseif num_args == 3 then -- Completing the version (e.g., :DocUrl open <cursor>)
+    local versions = { "latest", "stable" } -- Add more versions as needed
+    local completions = {}
+    for _, version in ipairs(versions) do
+      if version:find(arg_lead, 1, true) then
+        table.insert(completions, version)
+      end
+    end
+    return completions
+  end
+  return {}
+end
+
+vim.api.nvim_create_user_command("DocUrl", sphinx.handle_doc_url, {
+  nargs = "*", -- Allow 0, 1, or 2 arguments
+  complete = complete_doc_url,
+})
 
 local test_files = require "config.test_files"
 
 vim.api.nvim_create_user_command("Rc", function()
-  vim.edit "~/.zshrc"
+  vim.cmd [[ edit ~/.zshrc ]]
 end, {})
 
 vim.api.nvim_create_user_command("GetBufInfo", function()
