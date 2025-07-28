@@ -417,7 +417,6 @@ require "config.zoom"
 require "config.command-helper"
 require "config.gist-comments"
 require "config.snippets"
-require "config.last-command"
 require "config.register"
 require "config.dump"
 
