@@ -27,7 +27,7 @@ vim.keymap.set("n", "<leader>x", function(args)
   elseif python.has_ipython() then
     command = "ipython -i " .. filename
   else
-    command = "python -i " .. filename
+    command = "python3 -i " .. filename
   end
 
   terminal.open_terminal(true)
