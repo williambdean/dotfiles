@@ -101,25 +101,30 @@ vim.api.nvim_create_user_command("CloseIssue", function(opts)
   require("config.close-issue").close_issue()
 end, {})
 
-vim.keymap.set("n", "<leader>B", function()
-  local utils = require "octo.utils"
-  local buffer = utils.get_current_buffer()
-  if not buffer then
-    utils.error "Not in an octo buffer"
-    return
-  end
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "octo",
+  callback = function()
+    vim.keymap.set("n", "<leader>B", function()
+      local utils = require "octo.utils"
+      local buffer = utils.get_current_buffer()
+      if not buffer then
+        utils.error "Not in an octo buffer"
+        return
+      end
 
-  vim.ui.select({ "timelineItems", "full" }, {
-    prompt = "Select an item",
-  }, function(selected)
-    local item = selected == "full" and buffer or buffer.node[selected]
-    if not item then
-      utils.error "No item selected"
-      return
-    end
-    vim.notify(vim.inspect(item))
-  end)
-end)
+      vim.ui.select({ "timelineItems", "full" }, {
+        prompt = "Select an item",
+      }, function(selected)
+        local item = selected == "full" and buffer or buffer.node[selected]
+        if not item then
+          utils.error "No item selected"
+          return
+        end
+        vim.notify(vim.inspect(item))
+      end)
+    end, { buffer = true })
+  end,
+})
 
 local function current_author()
   local utils = require "octo.utils"
