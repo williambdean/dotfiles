@@ -34,6 +34,7 @@ opt.splitright = true
 require("lazy").setup {
   spec = {
     { import = "plugins" },
+    { "lark-parser/vim-lark-syntax" },
     {
       "L3MON4D3/LuaSnip",
       -- follow latest release.
@@ -419,6 +420,7 @@ require "config.gist-comments"
 require "config.snippets"
 require "config.register"
 require "config.dump"
+require("config.github").setup()
 
 local sphinx = require "config.sphinx"
 
@@ -451,7 +453,7 @@ local function complete_doc_url(arg_lead, cmd_line, cursor_pos)
 end
 
 vim.api.nvim_create_user_command("DocUrl", sphinx.handle_doc_url, {
-  nargs = "*", -- Allow 0, 1, or 2 arguments
+  nargs = "*", -- Allow 0, 1, or 1 arguments
   complete = complete_doc_url,
 })
 
@@ -467,3 +469,29 @@ end, {})
 
 vim.keymap.set("t", "<C-n>", "<Down>", { noremap = true, silent = true })
 vim.keymap.set("t", "<C-p>", "<Up>", { noremap = true, silent = true })
+
+vim.cmd "set completeopt+=noselect"
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "lua", "python", "markdown", "toml" },
+  callback = function()
+    local toggled = false
+    vim.keymap.set("n", "<leader>B", function()
+      if not toggled then
+        vim.cmd "Git blame"
+        toggled = true
+      else
+        --- Find the buffer that is of file type fugitiveblame and close it
+        for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+          if
+            vim.api.nvim_buf_get_option(buf, "filetype") == "fugitiveblame"
+          then
+            vim.api.nvim_buf_delete(buf, { force = true })
+            toggled = false
+            return
+          end
+        end
+      end
+    end)
+  end,
+})
