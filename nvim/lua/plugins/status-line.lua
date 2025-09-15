@@ -69,7 +69,7 @@ end
 M.last_fetched = 0
 
 M.fetch_notifications = function()
-  local current_time = vim.loop.hrtime() / 1e6 -- Convert to milliseconds
+  local current_time = vim.uv.hrtime() / 1e6 -- Convert to milliseconds
   if current_time - M.last_fetched < update_rate then
     return
   end
