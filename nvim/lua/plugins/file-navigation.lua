@@ -22,11 +22,11 @@ end, { desc = "Next quickfix item" })
 
 return {
   { "nanotee/zoxide.vim", cmd = { "Lz" } },
-  {
-    "benomahony/oil-git.nvim",
-    dependencies = { "stevearc/oil.nvim" },
-    -- No opts or config needed! Works automatically
-  },
+  -- {
+  --   "benomahony/oil-git.nvim",
+  --   dependencies = { "stevearc/oil.nvim" },
+  --   -- No opts or config needed! Works automatically
+  -- },
   {
     "stevearc/oil.nvim",
     dependencies = {
