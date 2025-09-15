@@ -420,6 +420,7 @@ require "config.gist-comments"
 require "config.snippets"
 require "config.register"
 require "config.dump"
+require "config.repos"
 require("config.github").setup()
 
 local sphinx = require "config.sphinx"
@@ -495,3 +496,26 @@ vim.api.nvim_create_autocmd("FileType", {
     end)
   end,
 })
+
+--- TODO: Exclude mlflow files or various other large hidden directories
+vim.cmd [[ set path +=,** ]]
+
+--- Easily make sections like
+--- Parameters
+--- ----------
+--- or
+--- Examples
+--- --------
+local create_underlined_section = function()
+  local line = vim.api.nvim_get_current_line()
+  local indent = line:match "^%s*" or "" -- Capture leading whitespace
+  local content = line:gsub("^%s*", "") -- Remove leading whitespace
+  local len = vim.fn.strwidth(content) -- Get width of content without indent
+  local underline = indent .. string.rep("-", len)
+
+  -- Insert the underline below the current line
+  local row = vim.api.nvim_win_get_cursor(0)[1]
+  vim.api.nvim_buf_set_lines(0, row, row, false, { underline })
+end
+
+vim.keymap.set("n", "<leader>u", create_underlined_section)
