@@ -18,6 +18,27 @@ This is an example of how to use the module.
     # Just call the main block
     main()
 
+This is an example with indentation.
+
+.. code-block:: python
+
+    x = 1
+    z = 2
+
+    for i in range(5):
+        print(i)
+
+        # Another example
+
+    def example():
+        print("This is an example")
+
+        if True:
+            print("This is true")
+
+        for i in range(5):
+            print(i)
+
 """
 
 from dataclasses import dataclass
@@ -85,6 +106,16 @@ def transform_data(df: pd.DataFrame) -> pd.DataFrame:
     ----------
     df : pd.DataFrame
         The DataFrame to process
+
+    Examples
+    --------
+    This is a code example.
+
+    .. code-block:: python
+
+        df = pd.DataFrame({"x": [1, 2], "y": [3, 4]})
+        transform_data(df)
+
 
     """
     return df.assign(z=lambda x: x["x"] + x["y"])
