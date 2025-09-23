@@ -114,7 +114,13 @@ def transform_data(df: pd.DataFrame) -> pd.DataFrame:
     .. code-block:: python
 
         df = pd.DataFrame({"x": [1, 2], "y": [3, 4]})
-        transform_data(df)
+
+        to_transform: bool = True
+
+        if to_transform:
+            transform_data(df)
+
+        # This is a comment in the example
 
 
     """
