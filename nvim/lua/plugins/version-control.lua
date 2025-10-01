@@ -387,6 +387,62 @@ return {
               }
             end,
           },
+          -- Octo commit list
+          commit = {
+            url = function()
+              local gh = require "octo.gh"
+
+              local query = [[
+                query Last100Commits($owner: String!, $name: String!) {
+                  repository(owner: $owner, name: $name) {
+                    defaultBranchRef {
+                      target {
+                        ... on Commit {
+                          history(first: 100) {
+                            nodes {
+                              oid
+                              message
+                              url
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                ]]
+
+              local utils = require "octo.utils"
+              local repo = utils.get_remote_name()
+              local owner, name = utils.split_repo(repo)
+
+              local result = gh.api.graphql {
+                query = query,
+                fields = {
+                  owner = owner,
+                  name = name,
+                },
+                jq = ".data.repository.defaultBranchRef.target.history.nodes",
+                opts = {
+                  cb = gh.create_callback {
+                    success = function(data)
+                      vim.ui.select(vim.json.decode(data), {
+                        prompt = "Select a commit",
+                        format_item = function(item)
+                          return item.oid:sub(1, 7) .. " - " .. item.message
+                        end,
+                      }, function(selected)
+                        if not selected then
+                          return
+                        end
+                        vim.notify("Commit URL: " .. selected.url)
+                      end)
+                    end,
+                  },
+                },
+              }
+            end,
+          },
           pr = {
             auto = function()
               local gh = require "octo.gh"

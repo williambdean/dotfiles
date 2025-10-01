@@ -1,4 +1,6 @@
-local function quick_chat(with_buffer)
+local function quick_chat(opts)
+  opts = opts or {}
+  local with_buffer = opts.with_buffer or false
   local chat = require "CopilotChat"
   local select = require "CopilotChat.select"
 
@@ -27,6 +29,37 @@ end
 
 vim.keymap.set("i", "@", "@<C-x><C-o>", { silent = true, buffer = true })
 vim.keymap.set("i", "#", "#<C-x><C-o>", { silent = true, buffer = true })
+
+---Create a popup to input a question for CopilotChat
+---@param cb fun(question: string)
+---@return nil
+local create_popup = function(cb)
+  local Popup = require "nui.popup"
+  local event = require("nui.utils.autocmd").event
+
+  local popup = Popup {
+    enter = true,
+    focusable = true,
+    border = {
+      style = "rounded",
+    },
+    position = "50%",
+    size = {
+      width = "80%",
+      height = "60%",
+    },
+  }
+
+  -- mount/open the component
+  popup:mount()
+
+  -- unmount component when cursor leaves buffer
+  popup:on(event.BufLeave, function()
+    local text = vim.api.nvim_buf_get_lines(popup.bufnr, 0, -1, false)
+    cb(vim.fn.join(text, "\n"))
+    popup:unmount()
+  end)
+end
 
 return {
   {
@@ -318,14 +351,14 @@ return {
       {
         "<leader>ccq",
         function()
-          quick_chat(false)
+          quick_chat { with_buffer = false }
         end,
         desc = "CopilotChat - Quick Chat",
       },
       {
         "<leader>ccb",
         function()
-          quick_chat(true)
+          quick_chat { with_buffer = true }
         end,
         desc = "CopilotChat - Quick Chat (Buffer)",
       },
@@ -356,8 +389,15 @@ return {
           local chat = require "CopilotChat"
           local select = require "CopilotChat.select"
 
-          local question = vim.fn.input "Quick Chat (Visual): "
-          chat.ask(question, { selection = select.visual })
+          create_popup(function(question)
+            if question == "" then
+              return
+            end
+            chat.ask(question, { selection = select.visual })
+          end)
+
+          -- local question = vim.fn.input "Quick Chat (Visual): "
+          -- chat.ask(question, { selection = select.visual })
         end,
         mode = "v",
         desc = "CopilotChat - Visual",

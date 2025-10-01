@@ -67,6 +67,7 @@ return {
       ensure_installed = {
         "ruff",
         "pyright",
+        "tinymist",
         "lua-language-server",
         "yaml-language-server",
         "typescript-language-server",
@@ -120,6 +121,19 @@ return {
       lspconfig.html.setup {
         capabilities = capabilities,
       }
+
+      lspconfig.tinymist.setup {
+        capabilities = capabilities,
+        settings = {
+          -- Automatically compile a PDF on each save
+          exportPdf = "onSave",
+          -- Define the output path for the PDF
+          outputPath = "$root/target/$dir/$name.pdf",
+          -- Set the formatter mode
+          formatterMode = "typstyle",
+        },
+      }
+
       lspconfig.ts_ls.setup { capabilities = capabilities }
       lspconfig.rust_analyzer.setup {
         capabilities = capabilities,
