@@ -422,6 +422,7 @@ require "config.register"
 require "config.dump"
 require "config.repos"
 require("config.github").setup()
+require "config.code-block"
 
 local sphinx = require "config.sphinx"
 
@@ -519,3 +520,13 @@ local create_underlined_section = function()
 end
 
 vim.keymap.set("n", "<leader>u", create_underlined_section)
+
+vim.opt.wildignore:append {
+  "*/node_modules/*",
+  "*/.git/*",
+  "*/data/*",
+  "*/.venv/*",
+  "*/mlruns/*",
+  "*/__pycache__/*",
+  "*/cache/*",
+}
