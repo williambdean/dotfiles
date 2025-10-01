@@ -311,6 +311,10 @@ move-from-downloads() {
     transfer-files $HOME/Downloads
 }
 
+move-from-screenshots() {
+    transfer-files $HOME/screenshots
+}
+
 downloads() {
     local source=${1:-$HOME/Downloads}
     FZF_DEFAULT_COMMAND="find $source -mindepth 1 -maxdepth 1" fzf -m
