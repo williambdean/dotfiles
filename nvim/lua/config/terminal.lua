@@ -120,7 +120,10 @@ end
 
 -- Open a terminal window
 -- @param right boolean
-function M.open_terminal(right)
+function M.open_terminal(opts)
+  opts = opts or {}
+  local right = opts.right or false
+
   if M.state.open then
     return
   end
@@ -169,7 +172,7 @@ function M.run_test(args, test_names)
     test_command = test_command .. " " .. args.args
   end
 
-  M.open_terminal(true)
+  M.open_terminal { right = true }
   M.send_command(test_command)
 end
 
