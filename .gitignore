@@ -11,3 +11,5 @@ oh-my-zsh/*/*.zsh
 __pycache__/
 
 .git
+
+node_modules/
