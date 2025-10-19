@@ -18,6 +18,6 @@ vim.keymap.set({ "n", "v" }, "<leader>x", function(args)
     local lines = terminal.get_visual_lines()
     command = table.concat(lines, "\n")
   end
-  terminal.open_terminal(true)
+  terminal.open_terminal { right = true }
   terminal.send_command(command)
 end, opts)

@@ -30,6 +30,6 @@ vim.keymap.set("n", "<leader>x", function(args)
     command = "python3 -i " .. filename
   end
 
-  terminal.open_terminal(true)
+  terminal.open_terminal { right = true }
   terminal.send_command(command)
 end, opts)
