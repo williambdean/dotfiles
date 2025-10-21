@@ -1,3 +1,38 @@
+---Create a popup to input a question. Handle the input with the given callback.
+---@param cb fun(question: string)
+---@return nil
+local create_popup = function(cb)
+  local Popup = require "nui.popup"
+  local event = require("nui.utils.autocmd").event
+
+  local popup = Popup {
+    enter = true,
+    focusable = true,
+    border = {
+      style = "rounded",
+    },
+    position = "50%",
+    size = {
+      width = "80%",
+      height = "60%",
+    },
+  }
+
+  -- mount/open the component
+  popup:mount()
+
+  popup:on(event.BufEnter, function()
+    vim.cmd "startinsert!"
+  end, { once = true })
+
+  -- unmount component when cursor leaves buffer
+  popup:on(event.BufLeave, function()
+    local text = vim.api.nvim_buf_get_lines(popup.bufnr, 0, -1, false)
+    cb(vim.fn.join(text, "\n"))
+    popup:unmount()
+  end)
+end
+
 local function quick_chat(opts)
   opts = opts or {}
   local with_buffer = opts.with_buffer or false
@@ -24,42 +59,13 @@ local function quick_chat(opts)
     end
   end
 
-  vim.ui.input({ prompt = prompt }, handle_input)
+  create_popup(handle_input)
+  --
+  -- vim.ui.input({ prompt = prompt }, handle_input)
 end
 
 vim.keymap.set("i", "@", "@<C-x><C-o>", { silent = true, buffer = true })
 vim.keymap.set("i", "#", "#<C-x><C-o>", { silent = true, buffer = true })
-
----Create a popup to input a question for CopilotChat
----@param cb fun(question: string)
----@return nil
-local create_popup = function(cb)
-  local Popup = require "nui.popup"
-  local event = require("nui.utils.autocmd").event
-
-  local popup = Popup {
-    enter = true,
-    focusable = true,
-    border = {
-      style = "rounded",
-    },
-    position = "50%",
-    size = {
-      width = "80%",
-      height = "60%",
-    },
-  }
-
-  -- mount/open the component
-  popup:mount()
-
-  -- unmount component when cursor leaves buffer
-  popup:on(event.BufLeave, function()
-    local text = vim.api.nvim_buf_get_lines(popup.bufnr, 0, -1, false)
-    cb(vim.fn.join(text, "\n"))
-    popup:unmount()
-  end)
-end
 
 return {
   {
@@ -259,6 +265,9 @@ return {
   -- },
   {
     "zbirenbaum/copilot.lua",
+    requires = {
+      "copilotlsp-nvim/copilot-lsp", -- (optional) for NES functionality
+    },
     cmd = { "Copilot" },
     event = "InsertEnter",
     opts = {},
