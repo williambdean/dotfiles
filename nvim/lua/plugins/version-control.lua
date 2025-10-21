@@ -105,23 +105,21 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = "octo",
   callback = function()
     vim.keymap.set("n", "<leader>B", function()
+      local context = require "octo.context"
       local utils = require "octo.utils"
-      local buffer = utils.get_current_buffer()
-      if not buffer then
-        utils.error "Not in an octo buffer"
-        return
-      end
 
-      vim.ui.select({ "timelineItems", "full" }, {
-        prompt = "Select an item",
-      }, function(selected)
-        local item = selected == "full" and buffer or buffer.node[selected]
-        if not item then
-          utils.error "No item selected"
-          return
-        end
-        vim.notify(vim.inspect(item))
-      end)
+      context.within_octo_buffer(function(buffer)
+        vim.ui.select({ "timelineItems", "full" }, {
+          prompt = "Select an item",
+        }, function(selected)
+          local item = selected == "full" and buffer or buffer.node[selected]
+          if not item then
+            utils.error "No item selected"
+            return
+          end
+          vim.notify(vim.inspect(item))
+        end)
+      end)()
     end, { buffer = true })
   end,
 })
@@ -265,7 +263,7 @@ return {
   {
     "linrongbin16/gitlinker.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
-    config = true,
+    opts = {},
     cmd = { "GitLink" },
     keys = {
       {
@@ -306,6 +304,56 @@ return {
   {
     "lewis6991/gitsigns.nvim",
     opts = {},
+    keys = {
+      {
+        "<leader>hq",
+        function()
+          local gitsigns = require "gitsigns"
+          vim.ui.select({
+            "buffer",
+            "all",
+            "attached",
+          }, {
+            prompt = "Select hunks to quickfix",
+          }, function(choice)
+            if not choice then
+              return
+            end
+
+            if choice == "buffer" then
+              choice = 0
+            end
+
+            gitsigns.setqflist(choice)
+          end)
+        end,
+        desc = "GitHub Hunks to Quickfix",
+      },
+      {
+        "]h",
+        function()
+          local gitsigns = require "gitsigns"
+          if vim.wo.diff then
+            vim.cmd.normal { "]h", bang = true }
+          else
+            gitsigns.nav_hunk "next"
+          end
+        end,
+        desc = "Next GitHub Hunk",
+      },
+      {
+        "[h",
+        function()
+          local gitsigns = require "gitsigns"
+          if vim.wo.diff then
+            vim.cmd.normal { "[h", bang = true }
+          else
+            gitsigns.nav_hunk "prev"
+          end
+        end,
+        desc = "Previous GitHub Hunk",
+      },
+    },
   },
   {
     dir = "~/GitHub/neovim-plugins/octo.nvim",
@@ -376,6 +424,9 @@ return {
         mappings = {
           notification = {
             read = { lhs = "<C-r>", desc = "mark notification as read" },
+          },
+          runs = {
+            rerun = { lhs = "<C-R>", desc = "Rerun workflow" },
           },
         },
         use_timeline_icons = true,
