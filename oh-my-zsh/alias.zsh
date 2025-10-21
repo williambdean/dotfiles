@@ -48,3 +48,4 @@ alias cd=z
 alias bvim="NVIM_APPNAME=bare-config nvim"
 
 alias todo="nvim todo.md"
+alias q=exit
