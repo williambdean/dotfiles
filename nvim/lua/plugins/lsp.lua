@@ -71,6 +71,7 @@ return {
         "lua-language-server",
         "yaml-language-server",
         "typescript-language-server",
+        "copilot-language-server",
         "shfmt",
         "codespell",
         "html-lsp",
@@ -97,6 +98,8 @@ return {
     config = function()
       require("mason").setup()
       require("mason-lspconfig").setup()
+
+      vim.lsp.enable "copilot_ls"
 
       local lspconfig = require "lspconfig"
       -- local capabilities = vim.lsp.protocol.make_client_capabilities()
