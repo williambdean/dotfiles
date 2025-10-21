@@ -34,6 +34,10 @@ opt.splitright = true
 require("lazy").setup {
   spec = {
     { import = "plugins" },
+    -- {
+    --   "dimtion/guttermarks.nvim",
+    --   event = { "BufReadPost", "BufNewFile", "BufWritePre" },
+    -- },
     { "lark-parser/vim-lark-syntax" },
     {
       "L3MON4D3/LuaSnip",
@@ -46,6 +50,14 @@ require("lazy").setup {
       config = function()
         require("luasnip.loaders.from_vscode").lazy_load()
       end,
+    },
+    {
+      dir = "~/github/neovim-plugins/ruff-rules.nvim",
+      dependencies = {
+        "nvim-lua/plenary.nvim",
+        "nvim-telescope/telescope.nvim",
+      },
+      opts = {},
     },
     {
       dir = "~/github/neovim-plugins/bible-verse.nvim",
@@ -498,9 +510,6 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
---- TODO: Exclude mlflow files or various other large hidden directories
-vim.cmd [[ set path +=,** ]]
-
 --- Easily make sections like
 --- Parameters
 --- ----------
@@ -521,6 +530,7 @@ end
 
 vim.keymap.set("n", "<leader>u", create_underlined_section)
 
+vim.cmd [[ set path +=,** ]]
 vim.opt.wildignore:append {
   "*/node_modules/*",
   "*/.git/*",
@@ -530,3 +540,6 @@ vim.opt.wildignore:append {
   "*/__pycache__/*",
   "*/cache/*",
 }
+
+vim.keymap.set("n", "]t", ":tabnext<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "[t", ":tabprevious<CR>", { noremap = true, silent = true })
