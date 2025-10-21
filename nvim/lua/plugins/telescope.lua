@@ -92,6 +92,54 @@ return {
         desc = "Zoxide then file picker",
       },
       {
+        "<leader>fd",
+        function()
+          local default_branch = vim.fn
+            .systemlist({
+              "git",
+              "rev-parse",
+              "--abbrev-ref",
+              "origin/HEAD",
+            })[1]
+            :gsub("origin/", "")
+
+          local files = vim.fn.systemlist {
+            "git",
+            "diff",
+            "--name-only",
+            default_branch,
+          }
+
+          if vim.v.shell_error ~= 0 then
+            vim.notify(
+              "Not a git repository or no differences found",
+              vim.log.levels.WARN
+            )
+            return
+          end
+
+          if #files == 0 then
+            vim.notify(
+              "No differences found with " .. default_branch,
+              vim.log.levels.INFO
+            )
+            return
+          end
+
+          require("telescope.pickers")
+            .new({}, {
+              prompt_title = "Files different from " .. default_branch,
+              finder = require("telescope.finders").new_table {
+                results = files,
+              },
+              sorter = require("telescope.config").values.generic_sorter {},
+              previewer = require("telescope.previewers").vim_buffer_cat.new {},
+            })
+            :find()
+        end,
+        desc = "Find differences with git default branch",
+      },
+      {
         "<leader>ff",
         function()
           local cwd
@@ -106,21 +154,21 @@ return {
             search_dirs = { cwd },
             follow = true,
             hidden = true,
-            no_ignore = false,
+            no_ignore = true,
             no_ignore_parent = false,
           }
 
-          require("telescope.builtin").find_files(params)
+          -- require("telescope.builtin").find_files(params)
 
-          -- local search
-          -- if is_git_repo() then
-          --     search = require("telescope.builtin").git_files
-          --     -- params.use_git_root = false
-          -- else
-          --     search = require("telescope.builtin").find_files
-          -- end
-          --
-          -- search(params)
+          local search
+          if is_git_repo() then
+            search = require("telescope.builtin").git_files
+            -- params.use_git_root = false
+          else
+            search = require("telescope.builtin").find_files
+          end
+
+          search(params)
         end,
         desc = "Find files",
       },
@@ -131,18 +179,18 @@ return {
         end,
         desc = "Continue last search",
       },
-      {
-        "<leader>fd",
-        function()
-          local dotfiles_dir = vim.fn.expand "$HOME/GitHub/dotfiles"
-          require("telescope.builtin").find_files {
-            cwd = dotfiles_dir,
-            search_dirs = { dotfiles_dir },
-            prompt_title = "Dotfiles",
-          }
-        end,
-        desc = "Find dotfiles",
-      },
+      -- {
+      --   "<leader>fd",
+      --   function()
+      --     local dotfiles_dir = vim.fn.expand "$HOME/GitHub/dotfiles"
+      --     require("telescope.builtin").find_files {
+      --       cwd = dotfiles_dir,
+      --       search_dirs = { dotfiles_dir },
+      --       prompt_title = "Dotfiles",
+      --     }
+      --   end,
+      --   desc = "Find dotfiles",
+      -- },
       {
         "<leader>fg",
         function()
