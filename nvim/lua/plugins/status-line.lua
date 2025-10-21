@@ -3,7 +3,15 @@
 ---
 local M = {}
 
+---@alias Type "Commit" | "Issue" | "PullRequest" | "Discussion"
+
+---@class NotificationCount
+---@field type Type
+---@field count number
+
+---@type table<Type, string>
 local mapping = {
+  Commit = " ",
   Issue = " ",
   PullRequest = " ",
   Discussion = " ",
@@ -12,6 +20,8 @@ local mapping = {
 local minutes = 1
 local update_rate = minutes * 1000 * 60
 
+---@param data NotificationCount[]
+---@return string
 M.structure_notification_line = function(data)
   local lines = {}
   for _, item in ipairs(data) do
@@ -24,6 +34,7 @@ end
 
 M.notification_count = ""
 
+---@return nil
 M.update_notification_count = function()
   local gh = require "octo.gh"
 
@@ -40,6 +51,7 @@ M.update_notification_count = function()
     opts = {
       cb = gh.create_callback {
         success = function(result)
+          ---@type NotificationCount[]
           local data = vim.json.decode(result)
 
           M.notification_count = M.structure_notification_line(data)
