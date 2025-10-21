@@ -1,9 +1,15 @@
---- Add gist comments
+--- Add gist comments to a gist and view existing comments
 
 local gh = require "octo.gh"
+local utils = require "octo.utils"
 
 local buffers = {}
 
+---@class AddCommentOpts
+---@field gist_id string
+---@field body string
+
+---@param opts AddCommentOpts
 local add_comment = function(opts)
   gh.api.post {
     "/gists/{gist_id}/comments",
@@ -13,6 +19,12 @@ local add_comment = function(opts)
   }
 end
 
+---@class Gist
+---@field id string
+---@field description string
+
+---@param gists Gist[]
+---@param cb fun(gist: Gist?)
 local select_gist = function(gists, cb)
   vim.ui.select(gists, {
     prompt = "Select a gist",
@@ -24,12 +36,22 @@ local select_gist = function(gists, cb)
   end)
 end
 
+---@class GistComment
+---@field id number
+---@field created_at string
+---@field body string
+
+---Display gist comments in a new buffer
+---@param comments GistComment[]
 local display_gist_comments = function(comments)
   local bufnr = vim.api.nvim_create_buf(false, true)
 
   local lines = {}
   for _, comment in ipairs(comments) do
-    table.insert(lines, string.format("ID: %s", comment.id))
+    table.insert(
+      lines,
+      string.format("ID: %s Created: %s", comment.id, comment.created_at)
+    )
     table.insert(lines, "")
     -- Split the body by newlines and add each line
     for line in comment.body:gmatch "[^\r\n]+" do
@@ -53,7 +75,7 @@ local get_gist_comments = function(opts)
   gh.api.get {
     "/gists/{gist_id}/comments",
     format = { gist_id = opts.gist_id },
-    jq = "map({id: .id, body: .body})",
+    jq = "map({id: .id, body: .body, created_at: .created_at})",
     opts = {
       cb = gh.create_callback {
         success = function(output)
@@ -77,6 +99,7 @@ local list_gists = function(cb)
     opts = {
       cb = gh.create_callback {
         success = function(output)
+          ---@type Gist[]
           local gists = vim.json.decode(output)
           select_gist(gists, cb)
         end,
@@ -103,17 +126,36 @@ vim.api.nvim_create_user_command("CreateGistComment", function(opts)
   local lines = vim.api.nvim_buf_get_lines(0, start, stop, false)
 
   if #lines == 0 then
-    vim.notify("No lines selected", vim.log.levels.ERROR)
+    utils.error "No lines selected"
     return
   end
 
   local body = vim.trim(table.concat(lines, "\n"))
 
   list_gists(function(gist)
-    add_comment {
-      gist_id = gist.id,
-      body = body,
-    }
-    vim.notify("Comment added to " .. gist.description)
+    if not gist then
+      utils.error "No gist selected. Aborting."
+      return
+    end
+
+    vim.ui.select(
+      {
+        "No",
+        "Yes",
+      },
+      { prompt = "Add comment to " .. gist.description .. "?" },
+      function(choice)
+        if choice ~= "Yes" then
+          utils.info "Aborting comment addition"
+          return
+        end
+
+        add_comment {
+          gist_id = gist.id,
+          body = body,
+        }
+        utils.info("Comment added to " .. gist.description)
+      end
+    )
   end)
 end, { range = true })
