@@ -15,6 +15,7 @@ local mapping = {
   Issue = " ",
   PullRequest = " ",
   Discussion = " ",
+  Release = " ",
 }
 
 local minutes = 1
