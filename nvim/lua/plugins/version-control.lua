@@ -502,12 +502,19 @@ return {
 
               local buffer = utils.get_current_buffer()
 
+              ---@param number number The PR number
               local auto_merge = function(number)
                 local cb = function()
                   utils.info "This PR will be auto-merged"
                 end
-                local opts = { cb = cb }
-                gh.pr.merge { number, auto = true, squash = true, opts = opts }
+                gh.pr.merge {
+                  number,
+                  auto = true,
+                  squash = true,
+                  opts = {
+                    cb = cb,
+                  },
+                }
               end
 
               if not buffer or not buffer:isPullRequest() then
@@ -564,14 +571,19 @@ return {
             end,
           },
           label = {
-            list = function()
+            search = function()
               local picker = require "octo.picker"
 
               picker.labels {
                 cb = function(labels)
                   local combined_labels = ""
                   for _, l in ipairs(labels) do
-                    combined_labels = combined_labels .. "," .. l.name
+                    ---Add quotes if there is a space in the label name
+                    local name = l.name
+                    if string.find(name, " ") then
+                      name = '"' .. name .. '"'
+                    end
+                    combined_labels = combined_labels .. "," .. name
                   end
                   combined_labels = string.sub(combined_labels, 2) -- Remove leading comma
 
