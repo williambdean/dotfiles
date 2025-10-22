@@ -435,6 +435,7 @@ require "config.dump"
 require "config.repos"
 require("config.github").setup()
 require "config.code-block"
+require "config.gitignore"
 
 local sphinx = require "config.sphinx"
 
