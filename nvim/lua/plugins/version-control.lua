@@ -413,7 +413,7 @@ return {
     config = function()
       require("octo").setup {
         -- default_to_projects_v2 = true,
-        use_local_fs = false,
+        use_local_fs = true,
         enable_builtin = true,
         default_to_projects_v2 = true,
         users = "assignable",
