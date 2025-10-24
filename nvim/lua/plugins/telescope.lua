@@ -17,6 +17,40 @@ return {
       "nvim-telescope/telescope-symbols.nvim",
       "xiyaowong/telescope-emoji.nvim",
     },
+    config = function()
+      local telescope = require "telescope"
+      local config = require "telescope.config"
+      local sorters = require "telescope.sorters"
+
+      -- Custom file sorter that deprioritizes Python files
+      local function custom_file_sorter(opts)
+        opts = opts or {}
+        local base_sorter = sorters.get_fzy_sorter(opts)
+
+        return sorters.Sorter:new {
+          discard = base_sorter.discard,
+          scoring_function = function(_, prompt, entry)
+            local base_score = base_sorter:scoring_function(prompt, entry)
+            
+            -- If it's a Python file, add a penalty to push it to the bottom
+            if entry.value and entry.value:match "%.py$" then
+              -- Add a large penalty to push Python files to the bottom
+              -- The higher the penalty, the lower in the list
+              return base_score + 1000000
+            end
+            
+            return base_score
+          end,
+          highlighter = base_sorter.highlighter,
+        }
+      end
+
+      telescope.setup {
+        defaults = {
+          file_sorter = custom_file_sorter,
+        },
+      }
+    end,
     extensions = {
       emoji = {
         action = function(emoji)
