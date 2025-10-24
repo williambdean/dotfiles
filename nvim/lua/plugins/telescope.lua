@@ -19,7 +19,6 @@ return {
     },
     config = function()
       local telescope = require "telescope"
-      local config = require "telescope.config"
       local sorters = require "telescope.sorters"
 
       -- Custom file sorter that deprioritizes Python files
