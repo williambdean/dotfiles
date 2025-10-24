@@ -22,6 +22,8 @@ return {
       local sorters = require "telescope.sorters"
 
       -- Custom file sorter that deprioritizes Python files
+      -- In telescope, lower scores appear first (top of list)
+      -- So we add a large penalty to Python files to push them to the bottom
       local function custom_file_sorter(opts)
         opts = opts or {}
         local base_sorter = sorters.get_fzy_sorter(opts)
@@ -30,14 +32,12 @@ return {
           discard = base_sorter.discard,
           scoring_function = function(_, prompt, entry)
             local base_score = base_sorter:scoring_function(prompt, entry)
-            
+
             -- If it's a Python file, add a penalty to push it to the bottom
             if entry.value and entry.value:match "%.py$" then
-              -- Add a large penalty to push Python files to the bottom
-              -- The higher the penalty, the lower in the list
               return base_score + 1000000
             end
-            
+
             return base_score
           end,
           highlighter = base_sorter.highlighter,
