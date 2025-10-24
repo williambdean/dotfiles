@@ -21,6 +21,10 @@ return {
       local telescope = require "telescope"
       local sorters = require "telescope.sorters"
 
+      -- Constants for file sorting
+      local PYTHON_FILE_PATTERN = "%.py$"
+      local PYTHON_FILE_PENALTY = 1000000
+
       -- Custom file sorter that deprioritizes Python files
       -- In telescope, lower scores appear first (top of list)
       -- So we add a large penalty to Python files to push them to the bottom
@@ -34,8 +38,8 @@ return {
             local base_score = base_sorter:scoring_function(prompt, entry)
 
             -- If it's a Python file, add a penalty to push it to the bottom
-            if entry.value and entry.value:match "%.py$" then
-              return base_score + 1000000
+            if entry.value and entry.value:match(PYTHON_FILE_PATTERN) then
+              return base_score + PYTHON_FILE_PENALTY
             end
 
             return base_score
