@@ -98,8 +98,8 @@ return {
     config = function()
       require("mason").setup()
       require("mason-lspconfig").setup()
-
-      vim.lsp.enable "copilot_ls"
+      --
+      -- vim.lsp.enable "copilot_ls"
 
       local lspconfig = require "lspconfig"
       -- local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -122,6 +122,10 @@ return {
       --   root_dir = lspconfig.util.root_pattern(".git", ".prettierrc"),
       -- }
       lspconfig.html.setup {
+        capabilities = capabilities,
+      }
+
+      lspconfig.gh_actions_ls.setup {
         capabilities = capabilities,
       }
 
@@ -209,6 +213,8 @@ return {
           debounce_text_changes = 150,
         },
       }
+
+      lspconfig.air.setup {}
 
       local group = vim.api.nvim_create_augroup("UserLspConfig", {})
       vim.api.nvim_create_autocmd("LspAttach", {
