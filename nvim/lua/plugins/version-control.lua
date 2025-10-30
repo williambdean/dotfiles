@@ -173,6 +173,8 @@ vim.keymap.set("n", "<leader>oS", function()
   github_search { include_repo = false }
 end, { silent = true, desc = "GitHub search" })
 
+---@param opts { number: number, repo: string }
+---@return "PullRequest"|"Issue"|"Discussion"|nil
 local get_typename = function(opts)
   local gh = require "octo.gh"
   local utils = require "octo.utils"
@@ -190,25 +192,14 @@ local get_typename = function(opts)
   }
   ]]
 
-  opts.repo = opts.repo or utils.get_remote_name()
   local owner, name = utils.split_repo(opts.repo)
-
-  local fields = {
-    owner = owner,
-    name = name,
-    number = opts.number,
-  }
 
   local result = gh.api.graphql {
     query = query,
-    fields = fields,
-    opts = {
-      mode = "sync",
-    },
+    F = { owner = owner, name = name, number = opts.number },
+    opts = { mode = "sync" },
   }
-  result = vim.json.decode(result)
-
-  local repository = result.data.repository
+  local repository = vim.json.decode(result).data.repository
 
   local issueOrPullRequest = repository.issueOrPullRequest
   if not utils.is_blank(issueOrPullRequest) then
@@ -243,9 +234,10 @@ local function open_github_as_octo_buffer()
     return
   end
 
-  local typename = get_typename {
-    number = number,
-  }
+  local buffer = utils.get_current_buffer()
+  local repo = buffer.repo or utils.get_remote_name()
+
+  local typename = get_typename { number = number, repo = repo }
   local get_uri = {
     Issue = utils.get_issue_uri,
     PullRequest = utils.get_pull_request_uri,
@@ -253,7 +245,7 @@ local function open_github_as_octo_buffer()
   }
 
   get_uri = get_uri[typename]
-  local uri = get_uri(number)
+  local uri = get_uri(number, repo)
   vim.cmd("edit " .. uri)
 end
 
@@ -359,7 +351,18 @@ return {
     dir = "~/GitHub/neovim-plugins/octo.nvim",
     cmd = "Octo",
     keys = {
-      { "<leader>oo", "<CMD>Octo<CR>", desc = "Open Octo" },
+      {
+        "<leader>oo",
+        "<CMD>Octo<CR>",
+        desc = "Open Octo",
+      },
+      {
+        "<leader><leader>",
+        function()
+          require("octo.picker").notifications()
+        end,
+        desc = "GitHub Notifications",
+      },
       {
         "<leader>ic",
         function()
@@ -413,6 +416,9 @@ return {
     config = function()
       require("octo").setup {
         -- default_to_projects_v2 = true,
+        debug = {
+          notify_missing_timeline_items = true,
+        },
         use_local_fs = true,
         enable_builtin = true,
         default_to_projects_v2 = true,
@@ -554,20 +560,6 @@ return {
               utils.info(
                 "Congratulations! 🎉 Well done on " .. buffer.node.title
               )
-            end,
-            update = function()
-              local gh = require "octo.gh"
-              local utils = require "octo.utils"
-              local buffer = utils.get_current_buffer()
-              if not buffer or not buffer:isPullRequest() then
-                utils.error "Not in a pull request buffer"
-                return
-              end
-
-              gh.pr["update-branch"] {
-                buffer.node.number,
-                opts = { cb = gh.create_callback {} },
-              }
             end,
           },
           label = {
@@ -775,6 +767,7 @@ return {
             direction = "DESC",
           },
         },
+        ---Choose picker
         picker = "telescope",
         -- picker_config = {
         --     use_emojis = true,
