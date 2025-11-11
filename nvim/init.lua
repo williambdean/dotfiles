@@ -40,6 +40,14 @@ require("lazy").setup {
     -- },
     { "lark-parser/vim-lark-syntax" },
     {
+      "vhyrro/luarocks.nvim",
+      priority = 1000, -- High priority is recommended
+      opts = {
+        rocks = { "lua-toml" }, -- Example: specify LuaRocks packages to install
+        -- luarocks_build_args = { "--with-lua=/my/path" }, -- Optional: extra build arguments
+      },
+    },
+    {
       "L3MON4D3/LuaSnip",
       -- follow latest release.
       version = "v2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
@@ -77,7 +85,12 @@ require("lazy").setup {
       -- plugin is not set up by default
       config = true,
     },
-    { "mluders/comfy-line-numbers.nvim", opts = {} },
+    -- {
+    --   "mluders/comfy-line-numbers.nvim",
+    --   opts = {
+    --     hidden_file_types = { "undotree", "octo" },
+    --   },
+    -- },
     {
       "chomosuke/typst-preview.nvim",
       lazy = false, -- or ft = 'typst'
@@ -375,10 +388,10 @@ end
 vim.keymap.set("n", "gx", open_url, { noremap = true, silent = true })
 vim.g.netrw_browsex_viewer = "wslview"
 
--- vim.o.background = "dark"
--- vim.cmd [[colorscheme gruvbox]]
-
-vim.cmd "colorscheme github_dark_high_contrast"
+vim.o.background = "dark"
+vim.cmd [[colorscheme gruvbox]]
+--
+-- vim.cmd "colorscheme github_dark_dimmed"
 
 -- Define transparency function
 local function enable_transparency()
@@ -432,7 +445,7 @@ require "config.gist-comments"
 require "config.snippets"
 require "config.register"
 require "config.dump"
-require "config.repos"
+-- require "config.repos"
 require("config.github").setup()
 require "config.code-block"
 require "config.gitignore"
@@ -495,6 +508,16 @@ vim.api.nvim_create_autocmd("FileType", {
       if not toggled then
         vim.cmd "Git blame"
         toggled = true
+        -- Add autocmd for when the blame buffer is closed
+        vim.api.nvim_create_autocmd("BufWinLeave", {
+          group = group,
+          pattern = "*",
+          callback = function(opts)
+            if vim.bo[opts.buf].filetype == "fugitiveblame" then
+              toggled = false
+            end
+          end,
+        })
       else
         --- Find the buffer that is of file type fugitiveblame and close it
         for _, buf in ipairs(vim.api.nvim_list_bufs()) do
@@ -519,9 +542,9 @@ vim.api.nvim_create_autocmd("FileType", {
 --- --------
 local create_underlined_section = function()
   local line = vim.api.nvim_get_current_line()
-  local indent = line:match "^%s*" or "" -- Capture leading whitespace
-  local content = line:gsub("^%s*", "") -- Remove leading whitespace
-  local len = vim.fn.strwidth(content) -- Get width of content without indent
+  local indent = line:match "^%s*" or "" -- capture leading whitespace
+  local content = line:gsub("^%s*", "") -- remove leading whitespace
+  local len = vim.fn.strwidth(content) -- get width of content without indent
   local underline = indent .. string.rep("-", len)
 
   -- Insert the underline below the current line
