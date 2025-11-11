@@ -73,7 +73,7 @@ return {
   {
     "copilotlsp-nvim/copilot-lsp",
     init = function()
-      vim.lsp.enable "copilot_ls"
+      -- vim.lsp.enable "copilot_ls"
     end,
   },
 }
