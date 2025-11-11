@@ -141,36 +141,13 @@ end
 
 vim.keymap.set("n", "<leader>A", current_author, { silent = true })
 
-local function create_octo_search(opts)
-  local cmd = ":Octo search "
-  local utils = require "octo.utils"
-
-  if opts.include_repo then
-    local repo = utils.get_remote_name()
-    if repo ~= nil then
-      cmd = cmd .. "repo:" .. repo .. " "
-    else
-      utils.error "No remote found"
-    end
-  end
-
-  if opts.query then
-    cmd = cmd .. opts.query
-  end
-
-  return cmd
-end
-
-local function github_search(opts)
-  local cmd = create_octo_search(opts)
-  vim.fn.feedkeys(vim.api.nvim_replace_termcodes(cmd, true, true, true), "n")
-end
-
 vim.keymap.set("n", "<leader>os", function()
-  github_search { include_repo = true }
+  require("octo.utils").create_base_search_command { include_current_repo = true }
 end, { silent = true, desc = "GitHub search for the current repository" })
 vim.keymap.set("n", "<leader>oS", function()
-  github_search { include_repo = false }
+  require("octo.utils").create_base_search_command {
+    include_current_repo = false,
+  }
 end, { silent = true, desc = "GitHub search" })
 
 ---@param opts { number: number, repo: string }
@@ -235,7 +212,12 @@ local function open_github_as_octo_buffer()
   end
 
   local buffer = utils.get_current_buffer()
-  local repo = buffer.repo or utils.get_remote_name()
+  local repo
+  if buffer ~= nil and buffer.repo then
+    repo = buffer.repo
+  else
+    repo = utils.get_remote_name()
+  end
 
   local typename = get_typename { number = number, repo = repo }
   local get_uri = {
@@ -359,7 +341,7 @@ return {
       {
         "<leader><leader>",
         function()
-          require("octo.picker").notifications()
+          require("octo.picker").notifications { show_repo_info = false }
         end,
         desc = "GitHub Notifications",
       },
@@ -769,6 +751,7 @@ return {
         },
         ---Choose picker
         picker = "telescope",
+        -- picker = "snacks",
         -- picker_config = {
         --     use_emojis = true,
         -- },
