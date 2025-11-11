@@ -57,6 +57,10 @@ end
 
 local function random_seed()
   local function add_rng_to_script(seed)
+    if seed == nil or seed == "" then
+      vim.notify("No seed provided", vim.log.levels.WARN)
+      return
+    end
     local row, _ = unpack(vim.api.nvim_win_get_cursor(0))
     vim.api.nvim_buf_set_lines(0, row, row, false, {
       'seed = sum(map(ord, "' .. seed .. '"))',
@@ -75,12 +79,11 @@ vim.keymap.set(
   { noremap = true, silent = true }
 )
 
-vim.keymap.set(
-  "n",
-  "<leader>rs",
-  random_seed,
-  { noremap = true, silent = true }
-)
+vim.keymap.set("n", "<leader>rs", random_seed, {
+  noremap = true,
+  silent = true,
+  desc = "Create a random seed based on input",
+})
 
 function print_current_visual_selection()
   local lines = get_visual_selection()
