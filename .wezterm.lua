@@ -13,7 +13,7 @@ config.initial_cols = 110
 config.font_size = 18.5
 
 -- Set the color scheme
-config.color_scheme = "Gruvbox Dark"
+config.color_scheme = "Gruvbox"
 
 -- Set the transparency of the background
 config.window_background_opacity = 0.8
@@ -29,11 +29,24 @@ config.harfbuzz_features = { "calt=0", "clig=0", "liga=0" }
 -- config.window_decorations = "NONE"
 
 -- Set custom font
-config.font = wezterm.font_with_fallback {
+-- config.font = wezterm.font("JetBrains Mono", {
+--   weight = "Thin",
+-- })
+--
+-- config.font = wezterm.font("Times New Roman", { weight = "Regular", stretch = "Normal", style = "Normal" }) -- /System/Library/Fonts/Supplemental/Times New Roman.ttf, CoreText
+-- config.font = wezterm.font("Times New Roman", {
+-- })
+--
+config.font = wezterm.font(
   "JetBrains Mono",
-  "Fira Code",
-  "Noto Color Emoji",
-}
+  { weight = "Thin", stretch = "Normal", style = "Normal" }
+) -- <built-in>, BuiltIn
+-- config.font = wezterm.font_with_fallback {
+--   wezterm.font('JetBrains Mono', { weight = 'Bold' }),
+--   -- "JetBrains Mono NL",
+--   -- "Fira Code",
+--   -- "Noto Color Emoji",
+-- }
 
 -- Set padding around the terminal
 config.window_padding = {
