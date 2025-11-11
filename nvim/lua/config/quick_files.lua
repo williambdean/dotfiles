@@ -112,11 +112,11 @@ local toggles = {
     file = "issues.md",
     toggle = create_file_toggle,
   },
-  {
-    mapping = "<leader><leader>",
-    file = require("config.obsidian").file_name "todo/",
-    toggle = create_file_toggle,
-  },
+  -- {
+  --   mapping = "<leader><leader>",
+  --   file = require("config.obsidian").file_name "todo/",
+  --   toggle = create_file_toggle,
+  -- },
   {
     mapping = "<leader>P",
     file = "script.py",
