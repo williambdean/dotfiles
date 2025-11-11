@@ -26,7 +26,8 @@ end
 
 local create_picker = function(kind)
   return function()
-    kind_map[kind] { cb = selected_callback }
+    local buffer = utils.get_current_buffer()
+    kind_map[kind] { cb = selected_callback, repo = buffer.repo }
   end
 end
 
