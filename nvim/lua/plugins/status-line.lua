@@ -33,10 +33,16 @@ M.structure_notification_line = function(data)
   return table.concat(lines, " ")
 end
 
-M.notification_count = ""
+---@class Status
+---@field last_fetched number
+---@field total_notifications? integer
+---@field display string
+
+---@type Status
+M.status = { last_fetched = 0, total_notifications = nil, display = "" }
 
 ---@return nil
-M.update_notification_count = function()
+function M.update_notification_count()
   local gh = require "octo.gh"
 
   local jq = [[
@@ -55,11 +61,35 @@ M.update_notification_count = function()
           ---@type NotificationCount[]
           local data = vim.json.decode(result)
 
-          M.notification_count = M.structure_notification_line(data)
+          M.status.display = M.structure_notification_line(data)
+          if
+            M.status.total_notifications ~= nil
+            and M.status.total_notifications ~= #data
+          then
+            vim.notify(
+              "There are new GitHub notifications!",
+              vim.log.levels.INFO,
+              {
+                title = "Octo",
+              }
+            )
+          end
+          M.status.total_notifications = #data
         end,
       },
     },
   }
+end
+
+M.fetch_notifications = function()
+  local current_time = vim.uv.hrtime() / 1e6 -- Convert to milliseconds
+  if current_time - M.status.last_fetched < update_rate then
+    return
+  end
+
+  M.status.last_fetched = current_time
+
+  M.update_notification_count()
 end
 
 M.display = function()
@@ -68,28 +98,15 @@ M.display = function()
   end
   local viewer = vim.g.octo_viewer
 
-  if M.notification_count == "" then
+  if M.status.display == "" then
     M.fetch_notifications()
   end
 
-  if M.notification_count ~= "" then
-    return M.notification_count .. "  " .. viewer
+  if M.status.display ~= "" then
+    return M.status.display .. "  " .. viewer
   end
 
   return " " .. viewer
-end
-
-M.last_fetched = 0
-
-M.fetch_notifications = function()
-  local current_time = vim.uv.hrtime() / 1e6 -- Convert to milliseconds
-  if current_time - M.last_fetched < update_rate then
-    return
-  end
-
-  M.last_fetched = current_time
-
-  M.update_notification_count()
 end
 
 return {
