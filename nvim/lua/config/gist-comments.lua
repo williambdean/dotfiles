@@ -29,7 +29,15 @@ local select_gist = function(gists, cb)
   vim.ui.select(gists, {
     prompt = "Select a gist",
     format_item = function(item)
-      return item.description
+      local description = item.description
+
+      if item.public then
+        description = description .. " (public)"
+      else
+        description = description .. " (private)"
+      end
+
+      return description
     end,
   }, function(selected)
     cb(selected)
@@ -95,7 +103,7 @@ end
 local list_gists = function(cb)
   gh.api.get {
     "/gists",
-    jq = ". | map({id: .id, description: .description})",
+    jq = ". | map({ id: .id, description: .description, public: .public })",
     opts = {
       cb = gh.create_callback {
         success = function(output)
