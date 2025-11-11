@@ -1,10 +1,11 @@
 ---Create a command to execute a GraphQL query from a file
+---Usage: Query
 local gh = require "octo.gh"
 local config = require "octo.config"
 
 ---@class Query
 ---@field query string
----@field timeout number|nil The timeout in seconds
+---@field timeout? number The timeout in seconds
 ---@field fields table
 
 ---@param opts Query
@@ -20,9 +21,7 @@ local sync_github_cli_query = function(opts)
     paginate = true,
     slurp = true,
     fields = opts.fields,
-    opts = {
-      mode = "sync",
-    },
+    opts = { mode = "sync" },
   }
   local resp = vim.fn.json_decode(output)
 
@@ -35,9 +34,9 @@ local sync_github_cli_query = function(opts)
   return resp
 end
 
----@param start_line number|nil
----@param end_line number|nil
----@param timeout number|nil The timeout in seconds
+---@param start_line? number
+---@param end_line? number
+---@param timeout? number The timeout in seconds
 ---@param fields table
 local function execute_query(start_line, end_line, timeout, fields)
   start_line = start_line or 0
@@ -51,6 +50,8 @@ local function execute_query(start_line, end_line, timeout, fields)
   }
 end
 
+---@param file string
+---@param content string
 local write_to_file = function(file, content)
   local f = io.open(file, "w")
   if f == nil then
@@ -68,8 +69,8 @@ end
 
 ---@class QueryArgs
 ---@field file string The file to write the response to
----@field timeoout number The timeout in seconds
----@field fields table The fields to include in the query. For instance, owner=wd60622
+---@field timeout number The timeout in seconds
+---@field fields table The fields to include in the query. For instance, owner=williambdean
 
 ---Parse the arguments passed to the Query command
 ---@param args string
