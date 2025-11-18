@@ -1,3 +1,5 @@
+local vim = vim
+
 local function get_stylua_config()
   return {
     runtime = {
@@ -66,12 +68,15 @@ return {
     opts = {
       ensure_installed = {
         "ruff",
+        -- "ty",
         "pyright",
+        -- "basedpyright",
         "tinymist",
         "lua-language-server",
         "yaml-language-server",
         "typescript-language-server",
         "copilot-language-server",
+        "vscode-html-language-server",
         "shfmt",
         "codespell",
         "html-lsp",
@@ -100,121 +105,150 @@ return {
       require("mason-lspconfig").setup()
       --
       -- vim.lsp.enable "copilot_ls"
+      --
 
-      local lspconfig = require "lspconfig"
+      vim.lsp.enable {
+        "ruff",
+        "ty",
+        "pyright",
+        "lua_ls",
+        "ts_ls",
+        "rust_analyzer",
+        "html",
+        "gh_actions_ls",
+        "tinymist",
+        "graphql",
+        "harper_ls",
+        "air",
+      }
+
+      vim.lsp.config("lua_ls", {
+        settings = {
+          Lua = {
+            diagnostics = {
+              globals = { "vim" },
+            },
+          },
+        },
+      })
+
+      -- vim.lsp.config("*",
+      --
+
+      ---local lspconfig = require "lspconfig"
       -- local capabilities = vim.lsp.protocol.make_client_capabilities()
-      local capabilities = require("blink.cmp").get_lsp_capabilities()
-      lspconfig.ruff.setup {
-        on_new_config = function(config, root_dir)
-          -- Look for .venv directory in the project root
-          local venv_path = vim.fn.finddir(".venv", root_dir .. ";")
-          if venv_path ~= "" then
-            -- Use the site-packages from .venv directory
-            config.cmd_env = {
-              PYTHONPATH = venv_path .. "/lib/python3.*/site-packages",
-            }
-          end
-        end,
-      }
-      -- lspconfig.prettier.setup {
-      --   capabilities = capabilities,
-      --   filetypes = { "javascript", "typescript", "html", "css", "json" },
-      --   root_dir = lspconfig.util.root_pattern(".git", ".prettierrc"),
+      -- local capabilities = require("blink.cmp").get_lsp_capabilities()
+      -- lspconfig.ruff.setup {
+      --   on_new_config = function(config, root_dir)
+      --     -- Look for .venv directory in the project root
+      --     local venv_path = vim.fn.finddir(".venv", root_dir .. ";")
+      --     if venv_path ~= "" then
+      --       -- Use the site-packages from .venv directory
+      --       config.cmd_env = {
+      --         PYTHONPATH = venv_path .. "/lib/python3.*/site-packages",
+      --       }
+      --     end
+      --   end,
       -- }
-      lspconfig.html.setup {
-        capabilities = capabilities,
-      }
-
-      lspconfig.gh_actions_ls.setup {
-        capabilities = capabilities,
-      }
-
-      lspconfig.tinymist.setup {
-        capabilities = capabilities,
-        settings = {
-          -- Automatically compile a PDF on each save
-          exportPdf = "onSave",
-          -- Define the output path for the PDF
-          outputPath = "$root/target/$dir/$name.pdf",
-          -- Set the formatter mode
-          formatterMode = "typstyle",
-        },
-      }
-
-      lspconfig.ts_ls.setup { capabilities = capabilities }
-      lspconfig.rust_analyzer.setup {
-        capabilities = capabilities,
-        settings = {
-          ["rust-analyzer"] = {
-            cargo = {
-              loadOutDirsFromCheck = true,
-            },
-            procMacro = {
-              enable = true,
-            },
-          },
-        },
-      }
-      lspconfig.graphql.setup {
-        capabilities = capabilities,
-        cmd = { "graphql-lsp", "server", "-m", "stream" },
-        filetypes = { "graphql", "gql" },
-        root_dir = lspconfig.util.root_pattern(
-          ".git",
-          ".graphqlrc*",
-          "graphql.config.*",
-          "graphql.config.*"
-        ),
-        settings = {
-          graphql = {
-            schema = "/home/wdean/schema.docs.graphql",
-          },
-        },
-      }
-      lspconfig.pyright.setup {
-        on_init = function(client)
-          client.config.settings = {
-            python = {
-              analysis = {
-                autoSearchPaths = true,
-                useLibraryCodeForTypes = true,
-                diagnosticMode = "workspace",
-              },
-              venvPath = vim.fn.getcwd(),
-              pythonPath = nil, -- Let pyright detect the interpreter
-            },
-          }
-        end,
-        on_new_config = function(config, root_dir)
-          -- Look for .venv or venv directory in the project root
-          local venv = vim.fn.finddir(".venv", root_dir .. ";")
-          if venv == "" then
-            venv = vim.fn.finddir("venv", root_dir .. ";")
-          end
-
-          if venv ~= "" then
-            local python_path = vim.fn.glob(venv .. "/bin/python")
-            config.settings = {
-              python = {
-                pythonPath = python_path,
-                venvPath = venv,
-              },
-            }
-          end
-        end,
-      }
-      lspconfig.harper_ls.setup {}
-      lspconfig.lua_ls.setup {
-        settings = {
-          Lua = get_stylua_config(),
-        },
-        ft = ".lua",
-        flags = {
-          debounce_text_changes = 150,
-        },
-      }
-
-      lspconfig.air.setup {}
+      -- -- lspconfig.prettier.setup {
+      -- --   capabilities = capabilities,
+      -- --   filetypes = { "javascript", "typescript", "html", "css", "json" },
+      -- --   root_dir = lspconfig.util.root_pattern(".git", ".prettierrc"),
+      -- -- }
+      -- lspconfig.html.setup {
+      --   capabilities = capabilities,
+      -- }
+      --
+      -- lspconfig.gh_actions_ls.setup {
+      --   capabilities = capabilities,
+      -- }
+      --
+      -- lspconfig.tinymist.setup {
+      --   capabilities = capabilities,
+      --   settings = {
+      --     -- Automatically compile a PDF on each save
+      --     exportPdf = "onSave",
+      --     -- Define the output path for the PDF
+      --     outputPath = "$root/target/$dir/$name.pdf",
+      --     -- Set the formatter mode
+      --     formatterMode = "typstyle",
+      --   },
+      -- }
+      --
+      -- lspconfig.ts_ls.setup { capabilities = capabilities }
+      -- lspconfig.rust_analyzer.setup {
+      --   capabilities = capabilities,
+      --   settings = {
+      --     ["rust-analyzer"] = {
+      --       cargo = {
+      --         loadOutDirsFromCheck = true,
+      --       },
+      --       procMacro = {
+      --         enable = true,
+      --       },
+      --     },
+      --   },
+      -- }
+      -- lspconfig.graphql.setup {
+      --   capabilities = capabilities,
+      --   cmd = { "graphql-lsp", "server", "-m", "stream" },
+      --   filetypes = { "graphql", "gql" },
+      --   root_dir = lspconfig.util.root_pattern(
+      --     ".git",
+      --     ".graphqlrc*",
+      --     "graphql.config.*",
+      --     "graphql.config.*"
+      --   ),
+      --   settings = {
+      --     graphql = {
+      --       schema = "/home/wdean/schema.docs.graphql",
+      --     },
+      --   },
+      -- }
+      -- lspconfig.pyright.setup {
+      --   on_init = function(client)
+      --     client.config.settings = {
+      --       python = {
+      --         analysis = {
+      --           autoSearchPaths = true,
+      --           useLibraryCodeForTypes = true,
+      --           diagnosticMode = "workspace",
+      --         },
+      --         venvPath = vim.fn.getcwd(),
+      --         pythonPath = nil, -- Let pyright detect the interpreter
+      --       },
+      --     }
+      --   end,
+      --   on_new_config = function(config, root_dir)
+      --     -- Look for .venv or venv directory in the project root
+      --     local venv = vim.fn.finddir(".venv", root_dir .. ";")
+      --     if venv == "" then
+      --       venv = vim.fn.finddir("venv", root_dir .. ";")
+      --     end
+      --
+      --     if venv ~= "" then
+      --       local python_path = vim.fn.glob(venv .. "/bin/python")
+      --       config.settings = {
+      --         python = {
+      --           pythonPath = python_path,
+      --           venvPath = venv,
+      --         },
+      --       }
+      --     end
+      --   end,
+      -- }
+      -- lspconfig.harper_ls.setup {}
+      -- lspconfig.lua_ls.setup {
+      --   settings = {
+      --     Lua = get_stylua_config(),
+      --   },
+      --   ft = ".lua",
+      --   flags = {
+      --     debounce_text_changes = 150,
+      --   },
+      -- }
+      --
+      -- lspconfig.air.setup {}
 
       local group = vim.api.nvim_create_augroup("UserLspConfig", {})
       vim.api.nvim_create_autocmd("LspAttach", {
