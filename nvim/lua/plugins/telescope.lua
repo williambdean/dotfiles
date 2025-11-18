@@ -1,3 +1,4 @@
+--- This is the configuration for telescope.nvim and various mappings.
 local is_git_repo = function()
   local git_dir = vim.fn.system "git rev-parse --is-inside-work-tree"
   return vim.v.shell_error == 0
@@ -140,6 +141,11 @@ return {
         desc = "Find differences with git default branch",
       },
       {
+        "<leader>ls",
+        ":Telescope lsp_document_symbols<CR>",
+        desc = "LSP Document Symbols",
+      },
+      {
         "<leader>ff",
         function()
           local cwd
@@ -160,13 +166,14 @@ return {
 
           -- require("telescope.builtin").find_files(params)
 
-          local search
-          if is_git_repo() then
-            search = require("telescope.builtin").git_files
-            -- params.use_git_root = false
-          else
-            search = require("telescope.builtin").find_files
-          end
+          -- local search
+          -- if is_git_repo() then
+          --   search = require("telescope.builtin").git_files
+          --   -- params.use_git_root = false
+          -- else
+          --   search = require("telescope.builtin").find_files
+          -- end
+          local search = require("telescope.builtin").find_files
 
           search(params)
         end,
