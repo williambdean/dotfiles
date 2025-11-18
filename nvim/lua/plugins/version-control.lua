@@ -1,6 +1,8 @@
+local vim = vim
+
 --- Creates an issue on GitHub using GitHub CLI
----
--- @param opts A table containing the title and body of the issue.
+
+---@param opts { title: string, body?: string } A table containing the title and body of the issue.
 local function create_issue(opts)
   local title = opts.title
   local body = opts.body or ""
@@ -68,33 +70,54 @@ local create_reference_issue = function(args)
   remove_visual_selection()
 end
 
-local has_upstream = function()
-  local output = vim.fn.system "git remote -v"
-  local lines = vim.split(output, "\n")
+---@return string[]
+local function get_remotes()
+  return vim.fn.systemlist "git remote"
+end
 
-  for _, line in ipairs(lines) do
-    if vim.startswith(line, "upstream") then
-      return true
-    end
+---@param action fun(opts: table) The action to perform with gitlinker
+local function gitlinker_link(action)
+  local remotes = get_remotes()
+  if #remotes == 0 then
+    vim.notify("No git remotes found", vim.log.levels.ERROR)
+    return
   end
-  return false
+
+  local lstart = vim.fn.line "'<"
+  local lend = vim.fn.line "'>"
+
+  local callback = function(remote)
+    require("gitlinker").link {
+      action = action,
+      message = false,
+      remote = remote,
+      lstart = lstart,
+      lend = lend,
+    }
+  end
+
+  if #remotes == 1 then
+    callback(remotes[1])
+    return
+  end
+
+  vim.ui.select(remotes, {
+    prompt = "There are multiple remotes. Select one:",
+  }, function(remote)
+    if not remote then
+      return
+    end
+    callback(remote)
+  end)
 end
 
 ---Create reference issue
 vim.keymap.set("v", "<leader>cri", function()
-  require("gitlinker").link {
-    action = create_reference_issue,
-    message = false,
-    remote = has_upstream() and "upstream" or "origin",
-  }
+  gitlinker_link(create_reference_issue)
 end, {})
 
 vim.keymap.set("v", "<leader>gho", function()
-  require("gitlinker").link {
-    action = require("gitlinker.actions").open_in_browser,
-    message = false,
-    remote = has_upstream() and "upstream" or "origin",
-  }
+  gitlinker_link(require("gitlinker.actions").open_in_browser)
 end, {})
 
 vim.api.nvim_create_user_command("CloseIssue", function(opts)
@@ -103,6 +126,7 @@ end, {})
 
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "octo",
+  desc = "Get the current octo buffer's timeline items or full node",
   callback = function()
     vim.keymap.set("n", "<leader>B", function()
       local context = require "octo.context"
@@ -123,7 +147,6 @@ vim.api.nvim_create_autocmd("FileType", {
     end, { buffer = true })
   end,
 })
-
 local function current_author()
   local utils = require "octo.utils"
 
@@ -243,11 +266,7 @@ return {
       {
         "<leader>gy",
         function()
-          require("gitlinker").link {
-            message = false,
-            action = require("gitlinker.actions").clipboard,
-            remote = has_upstream() and "upstream" or "origin",
-          }
+          gitlinker_link(require("gitlinker.actions").clipboard)
         end,
         desc = "Copy GitHub link",
         mode = { "n", "v" },
@@ -339,6 +358,14 @@ return {
         desc = "Open Octo",
       },
       {
+        "<leader>r<leader>",
+        function()
+          local utils = require "octo.utils"
+          local repo = utils.get_remote_name()
+          require("octo.picker").notifications { repo = repo }
+        end,
+      },
+      {
         "<leader><leader>",
         function()
           require("octo.picker").notifications { show_repo_info = false }
@@ -410,6 +437,18 @@ return {
           current_repo_only = true,
         },
         mappings = {
+          discussion = {
+            next_comment = { lhs = "]C", desc = "go to next comment" },
+            prev_comment = { lhs = "[C", desc = "go to previous comment" },
+          },
+          pull_request = {
+            next_comment = { lhs = "]C", desc = "go to next comment" },
+            prev_comment = { lhs = "[C", desc = "go to previous comment" },
+          },
+          issue = {
+            next_comment = { lhs = "]C", desc = "go to next comment" },
+            prev_comment = { lhs = "[C", desc = "go to previous comment" },
+          },
           notification = {
             read = { lhs = "<C-r>", desc = "mark notification as read" },
           },
@@ -482,117 +521,6 @@ return {
               }
             end,
           },
-          pr = {
-            auto = function()
-              local gh = require "octo.gh"
-              local picker = require "octo.picker"
-              local utils = require "octo.utils"
-
-              local buffer = utils.get_current_buffer()
-
-              ---@param number number The PR number
-              local auto_merge = function(number)
-                local cb = function()
-                  utils.info "This PR will be auto-merged"
-                end
-                gh.pr.merge {
-                  number,
-                  auto = true,
-                  squash = true,
-                  opts = {
-                    cb = cb,
-                  },
-                }
-              end
-
-              if not buffer or not buffer:isPullRequest() then
-                picker.prs {
-                  cb = function(selected)
-                    auto_merge(selected.obj.number)
-                  end,
-                }
-                return
-              else
-                auto_merge(buffer.node.number)
-              end
-            end,
-            celebrate = function()
-              local utils = require "octo.utils"
-              local buffer = utils.get_current_buffer()
-              if not buffer or not buffer:isPullRequest() then
-                utils.error "Wrong place to celebrate"
-                return
-              end
-
-              local state = buffer.node.state
-
-              if state ~= "MERGED" then
-                utils.error "PR is not merged yet. Isn't it too early to celebrate?"
-                return
-              end
-
-              if vim.g.octo_viewer ~= buffer.node.author.login then
-                utils.info(
-                  "You are not the author of this PR. Go celebrate with "
-                    .. buffer.node.author.login
-                )
-                return
-              end
-
-              utils.info(
-                "Congratulations! 🎉 Well done on " .. buffer.node.title
-              )
-            end,
-          },
-          label = {
-            search = function()
-              local picker = require "octo.picker"
-
-              picker.labels {
-                cb = function(labels)
-                  local combined_labels = ""
-                  for _, l in ipairs(labels) do
-                    ---Add quotes if there is a space in the label name
-                    local name = l.name
-                    if string.find(name, " ") then
-                      name = '"' .. name .. '"'
-                    end
-                    combined_labels = combined_labels .. "," .. name
-                  end
-                  combined_labels = string.sub(combined_labels, 2) -- Remove leading comma
-
-                  github_search {
-                    query = "label:" .. combined_labels,
-                    include_repo = true,
-                  }
-                end,
-              }
-            end,
-          },
-          my_notification = {
-            list = function()
-              local utils = require "octo.utils"
-
-              local opts = {}
-
-              if vim.fn.confirm("Current Repo Only?", "&Yes\n&No", 1) == 1 then
-                opts.repo = utils.get_remote_name()
-              end
-
-              require("octo.picker").notifications(opts)
-            end,
-            all = function()
-              local utils = require "octo.utils"
-
-              local opts = { all = true }
-
-              if vim.fn.confirm("Current Repo Only?", "&Yes\n&No", 1) == 1 then
-                opts.repo = utils.get_remote_name()
-              end
-
-              require("octo.picker").notifications(opts)
-            end,
-          },
           config = {
             notifications = function()
               local cfg = require("octo.config").values
@@ -633,7 +561,7 @@ return {
                 return
               end
 
-              local number = buffer.node.number
+              local number = buffer:issue().number
 
               gh.issue.transfer {
                 number,
@@ -657,7 +585,7 @@ return {
 
               local viewer = vim.g.octo_viewer
 
-              local number = buffer.node.number
+              local number = buffer:issue().number
 
               gh.repo.list {
                 limit = limit,
@@ -782,15 +710,22 @@ return {
         }
       end, { silent = true })
 
-      vim.keymap.set("i", "@", "@<C-x><C-o>", { buffer = true, silent = true })
-      vim.keymap.set("i", "#", "#<C-x><C-o>", { silent = true, buffer = true })
       -- Add the key mapping only for octo filetype
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "octo",
         callback = function()
-          vim.keymap.set("n", "la", function()
-            vim.notify "Use <localleader>la instead"
-          end, { silent = true, buffer = true })
+          vim.keymap.set(
+            "i",
+            "@",
+            "@<C-x><C-o>",
+            { buffer = true, silent = true }
+          )
+          vim.keymap.set(
+            "i",
+            "#",
+            "#<C-x><C-o>",
+            { silent = true, buffer = true }
+          )
         end,
       })
     end,
