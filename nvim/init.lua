@@ -1,3 +1,5 @@
+local vim = vim
+
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -34,6 +36,13 @@ opt.splitright = true
 require("lazy").setup {
   spec = {
     { import = "plugins" },
+    { "sindrets/diffview.nvim" },
+    -- {
+    -- "polarmutex/git-worktree.nvim",
+    --
+    -- ref ="
+    -- opts = {},
+    -- },
     -- {
     --   "dimtion/guttermarks.nvim",
     --   event = { "BufReadPost", "BufNewFile", "BufWritePre" },
@@ -232,9 +241,14 @@ require("lazy").setup {
 
 -- Enable syntax highlighting
 opt.syntax = "on"
--- Set spell checking
-opt.spell = true
+-- Set spellchecking
 opt.spelllang = "en_us"
+opt.spell = true
+
+vim.api.nvim_create_user_command("SpellDirectory", function()
+  local spell_directory = "~/.local/share/nvim/site/spell"
+  vim.cmd.edit(spell_directory)
+end, {})
 
 -- Disable error bells
 opt.errorbells = false
@@ -449,6 +463,7 @@ require "config.dump"
 require("config.github").setup()
 require "config.code-block"
 require "config.gitignore"
+require "config.worktrees"
 
 local sphinx = require "config.sphinx"
 
@@ -502,6 +517,7 @@ vim.cmd "set completeopt+=noselect"
 
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "lua", "python", "markdown", "toml" },
+  desc = "Git Blame",
   callback = function()
     local toggled = false
     vim.keymap.set("n", "<leader>B", function()
@@ -567,3 +583,29 @@ vim.opt.wildignore:append {
 
 vim.keymap.set("n", "]t", ":tabnext<CR>", { noremap = true, silent = true })
 vim.keymap.set("n", "[t", ":tabprevious<CR>", { noremap = true, silent = true })
+
+vim.api.nvim_create_user_command("CopyPath", function(opts)
+  local path
+  if opts.args == "relative" then
+    path = vim.fn.expand "%"
+  elseif opts.args == "name" then
+    path = vim.fn.expand "%:t"
+  elseif opts.args == "absolute" then
+    path = vim.fn.expand "%:p"
+  else
+    path = vim.fn.expand "%"
+  end
+
+  if path == "" then
+    vim.notify("No file path to copy", vim.log.levels.WARN)
+    return
+  end
+
+  vim.fn.setreg("+", path)
+  vim.notify("Copied: " .. path)
+end, {
+  nargs = "?",
+  complete = function(argLead, cmdLine)
+    return { "absolute", "relative", "name" }
+  end,
+})
