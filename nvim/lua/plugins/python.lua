@@ -30,7 +30,7 @@ vim.keymap.set(
   "n",
   "<leader>T",
   switch_to_test_file,
-  { noremap = true, silent = true }
+  { noremap = true, silent = true, desc = "Switch to test file" }
 )
 
 function get_visual_selection()
