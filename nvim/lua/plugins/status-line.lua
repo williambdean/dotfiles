@@ -1,10 +1,11 @@
 --- status-line.lua
 --- Add octo viewer to status line
----
+
+local vim = vim
 local M = {}
 
----@alias Type "Commit" | "Issue" | "PullRequest" | "Discussion"
-
+---@alias Type "Commit" | "Issue" | "PullRequest" | "Discussion" | "Release"
+---
 ---@class NotificationCount
 ---@field type Type
 ---@field count number
@@ -88,7 +89,6 @@ M.fetch_notifications = function()
   end
 
   M.status.last_fetched = current_time
-
   M.update_notification_count()
 end
 
