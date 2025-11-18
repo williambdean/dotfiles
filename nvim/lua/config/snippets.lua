@@ -94,6 +94,15 @@ ls.add_snippets("markdown", {
   ps("terminal", "```terminal\n$0\n```"),
   ps("bash", "```bash\n$0\n```"),
 })
+ls.add_snippets("octo", {
+  s("today", {
+    t(os.date "%Y-%m-%d"),
+  }),
+  ps("python", "```python\n$0\n```"),
+  ps("lua", "```lua\n$0\n```"),
+  ps("terminal", "```terminal\n$0\n```"),
+  ps("bash", "```bash\n$0\n```"),
+})
 
 ls.add_snippets("lua", {
   ps("M", "local M = {}\n\n$0\n\nreturn M"),
