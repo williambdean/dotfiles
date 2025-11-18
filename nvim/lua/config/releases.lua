@@ -26,6 +26,7 @@ local gen_from_release = function(opts)
     display = display .. " " .. utils.format_date(entry.createdAt)
 
     return {
+      filename = utils.get_release_uri(entry.tagName, opts.repo),
       value = entry.tagName,
       display = display,
       ordinal = display,
@@ -63,12 +64,10 @@ local release_body = defaulter(function(opts)
                     vim.split(body, "\n")
                   )
                   --- wrap lines
-                  vim.api.nvim_buf_set_option(self.state.bufnr, "wrap", true)
-                  vim.api.nvim_buf_set_option(
-                    self.state.bufnr,
-                    "filetype",
-                    "markdown"
-                  )
+                  vim.api.nvim_set_option_value("filetype", "markdown", {
+                    scope = "local",
+                    buf = self.state.bufnr,
+                  })
                 end,
               },
             },
