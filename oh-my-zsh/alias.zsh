@@ -26,6 +26,8 @@ alias gg="git log --graph --abbrev-commit --decorate --format=format:'%C(bold bl
 alias gdelete="git branch --merged | grep -v \* | xargs git branch -D "
 alias gr="git restore"
 
+alias cleanup="git fetch --prune && git branch --merged | grep -v '\*\|main\|master\|develop' | xargs -r git branch -d"
+
 # GitHub CLI
 alias ic="gh issue create -e"
 alias issues="nvim -c ':Octo issue list'"
