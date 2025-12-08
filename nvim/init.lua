@@ -74,7 +74,7 @@ require("lazy").setup {
         "nvim-lua/plenary.nvim",
         "nvim-telescope/telescope.nvim",
       },
-      opts = {},
+      opts = { picker = "telescope" },
     },
     {
       dir = "~/github/neovim-plugins/bible-verse.nvim",
