@@ -231,6 +231,10 @@ run = 'move-node-to-workspace B'
 if.app-id = 'com.google.Chrome'
 run = 'move-node-to-workspace B'
 
+[[on-window-detected]]
+if.app-id= 'com.microsoft.rdc.macos'
+run = 'move-node-to-workspace G'
+
 # Personal Apps
 [[on-window-detected]]
 if.app-id = 'com.apple.MobileSMS'
