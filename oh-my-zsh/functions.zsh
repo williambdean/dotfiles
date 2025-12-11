@@ -365,3 +365,19 @@ star() {
 function fvim() {
     vim $(fzf)
 }
+
+function new-location() {
+    path=$(pwd)
+    # Replace GitHub with github
+    path=${path/GitHub/github}
+    echo $path
+}
+
+function cd-new() {
+    cd $(new-location)
+}
+
+function remove-from-zoxide() {
+    local path=$(pwd)
+    zoxide remote $path
+}
