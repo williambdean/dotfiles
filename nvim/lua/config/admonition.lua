@@ -1,23 +1,5 @@
 ---Picker to create admonitions in markdown files based on selected block of text
-local pickers = require "telescope.pickers"
-local finders = require "telescope.finders"
-local conf = require("telescope.config").values
-local actions = require "telescope.actions"
-local action_state = require "telescope.actions.state"
-local themes = require "telescope.themes"
-
 local M = {}
-
--- Taken from octo.nvim/pickers/telescope/provider.lua
-local dropdown_opts = themes.get_dropdown {
-  layout_config = {
-    width = 0.4,
-    height = 15,
-  },
-  prompt_title = false,
-  results_title = false,
-  previewer = false,
-}
 
 local kinds = {
   "NOTE",
@@ -51,46 +33,28 @@ local create_callback = function(start, stop, lines)
   end
 end
 
-local admonition_picker = function(opts)
+---@param opts { cb: fun(kind: string) }
+local function admonition_picker(opts)
   local cb = opts.cb
 
-  pickers
-    .new(opts, {
-      finder = finders.new_table {
-        results = kinds,
-        entry_maker = function(entry)
-          return {
-            value = entry,
-            display = to_title_case(entry),
-            ordinal = entry,
-          }
-        end,
-      },
-      sorter = conf.generic_sorter(opts),
-      attach_mappings = function(prompt_bufnr, _)
-        actions.select_default:replace(function()
-          local selection = action_state.get_selected_entry()
-          actions.close(prompt_bufnr)
-          if selection == nil then
-            return
-          end
-          local kind = selection.value
-
-          cb(kind)
-        end)
-        return true
-      end,
-    })
-    :find()
+  vim.ui.select(kinds, {
+    prompt = "Select Admonition Type:",
+    format_item = to_title_case,
+  }, function(choice)
+    if choice == nil then
+      return
+    end
+    cb(choice)
+  end)
 end
 
 M.picker = function(opts)
   local start = opts.line1 - 1
   local stop = opts.line2
   local lines = vim.api.nvim_buf_get_lines(0, start, stop, false)
-  local picker_opts = vim.deepcopy(dropdown_opts)
-  picker_opts.cb = create_callback(start, stop, lines)
-  admonition_picker(picker_opts)
+  admonition_picker {
+    cb = create_callback(start, stop, lines),
+  }
 end
 
 return M
