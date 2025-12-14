@@ -13,3 +13,5 @@ local opts = {
   buffer = true,
 }
 vim.keymap.set("n", "<leader>x", execute.copy_output_to_clipboard, opts)
+
+vim.lsp.enable("copilot_ls", false)
