@@ -85,7 +85,14 @@ ls.add_snippets("python", {
   ),
 })
 
+local details_snippet = [[
+<details><summary>${1:Details}</summary>
+${2:Content goes here.}
+</details>
+]]
+
 ls.add_snippets("markdown", {
+
   s("today", {
     t(os.date "%Y-%m-%d"),
   }),
@@ -93,7 +100,9 @@ ls.add_snippets("markdown", {
   ps("lua", "```lua\n$0\n```"),
   ps("terminal", "```terminal\n$0\n```"),
   ps("bash", "```bash\n$0\n```"),
+  ps("details", details_snippet),
 })
+
 ls.add_snippets("octo", {
   s("today", {
     t(os.date "%Y-%m-%d"),
@@ -102,6 +111,7 @@ ls.add_snippets("octo", {
   ps("lua", "```lua\n$0\n```"),
   ps("terminal", "```terminal\n$0\n```"),
   ps("bash", "```bash\n$0\n```"),
+  ps("details", details_snippet),
 })
 
 ls.add_snippets("lua", {
