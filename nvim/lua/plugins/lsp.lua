@@ -94,22 +94,19 @@ return {
   {
     "williamboman/mason-lspconfig.nvim",
     event = { "BufReadPre", "BufNewFile" },
-    depends = {
+    dependencies = {
       "williamboman/mason.nvim",
       "neovim/nvim-lspconfig",
       -- "hrsh7th/cmp-nvim-lsp",
-      "sahhen/blink.nvim",
+      "sahhen/blink.cmp",
     },
     config = function()
       require("mason").setup()
       require("mason-lspconfig").setup()
-      --
-      -- vim.lsp.enable "copilot_ls"
-      --
 
       vim.lsp.enable {
         "ruff",
-        "ty",
+        -- "ty",
         "pyright",
         "lua_ls",
         "ts_ls",
