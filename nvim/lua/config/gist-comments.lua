@@ -100,7 +100,7 @@ local get_gist_comments = function(opts)
   }
 end
 
-local list_gists = function(cb)
+local function list_gists(cb)
   gh.api.get {
     "/gists",
     jq = ". | map({ id: .id, description: .description, public: .public })",
