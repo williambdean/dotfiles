@@ -1,0 +1,20 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "autoupdate": true,
+  "agent": {
+      "git": {
+          "mode": "primary",
+          "description": "You are to perform git actions",
+          "prompt": "{file:./prompts/git.md}"
+      },
+      "code-reviewer": {
+      "description": "Reviews code for best practices and potential issues",
+      "mode": "subagent",
+      "prompt": "You are a code reviewer. Focus on security, performance, and maintainability.",
+      "tools": {
+        "write": false,
+        "edit": false
+      }
+    }
+  }
+}
