@@ -86,6 +86,11 @@ local function gitlinker_link(action)
   local lstart = vim.fn.line "'<"
   local lend = vim.fn.line "'>"
 
+  if lstart == 0 or lend == 0 then
+    vim.notify("No visual selection found", vim.log.levels.ERROR)
+    return
+  end
+
   local callback = function(remote)
     require("gitlinker").link {
       action = action,
@@ -114,15 +119,41 @@ end
 ---Create reference issue
 vim.keymap.set("v", "<leader>cri", function()
   gitlinker_link(create_reference_issue)
-end, {})
+end, {
+  desc = "Create reference issue from visual selection",
+})
+
+local function display_github_usage(decoded)
+  local utils = require "octo.utils"
+
+  local rate_limit = decoded.data.rateLimit
+
+  local info_lines = {
+    "",
+    "GitHub GraphQL API Rate Limit:",
+    "================================",
+    string.format("Limit:     %d points per hour", rate_limit.limit),
+    string.format("Used:      %d points", rate_limit.used),
+    string.format("Remaining: %d points", rate_limit.remaining),
+    string.format("Resets at: %s", rate_limit.resetAt),
+    "",
+    string.format("Usage: %.1f%%", (rate_limit.used / rate_limit.limit) * 100),
+  }
+
+  utils.info(table.concat(info_lines, "\n"))
+end
 
 vim.keymap.set("v", "<leader>gho", function()
   gitlinker_link(require("gitlinker.actions").open_in_browser)
-end, {})
+end, {
+  desc = "Open GitHub link in browser from visual selection",
+})
 
 vim.api.nvim_create_user_command("CloseIssue", function(opts)
   require("config.close-issue").close_issue()
-end, {})
+end, {
+  desc = "Close the current issue",
+})
 
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "octo",
@@ -157,7 +188,8 @@ local function current_author()
     return
   end
 
-  local author = buffer.node.author.login
+  local node = buffer:isPullRequest() and buffer:pullRequest() or buffer:issue()
+  local author = node.author.login
   vim.fn.setreg("+", "@" .. author)
   utils.info("Copied author to clipboard: " .. author)
 end
@@ -256,7 +288,7 @@ end
 
 return {
   { "akinsho/git-conflict.nvim", opts = {} },
-  { "tpope/vim-fugitive", cmd = { "Git", "G", "Gw" } },
+  { "tpope/vim-fugitive", cmd = { "Git", "G", "Gw", "Gvdiffsplit" } },
   {
     "linrongbin16/gitlinker.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
@@ -353,6 +385,50 @@ return {
     cmd = "Octo",
     keys = {
       {
+        "<leader>oqi",
+        function()
+          local commands = require("octo.commands").commands
+
+          local repos = {
+            "pwntester/octo.nvim",
+            "pymc-labs/pymc-marketing",
+          }
+          vim.ui.select(repos, {
+            prompt = "Select repository to create issue in:",
+          }, function(repo)
+            if not repo then
+              return
+            end
+            commands.issue.create(repo)
+          end)
+        end,
+        desc = "Quick issue for octo.nvim",
+      },
+      {
+        "<leader>oni",
+        "<CMD>Octo issue create pwntester/octo.nvim<CR>",
+        desc = "Create octo.nvim issue",
+      },
+      {
+        "<leader>orl",
+        function()
+          local gh = require "octo.gh"
+
+          gh.api.graphql {
+            query = "query { rateLimit { used limit cost remaining resetAt } }",
+            opts = {
+              cb = gh.create_callback {
+                success = function(data)
+                  local decoded = vim.json.decode(data)
+                  display_github_usage(decoded)
+                end,
+              },
+            },
+          }
+        end,
+        desc = "Octo Rate Limit",
+      },
+      {
         "<leader>oo",
         "<CMD>Octo<CR>",
         desc = "Open Octo",
@@ -410,6 +486,59 @@ return {
         "<CMD>Octo pr list<CR>",
         desc = "List pull requests",
       },
+      {
+        "<leader>oe",
+        desc = "Create octo enum",
+        function()
+          local debug = require "octo.debug"
+          local utils = require "octo.utils"
+
+          local function create_callback(type)
+            return function(data)
+              local decoded = vim.json.decode(data)
+              local enum_values = decoded.data.__type.enumValues
+
+              if utils.is_blank(enum_values) then
+                utils.error("No enum values found for type: " .. type)
+                return
+              end
+
+              local typehint_parts = "---@alias octo." .. type
+              local typehint_values = {}
+              for _, enum in ipairs(enum_values) do
+                table.insert(typehint_values, '"' .. enum.name .. '"')
+              end
+
+              local typehint = typehint_parts
+                .. " "
+                .. table.concat(typehint_values, "|")
+              utils.copy_url(typehint)
+            end
+          end
+
+          vim.ui.input({
+            prompt = "Enter GraphQL type name: ",
+          }, function(input)
+            if input then
+              debug.lookup(input, create_callback(input))
+            end
+          end)
+        end,
+      },
+      {
+        "<leader>ol",
+        function()
+          local debug = require "octo.debug"
+          vim.ui.input({
+            prompt = "Enter GraphQL type name: ",
+          }, function(input)
+            if input then
+              debug.lookup(input)
+            end
+          end)
+        end,
+        desc = "Lookup GraphQL type",
+      },
       { "<leader>oi", "<CMD>Octo issue list<CR>", desc = "List issues" },
       {
         "<leader>od",
@@ -423,8 +552,12 @@ return {
       "nvim-telescope/telescope.nvim",
     },
     config = function()
+      ---@type OctoConfig
       require("octo").setup {
         -- default_to_projects_v2 = true,
+        suppress_missing_scope = {
+          projects_v2 = true,
+        },
         debug = {
           notify_missing_timeline_items = true,
         },
@@ -459,11 +592,11 @@ return {
         use_timeline_icons = true,
         commands = {
           release = {
-            list = function(repo)
-              require("config.releases").create_picker {
-                repo = repo,
-              }
-            end,
+            -- list = function(repo)
+            --   require("config.releases").create_picker {
+            --     repo = repo,
+            --   }
+            -- end,
           },
           -- Octo commit list
           commit = {
@@ -672,6 +805,9 @@ return {
           },
         },
         issues = {
+          body_callback = function(body)
+            return body .. "\n\n*Created via octo.nvim*"
+          end,
           order_by = {
             field = "UPDATED_AT",
             direction = "DESC",
@@ -680,6 +816,7 @@ return {
         ---Choose picker
         picker = "telescope",
         -- picker = "snacks",
+        -- picker = "fzf-lua",
         -- picker_config = {
         --     use_emojis = true,
         -- },
