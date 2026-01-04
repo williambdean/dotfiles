@@ -1,6 +1,22 @@
 {
+  "plugin": ["oh-my-opencode"],
   "$schema": "https://opencode.ai/config.json",
   "autoupdate": true,
+  "mcp": {
+    "github": {
+      "type": "local",
+      "command": ["docker", "run", "-i", "--rm", "-e", "GITHUB_PERSONAL_ACCESS_TOKEN", "ghcr.io/github/github-mcp-server"],
+      "environment": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GH_TOKEN}"
+      },
+      "enabled": true
+    },
+    "kanban": {
+        "type": "local",
+        "command": ["kanban", "mcp"],
+        "enabled": true
+    }
+  },
   "agent": {
       "git": {
           "mode": "primary",
@@ -11,6 +27,15 @@
       "description": "Reviews code for best practices and potential issues",
       "mode": "subagent",
       "prompt": "You are a code reviewer. Focus on security, performance, and maintainability.",
+      "tools": {
+        "write": false,
+        "edit": false
+      }
+    },
+    "kanban": {
+      "mode": "subagent",
+      "description": "Create and manage tasks on the Kanban board using the local Kanban MCP server",
+      "prompt": "{file:./prompts/kanban.md}",
       "tools": {
         "write": false,
         "edit": false

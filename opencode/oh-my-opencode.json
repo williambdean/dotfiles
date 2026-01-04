@@ -1,0 +1,32 @@
+{
+  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
+  "agents": {
+    "Sisyphus": {
+      "model": "github-copilot/claude-sonnet-4"
+    },
+    "librarian": {
+      "model": "gemini/gemini-2.5-flash"
+    },
+    "explore": {
+      "model": "gemini/gemini-2.5-flash"
+    },
+    "oracle": {
+      "model": "github-copilot/claude-sonnet-4"
+    },
+    "frontend-ui-ux-engineer": {
+      "model": "gemini/gemini-2.5-pro"
+    },
+    "document-writer": {
+      "model": "gemini/gemini-2.5-flash"
+    },
+    "multimodal-looker": {
+      "model": "gemini/gemini-2.5-flash"
+    },
+    "kanban": {
+      "model": "github-copilot/claude-opus-4-5"
+    },
+    "researcher": {
+      "model": "github-copilot/claude-sonnet-4"
+    }
+  }
+}
