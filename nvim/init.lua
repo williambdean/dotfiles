@@ -27,6 +27,9 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
+-- Enable project-local configuration files (.nvim.lua, .nvimrc, .exrc)
+vim.o.exrc = true
+
 local opt = vim.opt
 
 opt.termguicolors = true
@@ -125,7 +128,7 @@ require("lazy").setup {
         format_on_save = {
           -- These options will be passed to conform.format()
           timeout_ms = 500,
-          lsp_format = "fallback",
+          -- lsp_format = "fallback",
         },
       },
     },
@@ -267,6 +270,8 @@ opt.number = true
 
 -- Disable line wrapping
 opt.wrap = false
+opt.textwidth = 88
+opt.linebreak = true
 
 -- Enable smart case sensitivity in searches
 opt.smartcase = true
