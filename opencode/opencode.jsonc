@@ -1,7 +1,10 @@
 {
-  "plugin": ["oh-my-opencode"],
+  // "plugin": ["oh-my-opencode"],
   "$schema": "https://opencode.ai/config.json",
   "autoupdate": true,
+  "keybinds": {
+    "app_exit": "ctrl+d,<leader>q"
+  },
   "mcp": {
     "github": {
       "type": "local",
@@ -15,14 +18,19 @@
         "type": "local",
         "command": ["kanban", "mcp"],
         "enabled": true
+    },
+    "applescript": {
+      "type": "local",
+      "command": ["uvx", "mcp-applescript"],
+      "environment": {
+        "ALLOWED_APPS": "calendar",
+        "BLOCK_DANGEROUS": "true",
+        "TIMEOUT": "30"
+      },
+      "enabled": true
     }
   },
   "agent": {
-      "git": {
-          "mode": "primary",
-          "description": "You are to perform git actions",
-          "prompt": "{file:./prompts/git.md}"
-      },
       "code-reviewer": {
       "description": "Reviews code for best practices and potential issues",
       "mode": "subagent",
@@ -36,6 +44,15 @@
       "mode": "subagent",
       "description": "Create and manage tasks on the Kanban board using the local Kanban MCP server",
       "prompt": "{file:./prompts/kanban.md}",
+      "tools": {
+        "write": false,
+        "edit": false
+      }
+    },
+    "calendar": {
+      "mode": "subagent",
+      "description": "Manage macOS Calendar events - lookup, view details, and edit events with confirmations",
+      "prompt": "{file:./prompts/calendar.md}",
       "tools": {
         "write": false,
         "edit": false
