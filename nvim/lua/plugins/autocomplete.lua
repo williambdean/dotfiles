@@ -37,9 +37,6 @@ local function quick_chat(opts)
   opts = opts or {}
   local with_buffer = opts.with_buffer or false
   local chat = require "CopilotChat"
-  local select = require "CopilotChat.select"
-
-  local prompt = "Quick Chat: "
 
   if with_buffer then
     prompt = "Quick Chat (Buffer): "
@@ -51,17 +48,13 @@ local function quick_chat(opts)
     end
 
     if with_buffer then
-      chat.ask(input, {
-        selection = select.buffer,
-      })
+      chat.ask(input .. "using #buffer")
     else
       chat.ask(input)
     end
   end
 
   create_popup(handle_input)
-  --
-  -- vim.ui.input({ prompt = prompt }, handle_input)
 end
 
 vim.keymap.set("i", "@", "@<C-x><C-o>", { silent = true, buffer = true })
@@ -287,48 +280,9 @@ return {
     requires = {
       "copilotlsp-nvim/copilot-lsp", -- (optional) for NES functionality
     },
-    cmd = { "Copilot" },
-    event = "InsertEnter",
+    -- cmd = { "Copilot" },
+    -- event = "InsertEnter",
     opts = {},
-  },
-  {
-    "github/copilot.vim",
-    config = function()
-      -- Enable Copilot for specific filetypes including custom ones
-      vim.g.copilot_filetypes = {
-        ["*"] = true, -- Enable for all filetypes
-        ["copilot-chat"] = true, -- Explicitly enable for copilot-chat
-        ["markdown"] = true, -- Enable for markdown
-        ["yaml"] = true, -- Enable for yaml
-        ["gitcommit"] = true, -- Enable for git commits
-      }
-
-      -- -- Copilot general settings
-      -- vim.g.copilot_no_tab_map = true -- Disable tab mapping
-      -- vim.g.copilot_assume_mapped = true
-      -- vim.g.copilot_tab_fallback = ""
-      vim.g.copilot_no_tab_map = false -- Enable tab mapping
-      vim.g.copilot_assume_mapped = false -- Disable assume mapped
-      -- vim.g.copilot_tab_fallback = "" -- Empty fallback
-
-      vim.keymap.set("i", "<Tab>", function()
-        if require("copilot.suggestion").is_visible() then
-          require("copilot.suggestion").accept()
-        else
-          vim.api.nvim_feedkeys(
-            vim.api.nvim_replace_termcodes("<Tab>", true, false, true),
-            "n",
-            false
-          )
-        end
-      end, { silent = true })
-
-      -- Create mapping for manual trigger
-      vim.keymap.set("i", "<C-J>", 'copilot#Accept("<CR>")', {
-        expr = true,
-        replace_keycodes = false,
-      })
-    end,
   },
   -- {
   --   "CopilotC-Nvim/CopilotChat.nvim",
@@ -435,6 +389,11 @@ return {
       show_help = false,
       context = "buffers",
       language = "English",
+      headers = {
+        user = "  " .. vim.env.USER .. " ",
+        assistant = "  Copilot ",
+        tool = "󰊳  Tool ",
+      },
       prompts = {
         Explain = "Explain how it works in the English language.",
         Review = "Review the following code and provide concise suggestions.",
@@ -451,6 +410,18 @@ return {
         "<leader>t",
         function()
           require("CopilotChat").toggle()
+        end,
+        desc = "CopilotChat - Toggle",
+      },
+      {
+        "<leader>ta",
+        function()
+          require("CopilotChat").toggle {
+            system_prompt = [[
+              You are knowledgeable assistant that answers questions about
+              anything to the best of your knowledge
+            ]],
+          }
         end,
         desc = "CopilotChat - Toggle",
       },
@@ -493,13 +464,12 @@ return {
         "<leader>ccv",
         function()
           local chat = require "CopilotChat"
-          local select = require "CopilotChat.select"
 
           create_popup(function(question)
             if question == "" then
               return
             end
-            chat.ask(question, { selection = select.visual })
+            chat.ask(question .. " using #selection")
           end)
 
           -- local question = vim.fn.input "Quick Chat (Visual): "
