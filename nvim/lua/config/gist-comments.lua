@@ -79,11 +79,13 @@ local display_gist_comments = function(comments)
   return bufnr
 end
 
+---@param opts { gist_id: number }
 local get_gist_comments = function(opts)
   gh.api.get {
     "/gists/{gist_id}/comments",
     format = { gist_id = opts.gist_id },
     jq = "map({id: .id, body: .body, created_at: .created_at})",
+    paginate = true,
     opts = {
       cb = gh.create_callback {
         success = function(output)
