@@ -1,5 +1,8 @@
 local vim = vim
 
+--- Temporary reduction of warnings
+vim.g.deprecation_warnings = false
+
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
