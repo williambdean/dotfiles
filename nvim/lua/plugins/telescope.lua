@@ -134,7 +134,7 @@ return {
                 results = files,
               },
               sorter = require("telescope.config").values.generic_sorter {},
-              previewer = require("telescope.previewers").vim_buffer_cat.new {},
+              previewer = require("telescope.previewers").git_file_diff.new {},
             })
             :find()
         end,
@@ -144,6 +144,11 @@ return {
         "<leader>ls",
         ":Telescope lsp_document_symbols<CR>",
         desc = "LSP Document Symbols",
+      },
+      {
+        "<leader>fe",
+        ":Telescope symbols<CR>",
+        desc = "Find symbols",
       },
       {
         "<leader>ff",
@@ -246,6 +251,24 @@ return {
           require("telescope.builtin").live_grep(params)
         end,
         desc = "Find grep",
+      },
+      {
+        "<leader>n/",
+        function()
+          local opts = {}
+          local obsidian = require "config.obsidian"
+          if not obsidian.directory_exists then
+            vim.notify(
+              "Obsidian vault not found. Please set the directory in your config.",
+              vim.log.levels.WARN
+            )
+            return
+          end
+          opts.cwd = obsidian.directory
+
+          require("telescope.builtin").live_grep(opts)
+        end,
+        desc = "Find Obsidian notes",
       },
       {
         "<leader>nf",
