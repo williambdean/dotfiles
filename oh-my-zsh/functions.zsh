@@ -243,12 +243,16 @@ function prs_since_last_release() {
 
 
 function pr {
-    local current_branch=$(git branch --show-current)
-    local pr_number=$(gh pr list --head "$current_branch" --json number --jq '.[0].number')
-    if [ -z "$pr_number" ]
-    then
-        echo "No PR found for branch $current_branch"
-        return
+    local pr_number="$1"
+
+    # If no PR number provided, try to find PR for current branch
+    if [ -z "$pr_number" ]; then
+        local current_branch=$(git branch --show-current)
+        pr_number=$(gh pr list --head "$current_branch" --json number --jq '.[0].number')
+        if [ -z "$pr_number" ]; then
+            echo "No PR found for branch $current_branch"
+            return
+        fi
     fi
 
     nvim -c ":Octo pr edit $pr_number"
