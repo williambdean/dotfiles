@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
 """Capture an idea in a tmux popup and append it to post-ideas.md."""
 
+# /// script
+# dependencies = [
+#   "libtmux",
+# ]
+# ///
+
 import datetime
 import os
-import subprocess
+
 import sys
 import tempfile
+
+import libtmux
 
 
 IDEAS_DIR = "/Users/will/github/personal/posts"
@@ -13,24 +21,22 @@ IDEAS_FILE = os.path.join(IDEAS_DIR, "post-ideas.md")
 
 
 def tmux_display(message: str) -> None:
-    subprocess.run(["tmux", "display-message", message], check=False)
+    server = libtmux.Server()
+    server.cmd("display-message", message)
 
 
 def tmux_session() -> str:
-    try:
-        result = subprocess.run(
-            ["tmux", "display-message", "-p", "#S"],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        return result.stdout.strip() or "(unknown)"
-    except subprocess.CalledProcessError:
-        return "(unknown)"
+    server = libtmux.Server()
+    # Get the current session using libtmux API
+    result = server.cmd("display-message", "-p", "#S")
+    return result.stdout[0].strip() if result.stdout else "(unknown)"
 
 
 def open_editor(path: str) -> int:
+    import subprocess
+
     editor = os.environ.get("EDITOR", "vim")
+    editor = "vim"
     return subprocess.run([editor, path], check=False).returncode
 
 
