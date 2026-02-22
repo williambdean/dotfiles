@@ -407,6 +407,22 @@ return {
     },
     keys = {
       {
+        "<leader>sp",
+        function()
+          vim.ui.input({ prompt = "Chat with buffer: " }, function(input)
+            if input and input ~= "" then
+              require("CopilotChat").ask("#buffer " .. input, {
+                window = {
+                  layout = "vertical",
+                  width = 0.4,
+                },
+              })
+            end
+          end)
+        end,
+        desc = "CopilotChat - Chat with buffer",
+      },
+      {
         "<leader>t",
         function()
           require("CopilotChat").toggle()
