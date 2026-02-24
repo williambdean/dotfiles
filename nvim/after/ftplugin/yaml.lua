@@ -7,7 +7,30 @@ set.shiftwidth = 2
 set.softtabstop = 2
 set.tabstop = 2
 
-vim.lsp.enable "yamlls"
+vim.keymap.set("n", "<C-b>", function()
+  local path = vim.fn.expand "%:p"
+  local filename = path:match ".*/.github/workflows/([^/]+)%.ya?ml$"
+
+  if not filename then
+    vim.notify("Not a workflow file", vim.log.levels.WARN)
+    return
+  end
+
+  local utils = require "octo.utils"
+  local repo = utils.get_remote_name()
+  if not repo then
+    vim.notify("No git remote found", vim.log.levels.ERROR)
+    return
+  end
+
+  local url = string.format(
+    "https://github.com/%s/actions/workflows/%s.yml",
+    repo,
+    filename
+  )
+  require("octo.navigation").open_in_browser_raw(url)
+end, { buffer = true, silent = true })
+
 vim.lsp.config.yamlls.settings = {
   yaml = {
     validate = true,
