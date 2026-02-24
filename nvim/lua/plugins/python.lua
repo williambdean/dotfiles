@@ -1,6 +1,66 @@
 local function switch_to_test_file()
   local bufnr = vim.api.nvim_get_current_buf()
   local current_file = vim.api.nvim_buf_get_name(bufnr)
+  local filetype = vim.api.nvim_buf_get_option(bufnr, "filetype")
+
+  -- Check if we're in an oil buffer
+  if filetype == "oil" then
+    local ok, oil = pcall(require, "oil")
+    if not ok then
+      vim.notify("oil.nvim not available", vim.log.levels.ERROR)
+      return
+    end
+
+    local current_dir = oil.get_current_dir()
+    if not current_dir then
+      vim.notify("Could not get current oil directory", vim.log.levels.WARN)
+      return
+    end
+
+    local cwd = vim.fn.getcwd()
+    if cwd:sub(-1) ~= "/" then
+      cwd = cwd .. "/"
+    end
+
+    local relative_path = current_dir:sub(#cwd + 1)
+    local target_dir
+
+    if relative_path:match "^tests/" then
+      local test_subpath = relative_path:sub(7)
+      local source_dir =
+        require("config.test_files").find_source_dir(test_subpath)
+      if source_dir then
+        target_dir = cwd .. source_dir
+      else
+        vim.notify(
+          "Could not find source package for: " .. test_subpath,
+          vim.log.levels.WARN
+        )
+        return
+      end
+    elseif relative_path:match "^src/" then
+      target_dir = current_dir:gsub("^" .. cwd .. "src/", cwd .. "tests/", 1)
+    else
+      local first_dir = relative_path:match "^([^/]+)/"
+      if first_dir then
+        target_dir = cwd .. "tests/" .. relative_path:sub(#first_dir + 2)
+      else
+        vim.notify("Not in src/ or tests/ directory", vim.log.levels.WARN)
+        return
+      end
+    end
+
+    if vim.fn.isdirectory(target_dir) == 0 then
+      vim.notify(
+        "Directory does not exist: " .. target_dir,
+        vim.log.levels.WARN
+      )
+      return
+    end
+
+    oil.open(target_dir)
+    return
+  end
 
   -- Check if file is a Python file
   if not current_file:match "%.py$" then
@@ -30,7 +90,7 @@ vim.keymap.set(
   "n",
   "<leader>T",
   switch_to_test_file,
-  { noremap = true, silent = true, desc = "Switch to test file" }
+  { noremap = true, silent = true, desc = "Switch to test file/directory" }
 )
 
 function get_visual_selection()

@@ -24,6 +24,27 @@ local find_module_path = function(module_file_name)
   end
 end
 
+M.find_source_dir = function(test_relative_path)
+  local source_roots = { "./*/", "./src/*/" }
+  local source_dirs = {}
+
+  for _, root in ipairs(source_roots) do
+    local results = vim.fn.glob(root, true, true)
+    for _, result in ipairs(results) do
+      table.insert(source_dirs, result)
+    end
+  end
+
+  for _, src_dir in ipairs(source_dirs) do
+    local init_file = src_dir .. test_relative_path .. "__init__.py"
+    if vim.fn.filereadable(init_file) == 1 then
+      return src_dir .. test_relative_path
+    end
+  end
+
+  return nil
+end
+
 M.buffer_info = function()
   local bufnr = vim.api.nvim_get_current_buf()
   local current_file = vim.api.nvim_buf_get_name(bufnr)
