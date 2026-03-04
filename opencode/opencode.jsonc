@@ -2,9 +2,6 @@
   // "plugin": ["oh-my-opencode"],
   "$schema": "https://opencode.ai/config.json",
   "autoupdate": true,
-  "keybinds": {
-    "app_exit": "ctrl+d,<leader>q"
-  },
   "mcp": {
     "github": {
       "type": "local",
@@ -60,7 +57,7 @@
     },
     "ytt": {
       "mode": "subagent",
-      "description": "Fetch YouTube video transcripts using ytt CLI - for research and context enrichment",
+      "description": "Use when youtube video url is detected. Fetch YouTube video transcripts using ytt CLI - for research and context enrichment.",
       "prompt": "{file:./prompts/ytt.md}",
       "tools": {
         "bash": true,
