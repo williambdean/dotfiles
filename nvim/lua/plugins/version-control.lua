@@ -155,6 +155,13 @@ end, {
   desc = "Close the current issue",
 })
 
+vim.api.nvim_create_user_command("Pr", function(opts)
+  vim.cmd("Octo pr " .. table.concat(opts.fargs, " "))
+end, {
+  nargs = "+",
+  desc = "Alias for Octo pr command",
+})
+
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "octo",
   desc = "Get the current octo buffer's timeline items or full node",
