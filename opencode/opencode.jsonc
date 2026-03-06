@@ -5,7 +5,7 @@
   "mcp": {
     "github": {
       "type": "local",
-      "command": ["docker", "run", "-i", "--rm", "-e", "$GITHUB_PERSONAL_ACCESS_TOKEN", "ghcr.io/github/github-mcp-server"],
+      "command": ["docker", "run", "-i", "--rm", "-e", "GITHUB_PERSONAL_ACCESS_TOKEN", "ghcr.io/github/github-mcp-server"],
       "environment": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "${GH_TOKEN}"
       },
