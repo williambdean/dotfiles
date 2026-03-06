@@ -12,6 +12,7 @@ import os
 
 import sys
 import tempfile
+import subprocess
 
 import libtmux
 
@@ -33,8 +34,6 @@ def tmux_session() -> str:
 
 
 def open_editor(path: str) -> int:
-    import subprocess
-
     editor = os.environ.get("EDITOR", "vim")
     editor = "vim"
     return subprocess.run([editor, path], check=False).returncode
