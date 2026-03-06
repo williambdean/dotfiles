@@ -248,10 +248,32 @@ function pr {
     # If no PR number provided, try to find PR for current branch
     if [ -z "$pr_number" ]; then
         local current_branch=$(git branch --show-current)
-        pr_number=$(gh pr list --head "$current_branch" --json number --jq '.[0].number')
-        if [ -z "$pr_number" ]; then
+
+        # Get all PRs for current branch with number, title, and state
+        local prs=$(gh pr list --head "$current_branch" --json number,title,state --jq '.[] | "\(.number)\t\(.title)\t[\(.state)]"')
+
+        if [ -z "$prs" ]; then
             echo "No PR found for branch $current_branch"
             return
+        fi
+
+        # Count how many PRs we have
+        local pr_count=$(echo "$prs" | wc -l | tr -d ' ')
+
+        if [ "$pr_count" -eq 1 ]; then
+            # Only one PR, extract the number directly
+            pr_number=$(echo "$prs" | awk '{print $1}')
+        else
+            # Multiple PRs, use fzf to select
+            local selected=$(echo "$prs" | fzf --prompt="Select PR: " --height=40% --reverse)
+
+            if [ -z "$selected" ]; then
+                echo "No PR selected"
+                return
+            fi
+
+            # Extract PR number (first field)
+            pr_number=$(echo "$selected" | awk '{print $1}')
         fi
     fi
 
