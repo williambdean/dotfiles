@@ -472,6 +472,7 @@ require("config.github").setup()
 require "config.code-block"
 require "config.gitignore"
 require "config.worktrees"
+require "config.github-browse"
 
 local sphinx = require "config.sphinx"
 
