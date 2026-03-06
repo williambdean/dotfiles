@@ -558,6 +558,10 @@ return {
         suppress_missing_scope = {
           projects_v2 = true,
         },
+        poll = {
+          enabled = true,
+          interval = 5000,
+        },
         debug = {
           notify_missing_timeline_items = true,
         },
