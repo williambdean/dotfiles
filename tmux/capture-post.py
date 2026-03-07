@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Capture an idea in a tmux popup and append it to post-ideas.md."""
+"""Read a captured idea from stdin and append it to post-ideas.md."""
 
 # /// script
 # dependencies = [
@@ -9,10 +9,7 @@
 
 import datetime
 import os
-
 import sys
-import tempfile
-import subprocess
 
 import libtmux
 
@@ -28,21 +25,11 @@ def tmux_display(message: str) -> None:
 
 def tmux_session() -> str:
     server = libtmux.Server()
-    # Get the current session using libtmux API
     result = server.cmd("display-message", "-p", "#S")
     return result.stdout[0].strip() if result.stdout else "(unknown)"
 
 
-def open_editor(path: str) -> int:
-    editor = os.environ.get("EDITOR", "vim")
-    editor = "vim"
-    return subprocess.run([editor, path], check=False).returncode
-
-
-def read_idea(path: str) -> tuple[str, list[str]] | None:
-    with open(path, encoding="utf-8") as fh:
-        raw = fh.read()
-
+def parse_idea(raw: str) -> tuple[str, list[str]] | None:
     if not raw.strip():
         return None
 
@@ -86,25 +73,15 @@ def append_entry(idea: str, summary: list[str]) -> None:
 
 
 def main() -> int:
-    tmux_display("Idea capture: idea line first, blank line, then summary.")
-    temp = tempfile.NamedTemporaryFile(mode="w+", suffix=".md", delete=False)
-    temp_path = temp.name
-    temp.close()
-    try:
-        open_editor(temp_path)
-        parsed = read_idea(temp_path)
-        if not parsed:
-            tmux_display("Idea cancelled (no content saved).")
-            return 1
-        idea, summary = parsed
-        append_entry(idea, summary)
-        tmux_display(f"Idea saved ({idea[:40]}).")
-        return 0
-    finally:
-        try:
-            os.unlink(temp_path)
-        except OSError:
-            pass
+    raw = sys.stdin.read()
+    parsed = parse_idea(raw)
+    if not parsed:
+        tmux_display("Post idea: nothing to save.")
+        return 1
+    idea, summary = parsed
+    append_entry(idea, summary)
+    tmux_display(f"Post idea saved: {idea[:40]}")
+    return 0
 
 
 if __name__ == "__main__":
