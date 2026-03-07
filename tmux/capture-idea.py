@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Capture an idea in a tmux popup and append it to post-ideas.md."""
+"""Capture an idea in a vim popup and write it to stdout."""
 
 # /// script
 # dependencies = [
@@ -8,25 +8,13 @@
 # ///
 
 import os
-from pathlib import Path
-
 import sys
 import tempfile
 import subprocess
+from pathlib import Path
 
-import libtmux
-
-
-def tmux_display(message: str) -> None:
-    server = libtmux.Server()
-    server.cmd("display-message", message)
-
-
-def tmux_session() -> str:
-    server = libtmux.Server()
-    # Get the current session using libtmux API
-    result = server.cmd("display-message", "-p", "#S")
-    return result.stdout[0].strip() if result.stdout else "(unknown)"
+sys.path.insert(0, os.path.dirname(__file__))
+from capture_utils import tmux_display  # noqa: E402
 
 
 def open_editor(path: str) -> int:
@@ -38,29 +26,6 @@ def open_editor(path: str) -> int:
             stdout=tty,
             check=False,
         ).returncode
-
-
-def read_idea(path: str) -> tuple[str, list[str]] | None:
-    with open(path, encoding="utf-8") as fh:
-        raw = fh.read()
-
-    if not raw.strip():
-        return None
-
-    lines = raw.splitlines()
-    while lines and not lines[0].strip():
-        lines.pop(0)
-    while lines and not lines[-1].strip():
-        lines.pop()
-    if not lines:
-        return None
-
-    idea_line = lines[0].strip()
-    summary_lines = lines[1:]
-    while summary_lines and not summary_lines[0].strip():
-        summary_lines.pop(0)
-
-    return idea_line, summary_lines
 
 
 def main() -> int:

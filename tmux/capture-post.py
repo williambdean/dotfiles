@@ -11,42 +11,12 @@ import datetime
 import os
 import sys
 
-import libtmux
+sys.path.insert(0, os.path.dirname(__file__))
+from capture_utils import tmux_display, tmux_session, parse_idea  # noqa: E402
 
 
 IDEAS_DIR = "/Users/will/github/personal/posts"
 IDEAS_FILE = os.path.join(IDEAS_DIR, "post-ideas.md")
-
-
-def tmux_display(message: str) -> None:
-    server = libtmux.Server()
-    server.cmd("display-message", message)
-
-
-def tmux_session() -> str:
-    server = libtmux.Server()
-    result = server.cmd("display-message", "-p", "#S")
-    return result.stdout[0].strip() if result.stdout else "(unknown)"
-
-
-def parse_idea(raw: str) -> tuple[str, list[str]] | None:
-    if not raw.strip():
-        return None
-
-    lines = raw.splitlines()
-    while lines and not lines[0].strip():
-        lines.pop(0)
-    while lines and not lines[-1].strip():
-        lines.pop()
-    if not lines:
-        return None
-
-    idea_line = lines[0].strip()
-    summary_lines = lines[1:]
-    while summary_lines and not summary_lines[0].strip():
-        summary_lines.pop(0)
-
-    return idea_line, summary_lines
 
 
 def append_entry(idea: str, summary: list[str]) -> None:
