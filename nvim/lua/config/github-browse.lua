@@ -1,6 +1,6 @@
 local gh = require "octo.gh"
 
-local function browse_github_repos()
+local function pick_github_repo(callback)
   vim.ui.input({
     prompt = "Search GitHub repos: ",
   }, function(query)
@@ -12,7 +12,7 @@ local function browse_github_repos()
 
     gh.search.repos {
       query,
-      json = "fullName",
+      json = "fullName,description",
       limit = 30,
       opts = {
         cb = gh.create_callback {
@@ -34,51 +34,14 @@ local function browse_github_repos()
             vim.ui.select(repos, {
               prompt = "Select a repository:",
               format_item = function(item)
-                return item.fullName
+                return item.fullName .. ": " .. item.description
               end,
             }, function(selected)
               if not selected then
                 return
               end
 
-              local full_name = selected.fullName
-              local owner, repo_name = full_name:match "([^/]+)/(.+)"
-              local target_dir =
-                string.format("/tmp/github-%s-%s", owner, repo_name)
-
-              if vim.fn.isdirectory(target_dir) == 1 then
-                vim.notify(
-                  "Already cloned: " .. target_dir .. " - opening in oil",
-                  vim.log.levels.INFO
-                )
-                require("oil").open(target_dir)
-                return
-              end
-
-              vim.notify(
-                "Cloning " .. full_name .. " to " .. target_dir,
-                vim.log.levels.INFO
-              )
-
-              local clone_cmd = {
-                "git",
-                "clone",
-                "--depth",
-                "1",
-                "--filter=blob:none",
-                "https://github.com/" .. full_name .. ".git",
-                target_dir,
-              }
-
-              vim.fn.system(clone_cmd)
-
-              if vim.v.shell_error ~= 0 then
-                vim.notify("Failed to clone repo", vim.log.levels.ERROR)
-                return
-              end
-
-              vim.notify("Opened: " .. full_name, vim.log.levels.INFO)
-              require("oil").open(target_dir)
+              callback(selected)
             end)
           end,
           failure = function(err)
@@ -90,10 +53,59 @@ local function browse_github_repos()
   end)
 end
 
-vim.api.nvim_create_user_command("BrowseGithubRepos", browse_github_repos, {})
+local function browse_github_repos()
+  pick_github_repo(function(selected)
+    local full_name = selected.fullName
+    local owner, repo_name = full_name:match "([^/]+)/(.+)"
+    local target_dir = string.format("/tmp/github-%s-%s", owner, repo_name)
+
+    if vim.fn.isdirectory(target_dir) == 1 then
+      vim.notify(
+        "Already cloned: " .. target_dir .. " - opening in oil",
+        vim.log.levels.INFO
+      )
+      require("oil").open(target_dir)
+      return
+    end
+
+    vim.notify(
+      "Cloning " .. full_name .. " to " .. target_dir,
+      vim.log.levels.INFO
+    )
+
+    local clone_cmd = {
+      "git",
+      "clone",
+      "--depth",
+      "1",
+      "--filter=blob:none",
+      "https://github.com/" .. full_name .. ".git",
+      target_dir,
+    }
+
+    vim.fn.system(clone_cmd)
+
+    if vim.v.shell_error ~= 0 then
+      vim.notify("Failed to clone repo", vim.log.levels.ERROR)
+      return
+    end
+
+    vim.notify("Opened: " .. full_name, vim.log.levels.INFO)
+    require("oil").open(target_dir)
+  end)
+end
+
+local function browse_github_issues()
+  pick_github_repo(function(selected)
+    require("octo.picker").issues { repo = selected.fullName }
+  end)
+end
 
 vim.keymap.set("n", "<leader>gs", browse_github_repos, {
   desc = "Search GitHub repos and browse in oil",
 })
+vim.keymap.set("n", "<leader>gi", browse_github_issues, {
+  desc = "Search GitHub repos and browse its issues",
+})
 
-return {}
+return { pick_github_repo = pick_github_repo }
