@@ -16,6 +16,11 @@ return {
     -- stylua: ignore
     keys = {
       {
+        "<leader>ar",
+        function() require("config.ai-review").submit_to_ai() end,
+        desc = "Submit Octo review to AI",
+      },
+      {
         "<tab>",
         function()
           -- if there is a next edit, jump to it, otherwise apply it if any
@@ -25,11 +30,6 @@ return {
         end,
         expr = true,
         desc = "Goto/Apply Next Edit Suggestion",
-      },
-      {
-        "<leader>aa",
-        function() require("sidekick.cli").toggle() end,
-        desc = "Sidekick Toggle CLI",
       },
       {
         "<leader>as",
@@ -57,16 +57,9 @@ return {
         desc = "Sidekick Select Prompt",
       },
       {
-        "<c-.>",
-        function() require("sidekick.cli").focus() end,
-        mode = { "n", "x", "i", "t" },
-        desc = "Sidekick Switch Focus",
-      },
-      -- Example of a keybinding to open Gemini directly
-      {
-        "<leader>ag",
-        function() require("sidekick.cli").toggle({ name = "gemini", focus = true }) end,
-        desc = "Sidekick Toggle Gemini",
+        "<leader>af",
+        function() require("sidekick.cli").send({ msg = "{file}" }) end,
+        desc = "Send File to Sidekick",
       },
     },
   },

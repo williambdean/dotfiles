@@ -552,6 +552,18 @@ return {
         "<CMD>Octo discussion list<CR>",
         desc = "List discussions",
       },
+      {
+        "<leader>og",
+        "<CMD>CreateGist<CR>",
+        mode = "n",
+        desc = "Create gist from buffer",
+      },
+      {
+        "<leader>og",
+        ":'<,'>CreateGist<CR>",
+        mode = "v",
+        desc = "Create gist from selection",
+      },
     },
     depencencies = {
       "nvim-lua/plenary.nvim",
@@ -566,7 +578,7 @@ return {
           projects_v2 = true,
         },
         poll = {
-          enabled = true,
+          enabled = false,
           interval = 5000,
         },
         debug = {
@@ -602,12 +614,10 @@ return {
         },
         use_timeline_icons = true,
         commands = {
-          release = {
-            -- list = function(repo)
-            --   require("config.releases").create_picker {
-            --     repo = repo,
-            --   }
-            -- end,
+          debug = {
+            lookup = function(value)
+              require("octo.debug").lookup(value)
+            end,
           },
           -- Octo commit list
           commit = {

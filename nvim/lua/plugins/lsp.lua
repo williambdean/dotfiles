@@ -27,7 +27,7 @@ return {
     end,
   },
 
-  -- 2. LSP Configuration
+  -- 2. LSP Configuration + Glance for peek preview
   {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
