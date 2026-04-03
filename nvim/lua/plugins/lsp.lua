@@ -3,7 +3,7 @@ local vim = vim
 return {
   -- 1. Mason for Managing Binaries
   {
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",
     cmd = "Mason",
     opts = {
       ensure_installed = {
@@ -22,46 +22,55 @@ return {
         "prettier",
       },
     },
-    config = function(_, opts)
-      require("mason").setup(opts)
-    end,
   },
 
-  -- 2. LSP Configuration + Glance for peek preview
+  -- 2. mason-lspconfig: auto-enables Mason-installed servers via vim.lsp.enable()
+  --    Repo moved from williamboman/ to mason-org/ in v2.0
+  {
+    "mason-org/mason-lspconfig.nvim",
+    dependencies = { "mason-org/mason.nvim" },
+    opts = {
+      -- automatic_enable = true is the default in v2.x: calls vim.lsp.enable()
+      -- for every Mason-installed server that has a vim.lsp.config definition.
+    },
+  },
+
+  -- 3. nvim-lspconfig: provides server defaults (cmd, filetypes, root detection)
+  --    consumed automatically by vim.lsp.config via the runtimepath lsp/ dir.
+  --    Do NOT use require('lspconfig') -- deprecated in favour of vim.lsp.config.
   {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
-      "williamboman/mason.nvim",
-      "williamboman/mason-lspconfig.nvim",
+      "mason-org/mason.nvim",
+      "mason-org/mason-lspconfig.nvim",
       "saghen/blink.cmp",
     },
     config = function()
-      local lspconfig = require "lspconfig"
       local capabilities = require("blink.cmp").get_lsp_capabilities()
 
-      -- THE CORE FIX: Disable incremental sync to stop sync.lua assertion crashes.
-      -- This forces Full Sync, bypassing the buggy line-length calculation in 0.11.5.
-      local base_opts = {
+      -- Apply base options to ALL servers via wildcard.
+      -- Per-server vim.lsp.config() calls below are merged on top.
+      vim.lsp.config("*", {
         capabilities = capabilities,
         flags = {
+          -- Disable incremental sync to avoid sync.lua assertion crashes.
           allow_incremental_sync = false,
           debounce_text_changes = 150,
         },
-      }
+      })
 
-      -- Setup LUA
-      lspconfig.lua_ls.setup(vim.tbl_deep_extend("force", base_opts, {
+      -- Per-server overrides (only where custom settings are needed)
+      vim.lsp.config("lua_ls", {
         settings = {
           Lua = {
             diagnostics = { globals = { "vim" } },
             workspace = { checkThirdParty = false },
           },
         },
-      }))
+      })
 
-      -- Setup PYTHON (Pyright)
-      lspconfig.pyright.setup(vim.tbl_deep_extend("force", base_opts, {
+      vim.lsp.config("pyright", {
         settings = {
           python = {
             analysis = {
@@ -70,27 +79,12 @@ return {
             },
           },
         },
-      }))
+      })
 
-      -- List of all other servers to initialize with the safe flags
-      local servers = {
-        "ruff",
-        "ts_ls",
-        "rust_analyzer",
-        "html",
-        "gh_actions_ls",
-        "tinymist",
-        "typstyle",
-        "graphql",
-        "harper_ls",
-        "air",
-      }
-
-      for _, server in ipairs(servers) do
-        lspconfig[server].setup(base_opts)
-      end
-
-      -- LSP Keymaps & Shared Behavior
+      -- LSP Keymaps
+      -- nvim 0.12 built-in defaults cover: K (hover), grn (rename),
+      -- gra (code_action), grr (references), gri (implementation),
+      -- grt (type_definition), grx (codelens). Only map what differs.
       local group = vim.api.nvim_create_augroup("UserLspConfig", {})
       vim.api.nvim_create_autocmd("LspAttach", {
         group = group,
@@ -99,17 +93,13 @@ return {
 
           local opts = { buffer = ev.buf }
           vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-          vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-          vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-          vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
-          vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
           vim.keymap.set("n", "<leader>=", function()
             vim.lsp.buf.format { async = false }
           end, opts)
         end,
       })
 
-      -- Formatting Logic
+      -- Auto-format on save
       local lsp_format_enabled = true
       vim.api.nvim_create_autocmd("BufWritePre", {
         group = group,
@@ -117,14 +107,14 @@ return {
           if vim.bo.filetype == "markdown" or not lsp_format_enabled then
             return
           end
-          -- Use pcall to prevent the save process from hanging if an LSP error occurs
+          -- pcall prevents save from hanging on LSP errors
           pcall(function()
             vim.lsp.buf.format { bufnr = ev.buf, async = false }
           end)
         end,
       })
 
-      -- Diagnostics UI Configuration
+      -- Diagnostics UI
       vim.diagnostic.config {
         virtual_text = { prefix = "●", spacing = 5 },
         signs = true,
