@@ -12,6 +12,9 @@ oh-my-zsh/*/*.zsh
 
 __pycache__/
 
+# Compiled AppleScript binaries (derived from .applescript source)
+*.scpt
+
 .git
 
 node_modules/
