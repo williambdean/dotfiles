@@ -11,3 +11,6 @@ for file in *.zsh; do
 	ln -s $(pwd)/$file $ZSH_CUSTOM/$file
 done
 cd ..
+
+# HEIC to PNG Folder Action
+bash "$PWD/scripts/install-heic-to-png.sh"
