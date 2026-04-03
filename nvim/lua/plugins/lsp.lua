@@ -26,9 +26,10 @@ return {
 
   -- 2. mason-lspconfig: auto-enables Mason-installed servers via vim.lsp.enable()
   --    Repo moved from williamboman/ to mason-org/ in v2.0
+  --    Depends on nvim-lspconfig so its lsp/ dir is on runtimepath first.
   {
     "mason-org/mason-lspconfig.nvim",
-    dependencies = { "mason-org/mason.nvim" },
+    dependencies = { "mason-org/mason.nvim", "neovim/nvim-lspconfig" },
     opts = {
       -- automatic_enable = true is the default in v2.x: calls vim.lsp.enable()
       -- for every Mason-installed server that has a vim.lsp.config definition.
@@ -36,11 +37,12 @@ return {
   },
 
   -- 3. nvim-lspconfig: provides server defaults (cmd, filetypes, root detection)
-  --    consumed automatically by vim.lsp.config via the runtimepath lsp/ dir.
+  --    Must load eagerly (no event lazy-loading) so its lsp/*.lua files are on
+  --    the runtimepath when mason-lspconfig calls vim.lsp.enable() at startup.
   --    Do NOT use require('lspconfig') -- deprecated in favour of vim.lsp.config.
   {
     "neovim/nvim-lspconfig",
-    event = { "BufReadPre", "BufNewFile" },
+    lazy = false,
     dependencies = {
       "mason-org/mason.nvim",
       "mason-org/mason-lspconfig.nvim",
