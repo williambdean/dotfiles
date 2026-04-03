@@ -1,6 +1,8 @@
 -- Taken from https://www.youtube.com/watch?v=pKCzpfqBbYs
 local set = vim.opt_local
 
+require("config.workflow").setup()
+
 set.cursorcolumn = true
 set.expandtab = true
 set.shiftwidth = 2
