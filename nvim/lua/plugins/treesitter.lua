@@ -105,11 +105,10 @@ end
 return {
   { "powerman/vim-plugin-AnsiEsc" },
   {
+    -- v2 rewrite, requires Neovim 0.12+. Does NOT support lazy-loading.
     "nvim-treesitter/nvim-treesitter",
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter-textobjects",
-    },
-    ft = { "python" },
+    branch = "main",
+    lazy = false,
     build = ":TSUpdate",
     cmd = {
       "TSUpdate",
@@ -117,17 +116,28 @@ return {
       "FoldDocstrings",
       "UnfoldDocstrings",
     },
-    keys = {
-      { "ab", mode = "o" },
-      { "ib", mode = "o" },
-      { "af", mode = "o" },
-      { "if", mode = "o" },
-      { "ac", mode = "o" },
-      { "ic", mode = "o" },
-      { "il", mode = "o" },
-      { "al", mode = "o" },
-    },
     config = function()
+      -- v2 API: only install_dir is configurable via setup()
+      require("nvim-treesitter").setup {}
+
+      -- Install parsers (no-op if already installed)
+      require("nvim-treesitter").install {
+        "python",
+        "graphql",
+        "rst",
+        "markdown",
+        "markdown_inline",
+        "bash",
+      }
+
+      -- Enable treesitter highlighting and indent for relevant filetypes
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "python", "graphql", "markdown", "bash", "sh" },
+        callback = function()
+          vim.treesitter.start()
+        end,
+      })
+
       -- Create Neovim commands to fold/unfold docstrings
       -- vim.api.nvim_create_user_command("FoldDocstrings", fold_docstrings, {})
       -- vim.api.nvim_create_user_command(
@@ -135,74 +145,42 @@ return {
       --   unfold_docstrings,
       --   {}
       -- )
-
-      -- -- Autocmd to run FoldDocstrings when entering a Python file
-      -- local fold_docstrings_group =
-      --     vim.api.nvim_create_augroup("FoldDocstringGroup", { clear = true })
-      -- vim.api.nvim_create_autocmd("FileType", {
-      --   pattern = "python",
-      --   callback = function()
-      --     local bufnr = tostring(vim.api.nvim_get_current_buf())
-      --
-      --     if docstrings_are_folded[bufnr] == nil then
-      --       docstrings_are_folded[bufnr] = false
-      --     end
-      --
-      --     if docstrings_are_folded[bufnr] then
-      --       return
-      --     end
-      --
-      --     vim.cmd "FoldDocstrings"
-      --   end,
-      --   group = fold_docstrings_group,
-      -- })
-
-      require("nvim-treesitter.configs").setup {
-        ensure_installed = {
-          "python",
-          "graphql",
-          "rst",
-        },
-        highlight = {
-          enable = true,
-        },
-        indent = {
-          enable = true,
-        },
-        incremental_selection = {
-          enable = true,
-        },
-        refactor = {
-          highlight_definitions = {
-            enable = true,
-          },
-        },
-        textobjects = {
-          -- swap = {
-          --     enable = true,
-          --     swap_next = {
-          --         ["<leader>a"] = "@parameter.inner",
-          --     },
-          --     swap_previous = {
-          --         ["<leader>A"] = "@parameter.inner",
-          --     },
-          -- },
-          select = {
-            enable = true,
-            keymaps = {
-              ["ab"] = "@block.outer",
-              ["ib"] = "@block.inner",
-              ["af"] = "@function.outer",
-              ["if"] = "@function.inner",
-              ["ac"] = "@class.outer",
-              ["ic"] = "@class.inner",
-              ["il"] = "@loop.inner",
-              ["al"] = "@loop.outer",
-            },
-          },
+    end,
+  },
+  {
+    "nvim-treesitter/nvim-treesitter-textobjects",
+    branch = "main",
+    lazy = false,
+    init = function()
+      -- Disable built-in ftplugin mappings to avoid conflicts
+      vim.g.no_plugin_maps = true
+    end,
+    config = function()
+      require("nvim-treesitter-textobjects").setup {
+        select = {
+          lookahead = true,
         },
       }
+
+      -- Textobject keymaps (operator-pending and visual mode)
+      local select = require "nvim-treesitter-textobjects.select"
+      local maps = {
+        ["ab"] = "@block.outer",
+        ["ib"] = "@block.inner",
+        ["af"] = "@function.outer",
+        ["if"] = "@function.inner",
+        ["ac"] = "@class.outer",
+        ["ic"] = "@class.inner",
+        ["il"] = "@loop.inner",
+        ["al"] = "@loop.outer",
+      }
+      for key, query in pairs(maps) do
+        vim.keymap.set({ "x", "o" }, key, function()
+          select.select_textobject(query, "textobjects")
+        end, { desc = "Treesitter: " .. query })
+      end
     end,
   },
   -- { "nvim-treesitter/nvim-treesitter-context" },
+  { "dearrrfish/vim-applescript", ft = "applescript" },
 }
