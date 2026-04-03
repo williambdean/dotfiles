@@ -280,8 +280,7 @@ return {
     requires = {
       "copilotlsp-nvim/copilot-lsp", -- (optional) for NES functionality
     },
-    -- cmd = { "Copilot" },
-    -- event = "InsertEnter",
+    event = "InsertEnter",
     opts = {},
   },
   -- {
@@ -365,6 +364,7 @@ return {
   {
     "CopilotC-Nvim/CopilotChat.nvim",
     branch = "main",
+    event = "VeryLazy",
     dependencies = {
       { "zbirenbaum/copilot.lua" },
       -- { "github/copilot.vim" },
@@ -403,7 +403,6 @@ return {
       build = function()
         vim.notify "Please update the remote plugins by running :UpdateRemotePlugins, the"
       end,
-      event = "VeryLazy",
     },
     keys = {
       {

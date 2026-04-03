@@ -42,7 +42,15 @@ opt.splitright = true
 require("lazy").setup {
   spec = {
     { import = "plugins" },
-    { "sindrets/diffview.nvim" },
+    {
+      "sindrets/diffview.nvim",
+      cmd = {
+        "DiffviewOpen",
+        "DiffviewClose",
+        "DiffviewFileHistory",
+        "DiffviewToggleFiles",
+      },
+    },
     -- {
     -- "polarmutex/git-worktree.nvim",
     --
@@ -53,15 +61,7 @@ require("lazy").setup {
     --   "dimtion/guttermarks.nvim",
     --   event = { "BufReadPost", "BufNewFile", "BufWritePre" },
     -- },
-    { "lark-parser/vim-lark-syntax" },
-    {
-      "vhyrro/luarocks.nvim",
-      priority = 1000, -- High priority is recommended
-      opts = {
-        rocks = { "lua-toml" }, -- Example: specify LuaRocks packages to install
-        -- luarocks_build_args = { "--with-lua=/my/path" }, -- Optional: extra build arguments
-      },
-    },
+    { "lark-parser/vim-lark-syntax", ft = { "lark" } },
     {
       "L3MON4D3/LuaSnip",
       -- follow latest release.
@@ -76,6 +76,7 @@ require("lazy").setup {
     },
     {
       dir = "~/github/neovim-plugins/ruff-rules.nvim",
+      cmd = { "RuffRules" },
       dependencies = {
         "nvim-lua/plenary.nvim",
         "nvim-telescope/telescope.nvim",
@@ -108,9 +109,9 @@ require("lazy").setup {
     -- },
     {
       "chomosuke/typst-preview.nvim",
-      lazy = false, -- or ft = 'typst'
+      ft = "typst",
       version = "1.*",
-      opts = {}, -- lazy.nvim will implicitly calls `setup {}`
+      opts = {},
     },
     {
       "iamcco/markdown-preview.nvim",
@@ -127,6 +128,7 @@ require("lazy").setup {
     },
     {
       "stevearc/conform.nvim",
+      event = { "BufWritePre" },
       opts = {
         format_on_save = {
           -- These options will be passed to conform.format()
@@ -137,6 +139,7 @@ require("lazy").setup {
     },
     {
       "Eandrju/cellular-automaton.nvim",
+      cmd = { "CellularAutomaton" },
       config = function()
         vim.keymap.set(
           "n",
@@ -152,10 +155,20 @@ require("lazy").setup {
     },
     {
       dir = "~/GitHub/neovim-plugins/toggl.nvim",
+      cmd = {
+        "Toggl",
+        "TogglInit",
+        "TogglList",
+        "TogglConfig",
+        "TogglCurrent",
+        "TogglStop",
+        "TogglProjects",
+      },
       opts = {},
     },
     {
       dir = "~/GitHub/neovim-plugins/go-to",
+      cmd = { "ShowCommands", "EditCommands", "AddCommand", "DeleteCommand" },
       opts = {
         display_only = false,
       },
@@ -457,23 +470,31 @@ vim.o.updatetime = 100
 require "config.terminal"
 -- require "config.issues_prs"
 require "config.quick_files"
-require "config.github_queries"
-require "config.latest_prs"
-require "config.link"
 require "config.hash"
 require "config.zoom"
 require "config.command-helper"
-require "config.gist-comments"
-require "config.gist"
-require "config.snippets"
 require "config.register"
 require "config.dump"
 -- require "config.repos"
-require("config.github").setup()
 require "config.code-block"
-require "config.gitignore"
 require "config.worktrees"
-require "config.github-browse"
+
+-- Defer modules that pull in heavy dependencies (octo, luasnip, telescope) until after startup
+vim.api.nvim_create_autocmd("User", {
+  pattern = "VeryLazy",
+  once = true,
+  callback = function()
+    require "config.github_queries"
+    require "config.latest_prs"
+    require "config.gist-comments"
+    require "config.gist"
+    require "config.snippets"
+    require "config.link"
+    require "config.gitignore"
+    require "config.github-browse"
+    require("config.github").setup()
+  end,
+})
 
 local sphinx = require "config.sphinx"
 

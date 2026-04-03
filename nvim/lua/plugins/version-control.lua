@@ -294,47 +294,11 @@ local function open_github_as_octo_buffer()
 end
 
 return {
-  { "akinsho/git-conflict.nvim", opts = {} },
+  { "akinsho/git-conflict.nvim", event = { "BufReadPost" }, opts = {} },
   { "tpope/vim-fugitive", cmd = { "Git", "G", "Gw", "Gvdiffsplit" } },
   {
-    "linrongbin16/gitlinker.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    opts = {},
-    cmd = { "GitLink" },
-    keys = {
-      {
-        "<leader>gy",
-        function()
-          gitlinker_link(require("gitlinker.actions").clipboard)
-        end,
-        desc = "Copy GitHub link",
-        mode = { "n", "v" },
-      },
-    },
-  },
-  {
-    "petertriho/cmp-git",
-    dependencies = { "hrsh7th/nvim-cmp" },
-    ft = { "gitcommit", "octo", "markdown" },
-    opts = {
-      -- options go here
-    },
-    init = function()
-      table.insert(require("cmp").get_config().sources, { name = "git" })
-    end,
-    config = function()
-      require("cmp_git").setup {
-        filetypes = {
-          "gitcommit",
-          "octo",
-          -- Based on the gh pr create popup
-          "markdown",
-        },
-      }
-    end,
-  },
-  {
     "lewis6991/gitsigns.nvim",
+    event = { "BufReadPost" },
     opts = {},
     keys = {
       {
@@ -565,7 +529,7 @@ return {
         desc = "Create gist from selection",
       },
     },
-    depencencies = {
+    dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-tree/nvim-web-devicons",
       "nvim-telescope/telescope.nvim",
