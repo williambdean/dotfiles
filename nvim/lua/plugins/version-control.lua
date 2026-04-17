@@ -76,19 +76,31 @@ local function get_remotes()
 end
 
 ---@param action fun(opts: table) The action to perform with gitlinker
-local function gitlinker_link(action)
+---@param range? { lstart: integer, lend: integer }
+local function gitlinker_link(action, range)
   local remotes = get_remotes()
   if #remotes == 0 then
     vim.notify("No git remotes found", vim.log.levels.ERROR)
     return
   end
 
-  local lstart = vim.fn.line "'<"
-  local lend = vim.fn.line "'>"
-
-  if lstart == 0 or lend == 0 then
-    vim.notify("No visual selection found", vim.log.levels.ERROR)
-    return
+  local lstart, lend
+  if range then
+    lstart = range.lstart
+    lend = range.lend
+  else
+    local a = vim.fn.line "'<"
+    local b = vim.fn.line "'>"
+    if a == 0 or b == 0 then
+      -- Normal mode: link just the current line
+      local cur = vim.fn.line "."
+      lstart = cur
+      lend = cur
+    else
+      -- Ensure correct order regardless of selection direction
+      lstart = math.min(a, b)
+      lend = math.max(a, b)
+    end
   end
 
   local callback = function(remote)
@@ -295,6 +307,38 @@ end
 
 return {
   { "akinsho/git-conflict.nvim", event = { "BufReadPost" }, opts = {} },
+  {
+    "linrongbin16/gitlinker.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = {},
+    cmd = { "GitLink" },
+    keys = {
+      {
+        "<leader>gy",
+        function()
+          -- Capture marks before lazy-load triggers (marks can shift after load)
+          local mode = vim.fn.mode()
+          local range
+          if mode == "v" or mode == "V" or mode == "\22" then
+            -- Still in visual mode: get positions directly
+            local a = vim.fn.line "v"
+            local b = vim.fn.line "."
+            range = { lstart = math.min(a, b), lend = math.max(a, b) }
+          else
+            -- Normal mode or post-visual: use '< '> marks
+            local a = vim.fn.line "'<"
+            local b = vim.fn.line "'>"
+            if a ~= 0 and b ~= 0 then
+              range = { lstart = math.min(a, b), lend = math.max(a, b) }
+            end
+          end
+          gitlinker_link(require("gitlinker.actions").clipboard, range)
+        end,
+        desc = "Copy GitHub link",
+        mode = { "n", "v" },
+      },
+    },
+  },
   { "tpope/vim-fugitive", cmd = { "Git", "G", "Gw", "Gvdiffsplit" } },
   {
     "lewis6991/gitsigns.nvim",
