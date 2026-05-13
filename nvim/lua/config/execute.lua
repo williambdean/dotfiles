@@ -50,28 +50,41 @@ local get_code_in_code_block = function()
   local cursor_pos = vim.api.nvim_win_get_cursor(0)
   local cursor_row = cursor_pos[1] - 1 -- 0-indexed
 
+  local code_block_node = nil
+  local language_node = nil
+
   for id, node, metadata in query:iter_captures(root, bufnr, 0, -1) do
     local name = query.captures[id]
-    if name == "code_block" then
+    if name == "language" then
+      language_node = node
+    elseif name == "code_block" then
       local start_row, _, end_row, _ = node:range()
       if cursor_row >= start_row and cursor_row <= end_row then
-        local language = metadata.language or "text"
-        return {
-          code = vim.treesitter.get_node_text(node, bufnr),
-          language = language,
-          range = {
-            start = start_row,
-            stop = end_row,
-          },
-        }
+        code_block_node = node
       end
     end
   end
 
+  if not code_block_node then
+    return {
+      code = nil,
+      language = nil,
+      range = nil,
+    }
+  end
+
+  local start_row, _, end_row, _ = code_block_node:range()
+  local language = language_node
+      and vim.treesitter.get_node_text(language_node, bufnr)
+    or "text"
+
   return {
-    code = nil,
-    language = nil,
-    range = nil,
+    code = vim.treesitter.get_node_text(code_block_node, bufnr),
+    language = language,
+    range = {
+      start = start_row,
+      stop = end_row,
+    },
   }
 end
 
@@ -96,6 +109,7 @@ end
 M.copy_output_to_clipboard = function()
   local code_details = get_code_in_code_block()
   local code = code_details.code
+  local language = code_details.language
 
   if not code then
     return
@@ -103,7 +117,7 @@ M.copy_output_to_clipboard = function()
 
   highlight_range(code_details.range, 250)
 
-  M.async(code, function(output)
+  local function handle_output(output)
     if output == "" then
       vim.notify("No output from the code block.", vim.log.levels.WARN, {
         title = "Execute Code",
@@ -119,7 +133,33 @@ M.copy_output_to_clipboard = function()
         title = "Execute Code",
       }
     )
-  end)
+  end
+
+  if
+    language == "bash"
+    or language == "sh"
+    or language == "zsh"
+    or language == "terminal"
+  then
+    Job:new({
+      command = "bash",
+      args = { "-c", code },
+      on_exit = vim.schedule_wrap(function(j_self, _, _)
+        local output = table.concat(j_self:result(), "\n")
+        local stderr = table.concat(j_self:stderr_result(), "\n")
+        if stderr ~= "" then
+          vim.api.nvim_err_writeln("Error executing shell command: " .. stderr)
+        end
+        handle_output(output)
+      end),
+    }):start()
+  elseif language == "python" or language == "py" then
+    M.async(code, handle_output)
+  else
+    vim.notify("Unsupported language: " .. language, vim.log.levels.WARN, {
+      title = "Execute Code",
+    })
+  end
 end
 
 return M
