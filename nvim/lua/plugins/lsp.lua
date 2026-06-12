@@ -77,10 +77,18 @@ return {
           python = {
             analysis = {
               diagnosticMode = "openFilesOnly",
-              typeCheckingMode = "off", -- Let Ruff handle diagnostics
+              typeCheckingMode = "off",
             },
           },
         },
+        on_new_config = function(new_config, root_dir)
+          local venv = root_dir .. "/.venv"
+          if vim.fn.isdirectory(venv) == 1 then
+            new_config.settings.python.pythonPath = venv .. "/bin/python"
+            new_config.settings.python.venvPath = root_dir
+            new_config.settings.python.venv = ".venv"
+          end
+        end,
       })
 
       -- LSP Keymaps
