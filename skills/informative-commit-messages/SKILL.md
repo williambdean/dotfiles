@@ -19,3 +19,9 @@ Use a prefix of `!` in the case of a breaking change.
 
 If a specific commit will close a GitHub issue, use "Closes #<issue-number>" in
 order to trigger GitHub automation.
+
+Get the commit style for the current repo:
+
+```bash
+git log --oneline -10
+```
