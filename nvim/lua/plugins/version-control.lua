@@ -306,7 +306,11 @@ local function open_github_as_octo_buffer()
 end
 
 return {
-  { "akinsho/git-conflict.nvim", event = { "BufReadPost" }, opts = {} },
+  {
+    "akinsho/git-conflict.nvim",
+    event = { "BufReadPost" },
+    opts = {},
+  },
   {
     "linrongbin16/gitlinker.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
@@ -699,7 +703,7 @@ return {
             end,
             picker = function()
               require("config.easy_picker").new(
-                { "telescope", "fzf-lua", "snacks" },
+                { "telescope", "fzf-lua", "snacks", "default" },
                 {
                   selected_callback = function(selected)
                     local cfg = require("octo.config").values
