@@ -280,6 +280,10 @@ opt.softtabstop = 4
 opt.shiftwidth = 4
 opt.expandtab = true
 
+-- Show whitespace characters
+opt.list = true
+opt.listchars = "space:·,tab:>·"
+
 -- Enable smart indentation
 opt.smartindent = true
 
@@ -458,6 +462,25 @@ end
 -- --
 -- -- Enable transparency initially
 -- enable_transparency()
+
+-- Fix paste with Kitty Keyboard Protocol (KKP).
+-- Ghostty KKP-encodes newlines (\n) as \e[106;5u (Ctrl+J) in paste content.
+-- vim.paste splits input on \n, but none exist, so the entire paste arrives
+-- as one line with embedded KKP sequences. We intercept vim.paste, replace
+-- the sequences with real newlines, and re-split before passing through.
+do
+  local orig_paste = vim.paste
+  ---@diagnostic disable-next-line: duplicate-set-field
+  vim.paste = function(lines, phase)
+    local text = table.concat(lines, "\n")
+    -- \e[106;5u = KKP encoding of Ctrl+J (newline)
+    -- \e[13;2u  = KKP encoding of Shift+Enter (also used as newline)
+    text = text:gsub("\27%[106;5u", "\n")
+    text = text:gsub("\27%[13;2u", "\n")
+    lines = vim.split(text, "\n", { plain = true })
+    return orig_paste(lines, phase)
+  end
+end
 
 -- Trying to speed up the motions
 vim.o.timeoutlen = 300
