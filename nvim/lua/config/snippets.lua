@@ -6,6 +6,18 @@ local ps = ls.parser.parse_snippet
 
 ls.add_snippets("python", {
   ps(
+    "script",
+    [[
+    # /// script
+    # dependencies = [$1]
+    # requires-python = ">=${2:3.13}"
+    # ///
+
+
+    $3
+  ]]
+  ),
+  ps(
     "random",
     [[
   import numpy as np
