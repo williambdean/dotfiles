@@ -35,8 +35,6 @@ alias discussions="nvim -c ':Octo discussion list'"
 alias prs="nvim -c ':Octo pr list'"
 alias develop="nvim -c ':Octo issue develop'"
 alias merged="nvim -c ':Octo search repo:{owner}/{repo} is:merged'"
-alias switch="gh auth switch"
-
 alias db="nvim -c ':DBUI'"
 
 # Docker
@@ -51,3 +49,19 @@ alias bvim="NVIM_APPNAME=bare-config nvim"
 
 alias todo="nvim todo.md"
 alias q=exit
+
+# Define a function to search DuckDuckGo
+
+function \? () {
+    # Join arguments or read from pipe
+    local input="${*:-$(cat)}"
+    # URL encode spaces to %20
+    local query=$(echo "$input" | sed 's/ /%20/g')
+    w3m -o confirm_qq=false -no-cookie "https://duckduckgo.com/?q=$query"
+}
+# The 'noglob' alias makes it work without quotes
+alias \?='noglob \?'
+
+alias '??'='opencode run --model opencode/big-pickle'
+
+alias wts"wt switch"

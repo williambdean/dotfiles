@@ -403,6 +403,26 @@ function cd-new() {
     cd $(new-location)
 }
 
+# Colored man pages - https://youtu.be/D0sG2fj0G4Y
+# https://gist.github.com/bahamas10/542875bb47990933638d2b7dfaa501bf
+man() {
+    LESS_TERMCAP_mb="$(tput bold; tput setaf 1)" \
+    LESS_TERMCAP_md="$(tput bold; tput setaf 1)" \
+    LESS_TERMCAP_me="$(tput sgr0)" \
+    LESS_TERMCAP_se="$(tput sgr0)" \
+    LESS_TERMCAP_so="$(tput bold; tput setaf 3; tput setab 4)" \
+    LESS_TERMCAP_ue="$(tput sgr0)" \
+    LESS_TERMCAP_us="$(tput smul; tput bold; tput setaf 2)" \
+    LESS_TERMCAP_mr="$(tput rev)" \
+    LESS_TERMCAP_mh="$(tput dim)" \
+    LESS_TERMCAP_ZN="$(tput ssubm)" \
+    LESS_TERMCAP_ZV="$(tput rsubm)" \
+    LESS_TERMCAP_ZO="$(tput ssupm)" \
+    LESS_TERMCAP_ZW="$(tput rsupm)" \
+    MANPAGER='less' \
+    command man "$@"
+}
+
 function remove-from-zoxide() {
     local path=$(pwd)
     zoxide remote $path
