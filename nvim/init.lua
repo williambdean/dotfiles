@@ -232,6 +232,13 @@ require("lazy").setup {
       opts = {
         input = { enabled = false },
         picker = { enabled = true },
+        image = {
+          enabled = true,
+          doc = {
+            inline = true,
+            float = true,
+          },
+        },
       },
     },
     {
