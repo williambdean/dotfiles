@@ -1,0 +1,7 @@
+theme = GitHub Dark Dimmed
+# theme = Gruvbox Material Dark
+font-size = 16
+
+# Send Alt+Enter (\e\r) for Shift+Enter.
+# Pi maps alt+enter to tui.input.newLine (newline without submit).
+keybind = shift+enter=text:\x1b\x0d
