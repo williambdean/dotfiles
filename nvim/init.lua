@@ -84,24 +84,24 @@ require("lazy").setup {
       },
       opts = { picker = "telescope" },
     },
-    {
-      dir = "~/github/neovim-plugins/bible-verse.nvim",
-      -- Lazy load on plugin commands
-      cmd = { "BibleVerse", "BibleVerseQuery", "BibleVerseInsert" },
-      dependencies = {
-        "MunifTanjim/nui.nvim",
-      },
-      opts = {
-        diatheke = {
-          -- (MANDATORY)
-          -- Corresponds to the diatheke module; diatheke's -b flag.
-          -- In this example, we are using KJV module.
-          translation = "KJV",
-        },
-      },
-      -- plugin is not set up by default
-      config = true,
-    },
+    -- {
+    --   dir = "~/github/neovim-plugins/bible-verse.nvim",
+    --   -- Lazy load on plugin commands
+    --   cmd = { "BibleVerse", "BibleVerseQuery", "BibleVerseInsert" },
+    --   dependencies = {
+    --     "MunifTanjim/nui.nvim",
+    --   },
+    --   opts = {
+    --     diatheke = {
+    --       -- (MANDATORY)
+    --       -- Corresponds to the diatheke module; diatheke's -b flag.
+    --       -- In this example, we are using KJV module.
+    --       translation = "KJV",
+    --     },
+    --   },
+    --   -- plugin is not set up by default
+    --   config = true,
+    -- },
     -- {
     --   "mluders/comfy-line-numbers.nvim",
     --   opts = {
@@ -131,10 +131,12 @@ require("lazy").setup {
       "stevearc/conform.nvim",
       event = { "BufWritePre" },
       opts = {
+        formatters_by_ft = {
+          python = { "ruff_format", "ruff_organize_imports" },
+        },
         format_on_save = {
           -- These options will be passed to conform.format()
           timeout_ms = 500,
-          -- lsp_format = "fallback",
         },
       },
     },
@@ -168,7 +170,7 @@ require("lazy").setup {
       opts = {},
     },
     {
-      dir = "~/GitHub/neovim-plugins/go-to",
+      dir = "~/GitHub/neovim-plugins/go-to.nvim",
       cmd = { "ShowCommands", "EditCommands", "AddCommand", "DeleteCommand" },
       opts = {
         display_only = false,
@@ -508,7 +510,7 @@ require "config.register"
 require "config.dump"
 -- require "config.repos"
 require "config.code-block"
-require "config.worktrees"
+-- require "config.worktrees"
 
 -- Defer modules that pull in heavy dependencies (octo, luasnip, telescope) until after startup
 vim.api.nvim_create_autocmd("User", {

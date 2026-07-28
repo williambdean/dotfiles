@@ -1,7 +1,6 @@
 [user]
 	email = wd60622@gmail.com
 	name = Will Dean
-	signingkey = /Users/will/.ssh/id_ed25519.pub
 [alias]
     a = add
     br = branch
@@ -14,8 +13,6 @@
     ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate
     s = status --short
     uncommit = reset --sort HEAD^
-[credential]
-	helper = store
 [core]
 	editor = nvim
 [push]
@@ -39,5 +36,7 @@
 	required = true
 [gpg]
 	format = ssh
+[gpg "ssh"]
+	defaultKeyCommand = sh -c 'cat "$HOME/.ssh/id_ed25519.pub"'
 [commit]
 	gpgsign = true
