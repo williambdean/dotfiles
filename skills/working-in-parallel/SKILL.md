@@ -172,3 +172,16 @@ To prune stale worktree metadata (e.g. after a directory was deleted manually):
 ```bash
 git worktree prune
 ```
+
+## Isolated Environments
+
+For applications, please leverage `directory` specification. For example, in a python
+project using `uv`, you can do:
+
+```bash
+uv run --directory ./worktrees/some-feature <your-command>
+```
+
+This is also available using `pixi` as well.
+
+This keeps the environment isolation!
