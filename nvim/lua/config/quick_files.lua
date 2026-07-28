@@ -56,7 +56,7 @@ local create_toggle = function(state)
       -- Save the buffer before hiding the window
       if vim.api.nvim_buf_get_option(state.buf, "modified") then
         vim.api.nvim_buf_call(state.buf, function()
-          vim.cmd "write"
+          vim.cmd.write {}
         end)
       end
       vim.api.nvim_win_hide(state.win)
@@ -139,6 +139,9 @@ vim.api.nvim_create_user_command("QuickFile", function()
       return entry.file
     end,
   }, function(selected)
+    if selected == nil or selected.file == nil then
+      return
+    end
     vim.cmd.edit(selected.file)
   end)
 end, {})
