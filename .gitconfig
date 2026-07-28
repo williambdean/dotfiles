@@ -1,7 +1,6 @@
 [user]
 	email = wd60622@gmail.com
 	name = Will Dean
-	signingkey = /Users/will/.ssh/id_ed25519.pub
 [alias]
     a = add
     br = branch
