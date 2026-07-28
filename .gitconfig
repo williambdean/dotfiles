@@ -36,5 +36,7 @@
 	required = true
 [gpg]
 	format = ssh
+[gpg "ssh"]
+	defaultKeyCommand = sh -c 'cat "$HOME/.ssh/id_ed25519.pub"'
 [commit]
 	gpgsign = true
