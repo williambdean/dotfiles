@@ -101,20 +101,9 @@ return {
         end,
       })
 
-      -- Auto-format on save
+      -- Format-on-save is handled by conform.nvim (see init.lua).
+      -- Keep a toggle so LspDisableFormat can still suppress it if needed.
       local lsp_format_enabled = true
-      vim.api.nvim_create_autocmd("BufWritePre", {
-        group = group,
-        callback = function(ev)
-          if vim.bo.filetype == "markdown" or not lsp_format_enabled then
-            return
-          end
-          -- pcall prevents save from hanging on LSP errors
-          pcall(function()
-            vim.lsp.buf.format { bufnr = ev.buf, async = false }
-          end)
-        end,
-      })
 
       -- Diagnostics UI
       vim.diagnostic.config {

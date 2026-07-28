@@ -13,8 +13,6 @@
     ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate
     s = status --short
     uncommit = reset --sort HEAD^
-[credential]
-	helper = store
 [core]
 	editor = nvim
 [push]
@@ -25,10 +23,10 @@
 	rebase = false
 [credential "https://github.com"]
 	helper =
-	helper = !/home/linuxbrew/.linuxbrew/bin/gh auth git-credential
+	helper = !/opt/homebrew/bin/gh auth git-credential
 [credential "https://gist.github.com"]
 	helper =
-	helper = !/home/linuxbrew/.linuxbrew/bin/gh auth git-credential
+	helper = !/opt/homebrew/bin/gh auth git-credential
 [advice]
 	detachedHead = false
 [filter "lfs"]
