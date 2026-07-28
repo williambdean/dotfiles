@@ -42,6 +42,7 @@ opt.splitright = true
 require("lazy").setup {
   spec = {
     { import = "plugins" },
+    { "tjdevries/sPoNGe-BoB.NvIm" },
     {
       "sindrets/diffview.nvim",
       cmd = {
@@ -411,7 +412,7 @@ vim.api.nvim_create_autocmd({ "TermOpen", "TextYankPost" }, {
       vim.opt_local.number = false
       vim.opt_local.relativenumber = false
     else
-      vim.highlight.on_yank { timeout = 250 }
+      vim.hl.hl_op { timeout = 250 }
     end
   end,
 })

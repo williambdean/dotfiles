@@ -4,7 +4,7 @@
 local vim = vim
 local M = {}
 
----@alias Type "Commit" | "Issue" | "PullRequest" | "Discussion" | "Release"
+---@alias Type "Commit" | "Issue" | "PullRequest" | "Discussion" | "Release" | "RepositoryDependabotAlertsThread"
 ---
 ---@class NotificationCount
 ---@field type Type
@@ -14,9 +14,10 @@ local M = {}
 local mapping = {
   Commit = " ",
   Issue = " ",
-  PullRequest = " ",
+  PullRequest = " ",
   Discussion = " ",
   Release = " ",
+  RepositoryDependabotAlertsThread = " ",
 }
 
 local minutes = 1
